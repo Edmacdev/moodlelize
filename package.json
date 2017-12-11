@@ -1,0 +1,25 @@
+{
+  "name": "moodlelize",
+  "version": "1.0.0",
+  "description": "MEAN stack Web App",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app"
+  },
+  "dependencies": {
+    "bcryptjs": "*",
+    "body-parser": "*",
+    "cors": "*",
+    "express": "*",
+    "jsonwebtoken": "*",
+    "mongoose": "*",
+    "passport": "*",
+    "passport-jwt": "*"
+  },
+  "author": "Patrick Cagnoni",
+  "license": "ISC",
+  "devDependencies": {
+    "@angular/cli": "^1.6.0"
+  }
+}
