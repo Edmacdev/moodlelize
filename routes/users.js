@@ -8,16 +8,16 @@ const config = require('../config/database')
 //Register
 router.post('/register', (req, res) =>{
   let newUser = new User({
-    name: req.body.name,
+
     email: req.body.email,
     username: req.body.username,
     password: req.body.password
   });
   User.addUser(newUser, (err, user) =>{
     if(err){
-      res.json({success: false, msg:'Failed to register user ' + err})
+      res.json({success: false, msg:'Erro ao registrar usuário ' + err})
     }else{
-      res.json({success: true, msg: 'User register'})
+      res.json({success: true, msg: 'Usuário registrado'})
     }
   })
 
@@ -30,7 +30,7 @@ router.post('/authenticate', (req, res, next) =>{
   User.getUserByUsername(username,  (err, user) => {
     if(err)throw err;
     if(!user){
-      return res.json({success: false, msg: 'User Not Found'})
+      return res.json({success: false, msg: 'Usuário não encontrado'})
     }
     User.comparePassword(password, user.password, (err, isMatch) => {
       if(err) throw err;
@@ -50,7 +50,7 @@ router.post('/authenticate', (req, res, next) =>{
           }
         });
       }else {
-        return res.json({success: false, msg: 'Wrong password'});
+        return res.json({success: false, msg: 'Senha incorreta'});
       }
     })
   })

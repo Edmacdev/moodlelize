@@ -48,16 +48,14 @@ require('./config/passport')(passport);
 app.use(cors());
 
 //Index Route
-app.get('/', (req, res) => {
-  res.send('Invalid Endpoint')
+app.get('', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 //Routes
 app.use('/users', users);
 
-// app.get('/', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'dist/index.html'));
-// });
+
 
 app.listen(port, function(){
   console.log("servidor rodando no localhost: " + port)
