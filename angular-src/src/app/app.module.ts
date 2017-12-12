@@ -7,13 +7,13 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { HomeComponent } from './home/home.component';
-import { RegisterComponent } from './register/register.component';
 
 import { ValidateService } from './services/validate.service';
 import { FlashMessagesModule } from 'angular2-flash-messages'
 import { AuthService } from './services/auth.service';
 import { HttpModule } from '@angular/http';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { ProfileComponent } from './profile/profile.component';
 
 
 @NgModule({
@@ -22,8 +22,8 @@ import { DashboardComponent } from './dashboard/dashboard.component';
     LoginComponent,
     NavbarComponent,
     HomeComponent,
-    RegisterComponent,
-    DashboardComponent
+    DashboardComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,
