@@ -1,19 +1,22 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-
 import { AppRoutingModule } from './app-routing.module';
 import { FormsModule } from '@angular/forms';
+import { FlashMessagesModule } from 'angular2-flash-messages'
+import { HttpModule } from '@angular/http';
+
 import { AppComponent } from './app.component';
-import { LoginComponent } from './login/login.component';
-import { NavbarComponent } from './navbar/navbar.component';
-import { HomeComponent } from './home/home.component';
+import { LoginComponent } from './components/login/login.component';
+import { NavbarComponent } from './components/navbar/navbar.component';
+import { HomeComponent } from './components/home/home.component';
+import { MoodleRegComponent } from './components/moodle-reg/moodle-reg.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { ProfileComponent } from './components/profile/profile.component';
 
 import { ValidateService } from './services/validate.service';
-import { FlashMessagesModule } from 'angular2-flash-messages'
 import { AuthService } from './services/auth.service';
-import { HttpModule } from '@angular/http';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { ProfileComponent } from './profile/profile.component';
+import { AuthGuard } from './guards/auth.guard';
+
 
 
 @NgModule({
@@ -23,7 +26,8 @@ import { ProfileComponent } from './profile/profile.component';
     NavbarComponent,
     HomeComponent,
     DashboardComponent,
-    ProfileComponent
+    ProfileComponent,
+    MoodleRegComponent
   ],
   imports: [
     BrowserModule,
@@ -34,7 +38,8 @@ import { ProfileComponent } from './profile/profile.component';
   ],
   providers: [
     ValidateService,
-    AuthService
+    AuthService,
+    AuthGuard
 
   ],
   bootstrap: [AppComponent]

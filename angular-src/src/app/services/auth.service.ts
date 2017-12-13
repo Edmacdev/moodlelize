@@ -1,13 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Http, Headers } from '@angular/http';
 import 'rxjs/add/operator/map';
+import { tokenNotExpired } from 'angular2-jwt';
 
 @Injectable()
 export class AuthService {
   authToken: any;
   user: any;
-
-   constructor(private http: Http) { }
+  isDev:boolean;
+   constructor(private http: Http) {
+     this.isDev = true; // Change to false before deployment
+   }
 
   registerUser(user){
     let headers = new Headers();
@@ -44,10 +47,20 @@ export class AuthService {
     this.authToken = token;
   }
 
+  loggedIn() {
+    return tokenNotExpired('id_token');
+  }
+
   logout(){
     this.authToken = null;
     this.user = null;
     localStorage.clear();
   }
-
+  prepEndpoint(ep){
+   if(this.isDev){
+     return ep;
+   } else {
+     return 'http://localhost:8080/'+ep;
+   }
+ }
 }

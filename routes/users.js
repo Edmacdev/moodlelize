@@ -22,7 +22,7 @@ router.post('/register', (req, res) =>{
   })
 
 });
-
+ 
 router.post('/authenticate', (req, res, next) =>{
   const username = req.body.username;
   const password = req.body.password;
@@ -57,8 +57,12 @@ router.post('/authenticate', (req, res, next) =>{
 });
 
 //Profile
-router.get('/profile', passport.authenticate('jwt', {session:false}), (req, res) =>{
+router.get('/profile', passport.authenticate('jwt', {session:false}), (req, res, next) => {
   res.json({user: req.user});
 });
+//Profile
+// router.get('/profile', (req, res next) => {
+//
+// })
 
 module.exports = router;
