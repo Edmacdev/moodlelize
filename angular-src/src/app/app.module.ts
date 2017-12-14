@@ -16,8 +16,7 @@ import { ProfileComponent } from './components/profile/profile.component';
 import { ValidateService } from './services/validate.service';
 import { AuthService } from './services/auth.service';
 import { AuthGuard } from './guards/auth.guard';
-
-
+import { MoodleService } from './services/moodle.service';
 
 @NgModule({
   declarations: [
@@ -39,7 +38,8 @@ import { AuthGuard } from './guards/auth.guard';
   providers: [
     ValidateService,
     AuthService,
-    AuthGuard
+    AuthGuard,
+    MoodleService
 
   ],
   bootstrap: [AppComponent]

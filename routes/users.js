@@ -22,7 +22,7 @@ router.post('/register', (req, res) =>{
   })
 
 });
- 
+
 router.post('/authenticate', (req, res, next) =>{
   const username = req.body.username;
   const password = req.body.password;
@@ -60,9 +60,31 @@ router.post('/authenticate', (req, res, next) =>{
 router.get('/profile', passport.authenticate('jwt', {session:false}), (req, res, next) => {
   res.json({user: req.user});
 });
-//Profile
-// router.get('/profile', (req, res next) => {
-//
-// })
+
+//Update user
+router.put('/update', (req, res, next) => {
+  const userId = req.body.userId;
+
+  let moodle = {
+    name: req.body.name,
+    url: req.body.url,
+    token: req.body.token
+  };
+  User.getUserById(userId, (err, user) => {
+    if(err)throw err;
+    if(!user){
+      return res.json({success: false, msg: 'Usuário não encontrado'})
+    };
+
+    user.moodle = req.body.moodle;
+    user.save((err) => {
+      if(err){
+        return res.json({success: false, msg: 'Não foi possível salvar os dados'})
+      }
+      return res.json({success: true, msg: 'Dados salvos com sucesso'});
+    });
+  });
+});
+
 
 module.exports = router;

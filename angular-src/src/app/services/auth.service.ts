@@ -31,7 +31,17 @@ export class AuthService {
     this.loadToken();
     headers.append('Authorization', this.authToken)
     headers.append('Content-Type', 'application/json');
+
     return this.http.get("http://localhost:3000/users/profile", {headers: headers})
+    .map(res => res.json());
+  }
+  updateMoodle(moodle){
+    let headers = new Headers();
+    this.loadToken();
+    headers.append('Authorization', this.authToken)
+    headers.append('Content-Type', 'application/json');
+    console.log('update moodle')
+    return this.http.put("http://localhost:3000/users/update", moodle, {headers: headers})
     .map(res => res.json());
   }
 

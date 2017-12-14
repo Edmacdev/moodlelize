@@ -4,7 +4,7 @@ const config = require('../config/database');
 
 //User Schema
 const UserSchema = mongoose.Schema({
-  
+
   email: {
     type: String,
     require: true
@@ -16,7 +16,14 @@ const UserSchema = mongoose.Schema({
   password: {
     type: String,
     required: true
-  }
+  },
+  moodles: [
+    {
+      url: String,
+      name: String,
+      token:String
+    }
+  ]
 });
 
 const User = module.exports = mongoose.model('User', UserSchema);

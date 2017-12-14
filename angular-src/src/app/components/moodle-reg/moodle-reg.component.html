@@ -1,3 +1,25 @@
-<p>
-  moodle-reg works!
-</p>
+<h2>Administrar Moodles</h2>
+<div class="addItemContainer">
+  <ul>
+    <li *ngFor = "let item of items">
+      {{item}} <span>X</span>
+    </li>
+  </ul>
+</div>
+
+<button  (click)="showDiv()" class="btn btn-primary">+</button>
+<div ng-hide="showDiv()"  class="addItem">
+  <h3>Adicionar novo moodle</h3>
+  <form (submit)="onAddSubmit()">
+    <div class="form-group">
+      <input type="text" [(ngModel)]="name" name="name"class="addText" placeholder="Nome do moodle">
+    </div>
+    <div class="form-group">
+      <input type="text" [(ngModel)]="url" name="url" class="addText" placeholder="Endereço do moodle">
+    </div>
+    <div class="form-group">
+      <input type="text" [(ngModel)]="token" name="token" class="addText" placeholder="Token">
+    </div>
+    <input class="btn btn-primary" type="submit" name="addItem-submit" value="Adicionar">
+  </form>
+</div>
