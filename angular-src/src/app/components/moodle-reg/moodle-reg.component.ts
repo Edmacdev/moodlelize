@@ -44,7 +44,7 @@ export class MoodleRegComponent implements OnInit {
   onAddSubmit(){
 
     const moodle ={
-      userId: this.userId,
+      
       name: this.name,
       url: this.url,
       token: this.token

@@ -37,11 +37,13 @@ export class AuthService {
   }
   updateMoodle(moodle){
     let headers = new Headers();
+    let params = new URLSearchParams();
     this.loadToken();
+    console.log(moodle.userId)
     headers.append('Authorization', this.authToken)
     headers.append('Content-Type', 'application/json');
-    console.log('update moodle')
-    return this.http.put("http://localhost:3000/users/update", moodle, {headers: headers})
+    params.append('id', moodle.userId);
+    return this.http.put("http://localhost:3000/users/update", moodle, {headers: headers, params: params})
     .map(res => res.json());
   }
 

@@ -62,29 +62,20 @@ router.get('/profile', passport.authenticate('jwt', {session:false}), (req, res,
 });
 
 //Update user
-router.put('/update', (req, res, next) => {
-  const userId = req.body.userId;
+router.put('/update/:id', (req, res, next) => {
+  const moodleE ={
 
-  let moodle = {
-    name: req.body.name,
-    url: req.body.url,
-    token: req.body.token
-  };
-  User.getUserById(userId, (err, user) => {
-    if(err)throw err;
-    if(!user){
-      return res.json({success: false, msg: 'Usuário não encontrado'})
-    };
-
-    user.moodle = req.body.moodle;
-    user.save((err) => {
-      if(err){
-        return res.json({success: false, msg: 'Não foi possível salvar os dados'})
-      }
-      return res.json({success: true, msg: 'Dados salvos com sucesso'});
-    });
-  });
+    name: 'raleduc',
+    url: 'ead.raleduc.com.br',
+    token: 'token'
+  }
+  User.updateMoodle(req.params.id, moodleE, (err, user) => {
+    if(err){
+      console.log('erro ocorreu');
+    }else res.send(user);
+  })
 });
+
 
 
 module.exports = router;
