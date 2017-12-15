@@ -1,7 +1,15 @@
 <div class="jumbotron">
   <div class="container">
     <h1 class="display-3">Moodlelize</h1>
-    <p>Plataforma de acesso e administração de moodle</p>
-    <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p>
+    <p>Plataforma de acesso e administração de moodles</p>
+    <!-- <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p> -->
   </div>
+</div>
+<div *ngIf="authService.loggedIn()" >
+  <h3>Bem vindo {{user.username}}</h3>
+  <app-moodle-reg></app-moodle-reg>
+</div>
+<div *ngIf="!authService.loggedIn()">
+  <p>Para utilizar a plataforma, faça o login ou cadastre-se</p>
+  <app-login></app-login>
 </div>

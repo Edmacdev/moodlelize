@@ -63,13 +63,8 @@ router.get('/profile', passport.authenticate('jwt', {session:false}), (req, res,
 
 //Update user
 router.put('/update/:id', (req, res, next) => {
-  const moodleE ={
-
-    name: 'raleduc',
-    url: 'ead.raleduc.com.br',
-    token: 'token'
-  }
-  User.updateMoodle(req.params.id, moodleE, (err, user) => {
+  console.log(req.params.id)
+  User.updateMoodle(req.params.id, req.body, (err, user) => {
     if(err){
       console.log('erro ocorreu');
     }else res.send(user);

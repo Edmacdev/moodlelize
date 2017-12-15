@@ -1,0 +1,9 @@
+<div class="block">
+  <h4>Buscar Cursos</h4>
+  <form (submit)="onSubmit('search', 'Comercial')">
+    <div class="form-group" >
+      <input type="text" [(ngModel)]="searchQuery" name="searchQuery" class=""  class="form-control" placeholder="" value="">
+    </div>
+    <input type="submit" name="search-submit" class="form-control btn btn-primary" value="Buscar">
+  </form>
+</div>

@@ -17,6 +17,8 @@ import { ValidateService } from './services/validate.service';
 import { AuthService } from './services/auth.service';
 import { AuthGuard } from './guards/auth.guard';
 import { MoodleService } from './services/moodle.service';
+import { SearchCoursesComponent } from './components/search-courses/search-courses.component';
+import { MoodleApiService } from './services/moodle-api.service';
 
 @NgModule({
   declarations: [
@@ -26,7 +28,8 @@ import { MoodleService } from './services/moodle.service';
     HomeComponent,
     DashboardComponent,
     ProfileComponent,
-    MoodleRegComponent
+    MoodleRegComponent,
+    SearchCoursesComponent
   ],
   imports: [
     BrowserModule,
@@ -39,7 +42,8 @@ import { MoodleService } from './services/moodle.service';
     ValidateService,
     AuthService,
     AuthGuard,
-    MoodleService
+    MoodleService,
+    MoodleApiService
 
   ],
   bootstrap: [AppComponent]

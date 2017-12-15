@@ -12,13 +12,13 @@ declare var $:any;
   styleUrls: ['./moodle-reg.component.scss']
 })
 export class MoodleRegComponent implements OnInit {
-  items = ['Moodle 1', 'Moodle 2', 'Moodle 3']
 
   user:Object;
   userId: String;
   name: String;
   url: String;
   token: String;
+  moodles:String[];
 
   constructor(
     private authService:AuthService,
@@ -30,6 +30,8 @@ export class MoodleRegComponent implements OnInit {
     $('.addItem').hide();
 
     this.authService.getProfile().subscribe(profile => {
+      this.user = profile.user;
+      this.moodles = profile.user.moodles
       this.userId = profile.user._id;
 
     },
@@ -44,21 +46,12 @@ export class MoodleRegComponent implements OnInit {
   onAddSubmit(){
 
     const moodle ={
-      
       name: this.name,
       url: this.url,
       token: this.token
     }
-    console.log(moodle)
-    this.authService.updateMoodle(moodle).subscribe(data => {
-      if(data.success){
-        this.flashMessage.show('Moodle registrado com sucesso', {cssClass: 'alert-success', timeout:3000});
-        this.router.navigate(['/dashboard'])
-      }else{
-        this.flashMessage.show('Erro ao registrar moodle', {cssClass: 'alert-danger', timeout:3000});
-        this.router.navigate(['/dashboard'])
-      }
-    })
+
+    this.authService.updateMoodle(this.userId, moodle);
   }
 
 }

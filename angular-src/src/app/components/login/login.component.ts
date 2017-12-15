@@ -60,10 +60,10 @@ export class LoginComponent implements OnInit {
     this.authService.registerUser(user).subscribe(data => {
       if(data.success){
         this.flashMessage.show('Usuário registrado com sucesso', {cssClass: 'alert-success', timeout:3000});
-        this.router.navigate(['/login'])
+        this.router.navigate(['/home'])
       }else{
         this.flashMessage.show('Erro ao registrar usuário', {cssClass: 'alert-danger', timeout:3000});
-        this.router.navigate(['/login'])
+        this.router.navigate(['/home'])
       }
     });
   }
@@ -82,10 +82,10 @@ export class LoginComponent implements OnInit {
       if(data.success){
         this.authService.storeUserData(data.token, data.user);
         this.flashMessage.show('Você está logado', {cssClass: 'alert-success', timeout: 5000});
-        this.router.navigate(['dashboard']);
+        this.router.navigate(['home']);
       }else{
         this.flashMessage.show(data.msg, {cssClass: 'alert-danger', timeout:3000});
-        this.router.navigate(['login']);
+        this.router.navigate(['home']);
       }
     });
   }

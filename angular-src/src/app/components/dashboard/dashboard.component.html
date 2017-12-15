@@ -1,2 +1,9 @@
 <h1>DASHBOARD</h1>
-<app-moodle-reg></app-moodle-reg>
+<div *ngIf="user">
+  <h2 >Moodle {{user.moodles[0].name}}</h2>
+  <div class="row">
+    <div class="col-md-6 block">
+      <app-search-courses></app-search-courses>
+    </div>
+  </div>
+</div>

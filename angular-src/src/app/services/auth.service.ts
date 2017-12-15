@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers } from '@angular/http';
+import { Http, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/add/operator/map';
 import { tokenNotExpired } from 'angular2-jwt';
 
@@ -11,7 +11,7 @@ export class AuthService {
    constructor(private http: Http) {
      this.isDev = true; // Change to false before deployment
    }
-
+// User
   registerUser(user){
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
@@ -31,22 +31,9 @@ export class AuthService {
     this.loadToken();
     headers.append('Authorization', this.authToken)
     headers.append('Content-Type', 'application/json');
-
     return this.http.get("http://localhost:3000/users/profile", {headers: headers})
     .map(res => res.json());
   }
-  updateMoodle(moodle){
-    let headers = new Headers();
-    let params = new URLSearchParams();
-    this.loadToken();
-    console.log(moodle.userId)
-    headers.append('Authorization', this.authToken)
-    headers.append('Content-Type', 'application/json');
-    params.append('id', moodle.userId);
-    return this.http.put("http://localhost:3000/users/update", moodle, {headers: headers, params: params})
-    .map(res => res.json());
-  }
-
   storeUserData(token, user){
     localStorage.setItem('id_token', token);
     localStorage.setItem('user', JSON.stringify(user));
@@ -75,4 +62,15 @@ export class AuthService {
      return 'http://localhost:8080/'+ep;
    }
  }
+
+//Moodle
+updateMoodle(id, moodle){
+  let headers = new Headers();
+  let options = new RequestOptions({ headers: headers });
+  headers.append('Content-Type', 'application/json');
+  let body = JSON.stringify(moodle);
+  console.log('headers: ' + headers + 'options: ' + options + 'body: ' + body)
+  return this.http.put("http://localhost:3000/users/update/" + id, body, options)
+  .map(res => res.json());
+}
 }
