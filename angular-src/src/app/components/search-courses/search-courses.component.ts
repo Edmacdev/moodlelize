@@ -7,13 +7,21 @@ import { MoodleApiService } from '../../services/moodle-api.service';
   styleUrls: ['./search-courses.component.scss']
 })
 export class SearchCoursesComponent implements OnInit {
-
+  results: [Object];
   constructor(private moodleApiService: MoodleApiService) { }
 
   ngOnInit() {
   }
-  onSubmit(name, value){
-    this.moodleApiService.core_course_search_courses(name, value);
+  onSubmit(value){
+    this.moodleApiService.core_course_search_courses(value).subscribe(data => {
+      if(data){
+
+        this.results = data.courses;
+        console.log(data.courses)
+      }else{
+        console.log('erro');
+      }
+    });
   }
 
 }

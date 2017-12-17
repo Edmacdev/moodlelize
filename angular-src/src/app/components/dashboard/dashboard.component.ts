@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,18 +11,26 @@ import { Router } from '@angular/router';
 export class DashboardComponent implements OnInit {
 
   user:Object;
-  constructor(private authService: AuthService, private router:Router) { }
+  index:number;
+
+  constructor(private authService: AuthService,  private router:ActivatedRoute) { }
 
   ngOnInit() {
 
     this.authService.getProfile().subscribe(profile => {
       this.user = profile.user;
-      console.log (this.user)
+
     },
     err => {
       console.log(err);
       return false;
     });
 
+    this.router.params.subscribe(params => {
+      this.index = +params['i'];
+    })
+
   }
+
+
 }

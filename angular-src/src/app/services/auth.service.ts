@@ -38,7 +38,7 @@ export class AuthService {
     localStorage.setItem('id_token', token);
     localStorage.setItem('user', JSON.stringify(user));
     this.authToken = token;
-    this.user = user;
+    this.user = user; 
   }
 
   loadToken(){
@@ -69,7 +69,7 @@ updateMoodle(id, moodle){
   let options = new RequestOptions({ headers: headers });
   headers.append('Content-Type', 'application/json');
   let body = JSON.stringify(moodle);
-  console.log('headers: ' + headers + 'options: ' + options + 'body: ' + body)
+  console.log(body)
   return this.http.put("http://localhost:3000/users/update/" + id, body, options)
   .map(res => res.json());
 }

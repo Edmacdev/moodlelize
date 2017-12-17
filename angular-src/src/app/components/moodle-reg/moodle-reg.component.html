@@ -1,7 +1,7 @@
 <h2>Administrar Moodles</h2>
 <div class="addItemContainer">
   <ul>
-    <li *ngFor = "let moodle of moodles" [routerLink]="['/dashboard']">
+    <li *ngFor = "let moodle of moodles; let i = index" [routerLink]="['/dashboard', i]">
       {{moodle.name}} <span>X</span>
     </li>
   </ul>
@@ -23,4 +23,3 @@
     <input class="btn btn-primary" type="submit" name="addItem-submit" value="Adicionar">
   </form>
 </div>
- 

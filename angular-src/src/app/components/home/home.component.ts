@@ -10,6 +10,7 @@ import { AuthService } from '../../services/auth.service';
 export class HomeComponent implements OnInit {
 
 user:Object;
+username:String;
 
   constructor(
     private router: Router,
@@ -24,6 +25,8 @@ user:Object;
   getProfile(){
     this.authService.getProfile().subscribe(profile => {
       this.user = profile.user;
+      this.username = profile.user.username
+    
     },
     err => {
       console.log(err);

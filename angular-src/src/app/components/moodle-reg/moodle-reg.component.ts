@@ -18,7 +18,7 @@ export class MoodleRegComponent implements OnInit {
   name: String;
   url: String;
   token: String;
-  moodles:String[];
+  moodles:Object;
 
   constructor(
     private authService:AuthService,
@@ -31,7 +31,7 @@ export class MoodleRegComponent implements OnInit {
 
     this.authService.getProfile().subscribe(profile => {
       this.user = profile.user;
-      this.moodles = profile.user.moodles
+      this.moodles = profile.user.moodles;
       this.userId = profile.user._id;
 
     },
@@ -51,7 +51,15 @@ export class MoodleRegComponent implements OnInit {
       token: this.token
     }
 
-    this.authService.updateMoodle(this.userId, moodle);
+    this.authService.updateMoodle(this.userId, moodle).subscribe(data => {
+      if(data.success){
+        this.flashMessage.show('Usuário registrado com sucesso', {cssClass: 'alert-success', timeout:3000});
+        document.location.reload(true);
+      }else{
+        this.flashMessage.show('Erro ao registrar usuário', {cssClass: 'alert-danger', timeout:3000});
+        document.location.reload(true);
+      }
+    });
   }
 
 }

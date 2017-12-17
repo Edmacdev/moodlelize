@@ -6,7 +6,7 @@
   </div>
 </div>
 <div *ngIf="authService.loggedIn()" >
-  <h3>Bem vindo {{user.username}}</h3>
+  <h3>Bem vindo {{username}}</h3>
   <app-moodle-reg></app-moodle-reg>
 </div>
 <div *ngIf="!authService.loggedIn()">

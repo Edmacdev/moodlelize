@@ -53,11 +53,10 @@ module.exports.comparePassword = function(candidatePassword, hash, callback){
   });
 }
 module.exports.updateMoodle = function(id, moodle, callback){
-  
-  User.findOneAndUpdate(
-    {_id: id},
-    {$set:{moodles: moodle}},
-      {upsert: true},
+
+  User.update(
+    {"_id": id},
+    {$push:{"moodles": moodle}},
       callback
     );
 }

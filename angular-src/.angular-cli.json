@@ -21,7 +21,7 @@
       "styles": [
         "styles.scss"
       ],
-      "scripts": [    
+      "scripts": [
         "../node_modules/bootstrap/dist/js/bootstrap.min.js"
 		],
       "environmentSource": "environments/environment.ts",
@@ -58,5 +58,6 @@
   "defaults": {
     "styleExt": "scss",
     "component": {}
-  }
+  },
+  "start": "node app"
 }
