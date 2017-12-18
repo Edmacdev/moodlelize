@@ -1,0 +1,28 @@
+.filterList {
+  padding-left: 0px;
+}
+.filterListBox{
+  background: #5C8297;
+  height: 40px;
+  vertical-align: middle;
+}
+.filterList li  {
+  margin-bottom: 15px;
+  list-style-type: none;
+  cursor: pointer;
+  float:left;
+  padding: 10px;
+  color: white;
+}
+.filterList li:hover{
+  font-weight: bold;
+}
+.form-group {
+  margin-bottom: 0px;
+}
+.active{
+  // background: #012345;
+}
+.filterList li:active{
+  background: #012345;
+}

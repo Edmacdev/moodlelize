@@ -5,10 +5,6 @@
     <!-- <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p> -->
   </div>
 </div>
-<div *ngIf="authService.loggedIn()" >
-  <h3>Bem vindo {{username}}</h3>
-  <app-moodle-reg></app-moodle-reg>
-</div>
 <div *ngIf="!authService.loggedIn()">
   <p>Para utilizar a plataforma, faça o login ou cadastre-se</p>
   <app-login></app-login>

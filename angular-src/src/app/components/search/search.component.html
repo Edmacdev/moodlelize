@@ -1,0 +1,37 @@
+<div >
+  <h4>Buscador</h4>
+  <form (submit)="onSubmit(searchQuery)">
+    <div class="form-group" >
+      <input type="text" [(ngModel)]="searchQuery" name="searchQuery" class=""  class="form-control" placeholder="" value="">
+    </div>
+    <div class="filterListBox">
+      <ul class="filterList">
+        <li class="active"><a (click)="filter = 'Tudo'">Tudo</a></li>
+        <li ><a (click)="filter = 'Usuários'" id="usuarios">Usuários</a></li>
+        <li ><a (click)="filter = 'Cursos'">Cursos</a></li>
+      </ul>
+    </div>
+
+    <input type="submit" name="search-submit" class="form-control btn btn-primary" value="Buscar {{filter}}">
+
+  </form>
+  <div *ngIf=(results)>
+    <div >
+      <h5>Resultado</h5>
+      <ul>
+        <li *ngFor="let result of results" >
+          <ul>
+            <li><h3><strong>{{result.moodle.name}}</strong></h3></li>
+            <li *ngFor="let course of result.courses">
+              <ul >
+                <li><p>Nome: {{course.fullname}}</p></li>
+                <li><p>id: {{course.id}}</p></li>
+                <li><p>Categoria: {{course.categoryname}}</p></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

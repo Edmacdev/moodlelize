@@ -20,13 +20,15 @@ username:String;
   ngOnInit() {
 
     this.getProfile();
-
+    if(this.authService.loggedIn()){
+      this.router.navigate(['dashboard']);
+    }
   }
   getProfile(){
     this.authService.getProfile().subscribe(profile => {
       this.user = profile.user;
       this.username = profile.user.username
-    
+
     },
     err => {
       console.log(err);
