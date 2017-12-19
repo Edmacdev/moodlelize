@@ -11,7 +11,7 @@ declare var $:any;
 })
 export class SearchComponent implements OnInit {
 
-  results: [any];
+  results: [Object];
   data: Object;
   user: {
     email: {
@@ -34,7 +34,8 @@ export class SearchComponent implements OnInit {
       }
     ]
   };
-  filter: String;
+  filter: = "tudo";
+  isResult = false;
 
   constructor(
     private moodleApiService: MoodleApiService,
@@ -51,33 +52,81 @@ export class SearchComponent implements OnInit {
       console.log(err);
       return false;
     });
-
-    $('.filterList > li').click( () => {
-      console.log($('.filterList > li').children())
-    });
-
-
   }
+
   onSubmit(value){
-      // this.results = [];
+    this.isResult = true;
+    this.results = [];
+
     for( let i = 0; i < this.user.moodles.length; i++){
 
-      this.moodleApiService.core_course_search_courses(this.user.moodles[i].url, this.user.moodles[i].token, value).subscribe(data => {
-        if(data){
+      switch(this.filter){
 
-          this.data = data;
-          Object.defineProperty(this.data, "moodle", {value:this.user.moodles[i]});
+        case 'tudo':
 
+          this.moodleApiService.request(this.user.moodles[i].url, params).subscribe(data => {
 
-          this.results.push(this.data);
-          console.log(this.results)
+            if(data){
 
-        }else{
-          console.log('erro');
+              this.data = data;
+              Object.defineProperty(this.data, "moodle", {value:this.user.moodles[i]});
+              this.results.push(this.data);
+              console.log(this.results)
+
+            }else{
+              console.log('erro');
+            }
+          });
+        break;
+
+        case 'usuários':
+
+          let params = {
+            wstoken: this.user.moodles[i].token,
+            wsfunction:'core_user_get_users',
+            moodlewsrestformat:'json',
+            value: value,
+            criteria: ['firstname', 'lastname','username', 'email']
+          }
+
+          this.moodleApiService.core_user_get_users(this.user.moodles[i].url, params).subscribe(data => {
+            if(data){
+
+              this.data = data;
+              Object.defineProperty(this.data, "moodle", {value:this.user.moodles[i]});
+              this.results.push(this.data);
+              console.log(this.results)
+            }else{
+              console.log('erro');
+            }
+          });
+
+        break;
+
+      case 'cursos':
+
+        let params = {
+          wstoken: this.user.moodles[i].token,
+          wsfunction:'core_course_search_courses',
+          moodlewsrestformat:'json',
+          criterianame: 'search',
+          criteriavalue: value
         }
-      });
+
+        this.moodleApiService.core_course_search_courses(this.user.moodles[i].url, params).subscribe(data => {
+          if(data){
+
+            this.data = data;
+            Object.defineProperty(this.data, "moodle", {value:this.user.moodles[i]});
+            this.results.push(this.data);
+            console.log(this.results)
+          }else{
+            console.log('erro');
+          }
+        });
+        break;
+      }
     }
+
   }
-
-
 }

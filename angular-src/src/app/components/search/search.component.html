@@ -6,32 +6,78 @@
     </div>
     <div class="filterListBox">
       <ul class="filterList">
-        <li class="active"><a (click)="filter = 'Tudo'">Tudo</a></li>
-        <li ><a (click)="filter = 'Usuários'" id="usuarios">Usuários</a></li>
-        <li ><a (click)="filter = 'Cursos'">Cursos</a></li>
+        <li ><a (click)="filter = 'tudo'">Tudo</a></li>
+        <li ><a (click)="filter = 'usuários'; isResult = false" id="usuarios">Usuários</a></li>
+        <li ><a (click)="filter = 'cursos'; isResult = false">Cursos</a></li>
       </ul>
     </div>
 
     <input type="submit" name="search-submit" class="form-control btn btn-primary" value="Buscar {{filter}}">
 
   </form>
-  <div *ngIf=(results)>
-    <div >
-      <h5>Resultado</h5>
-      <ul>
-        <li *ngFor="let result of results" >
-          <ul>
-            <li><h3><strong>{{result.moodle.name}}</strong></h3></li>
-            <li *ngFor="let course of result.courses">
-              <ul >
-                <li><p>Nome: {{course.fullname}}</p></li>
-                <li><p>id: {{course.id}}</p></li>
-                <li><p>Categoria: {{course.categoryname}}</p></li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-      </ul>
+  <div *ngIf="(isResult)">
+
+    <div *ngIf="(filter == 'cursos')">
+      <div>
+        <h5>Resultado</h5>
+        <ul>
+          <li *ngFor="let result of results" >
+            <ul>
+              <li><h3><strong>Moodle {{result.moodle.name}}</strong></h3></li>
+              <li *ngFor="let course of result.courses">
+                <ul >
+                  <li><p>Nome: {{course.fullname}}</p></li>
+                  <li><p>id: {{course.id}}</p></li>
+                  <li><p>Categoria: {{course.categoryname}}</p></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
     </div>
+
+    <div *ngIf="(filter == 'usuários')">
+      <div>
+        <h5>Resultado</h5>
+        <ul>
+          <li *ngFor="let result of results" >
+            <ul>
+              <li><h3><strong> Moodle {{result.moodle.name}}</strong></h3></li>
+              <li *ngFor="let user of result.users">
+                <ul >
+                  <li><p>Nome: {{user.fullname}}</p></li>
+                  <li><p>id: {{user.id}}</p></li>
+                  <li><p>email: {{user.email}}</p></li>
+                  <li><p>username: {{user.username}}</p></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div *ngIf="(filter == 'tudo')">
+      <div>
+        <h5>Resultado</h5>
+        <ul>
+          <li *ngFor="let result of results" >
+            <ul>
+              <li><h3><strong> Moodle {{result.moodle.name}}</strong></h3></li>
+              <li *ngFor="let user of result.users">
+                <ul >
+                  <li><p>Nome: {{user.fullname}}</p></li>
+                  <li><p>id: {{user.id}}</p></li>
+                  <li><p>email: {{user.email}}</p></li>
+                  <li><p>username: {{user.username}}</p></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+
   </div>
 </div>
