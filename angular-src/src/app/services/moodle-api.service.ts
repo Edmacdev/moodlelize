@@ -31,7 +31,7 @@ wsURL: String = '/webservice/rest/server.php';
   core_user_view_user_list(host, token, courseid){
 
   }
-  request(host, token, function, params){
+  request(host, token, wsfunction, params){
     return this.http.get("https://" + host + this.wsURL + '?' + params)
 
   }

@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { MoodleApiService } from '../../services/moodle-api.service';
 import { AuthService } from '../../services/auth.service';
 
+declare var $:any;
+
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
@@ -31,8 +33,8 @@ export class SearchComponent implements OnInit {
         token:String
       }
     ]
-  });
-  filter: = "tudo";
+  };
+  filter: String;
 
   constructor(
     private moodleApiService: MoodleApiService,
@@ -57,7 +59,7 @@ export class SearchComponent implements OnInit {
 
   }
   onSubmit(value){
-      this.results = [];
+      // this.results = [];
     for( let i = 0; i < this.user.moodles.length; i++){
 
       this.moodleApiService.core_course_search_courses(this.user.moodles[i].url, this.user.moodles[i].token, value).subscribe(data => {

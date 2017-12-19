@@ -17,7 +17,7 @@ import { ValidateService } from './services/validate.service';
 import { AuthService } from './services/auth.service';
 import { AuthGuard } from './guards/auth.guard';
 import { MoodleService } from './services/moodle.service';
-import { SearchCoursesComponent } from './components/search-courses/search-courses.component';
+
 import { MoodleApiService } from './services/moodle-api.service';
 import { CoursePageComponent } from './components/course-page/course-page.component';
 import { SearchComponent } from './components/search/search.component';
@@ -31,7 +31,7 @@ import { SearchComponent } from './components/search/search.component';
     DashboardComponent,
     ProfileComponent,
     MoodleRegComponent,
-    SearchCoursesComponent,
+    
     CoursePageComponent,
     SearchComponent
   ],
