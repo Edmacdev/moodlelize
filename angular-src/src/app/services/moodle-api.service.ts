@@ -6,6 +6,7 @@ import { AuthService } from '../services/auth.service';
 @Injectable()
 export class MoodleApiService {
 wsURL: String = '/webservice/rest/server.php';
+
 // wsToken: String = '8672510676f1c09e441042e532b3786a';
 
   constructor(
