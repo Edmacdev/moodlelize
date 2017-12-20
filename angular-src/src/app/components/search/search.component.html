@@ -46,7 +46,8 @@
               <li><h3><strong> Moodle {{result.moodle.name}}</strong></h3></li>
               <li *ngFor="let user of result.users">
                 <ul >
-                  <li><p>Nome: {{user.fullname}}</p></li>
+                  <li><p>Nome: {{user.firstname}}</p></li>
+                  <li><p>Sobrenome: {{user.lastname}}</p></li>
                   <li><p>id: {{user.id}}</p></li>
                   <li><p>email: {{user.email}}</p></li>
                   <li><p>username: {{user.username}}</p></li>

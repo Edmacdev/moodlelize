@@ -11,8 +11,10 @@ declare var $:any;
 })
 export class SearchComponent implements OnInit {
 
-  results: [Object];
-  data: Object;
+  results: Object[];
+  data: {
+    users:[Object];
+  }
   user: {
     email: {
       type: String,
@@ -34,7 +36,7 @@ export class SearchComponent implements OnInit {
       }
     ]
   };
-  filter: = "tudo";
+  filter: String;
   isResult = false;
 
   constructor(
@@ -43,7 +45,7 @@ export class SearchComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-
+    this.filter = 'tudo'
     this.authService.getProfile().subscribe(profile => {
       this.user = profile.user;
 
@@ -58,54 +60,72 @@ export class SearchComponent implements OnInit {
     this.isResult = true;
     this.results = [];
 
+
     for( let i = 0; i < this.user.moodles.length; i++){
 
       switch(this.filter){
 
         case 'tudo':
-
-          this.moodleApiService.request(this.user.moodles[i].url, params).subscribe(data => {
-
-            if(data){
-
-              this.data = data;
-              Object.defineProperty(this.data, "moodle", {value:this.user.moodles[i]});
-              this.results.push(this.data);
-              console.log(this.results)
-
-            }else{
-              console.log('erro');
-            }
-          });
         break;
 
         case 'usuários':
 
-          let params = {
+          let userParams = {
             wstoken: this.user.moodles[i].token,
             wsfunction:'core_user_get_users',
             moodlewsrestformat:'json',
             value: value,
-            criteria: ['firstname', 'lastname','username', 'email']
+            criteria: ['firstname','lastname', 'email']
           }
 
-          this.moodleApiService.core_user_get_users(this.user.moodles[i].url, params).subscribe(data => {
-            if(data){
+          this.moodleApiService.core_user_get_users(this.user.moodles[i].url, userParams).subscribe(data => {
 
-              this.data = data;
-              Object.defineProperty(this.data, "moodle", {value:this.user.moodles[i]});
-              this.results.push(this.data);
-              console.log(this.results)
-            }else{
-              console.log('erro');
-            }
-          });
+            if(data){
+                  this.data = data;
+                  this.results.push(this.data)
+                  Object.defineProperty(this.data, "moodle", {value:this.user.moodles[i]});
+                }else{
+                  console.log('erro');
+                }
+            });
+          // let params = {
+          //   wstoken: this.user.moodles[i].token,
+          //   wsfunction:'core_user_get_users',
+          //   moodlewsrestformat:'json',
+          //   value: value,
+          //   criteria: ['firstname','lastname', 'email']
+          // }
+          //
+          //
+          // for (let j = 0; j < params.criteria.length; j ++){
+          //   this.moodleApiService.core_user_get_users(this.user.moodles[i].url, params, j).subscribe(data => {
+          //     if(j == 0){
+          //
+          //       if(data){
+          //
+          //         this.data = data;
+          //         Object.defineProperty(this.data, "moodle", {value:this.user.moodles[i]});
+          //
+          //         // console.log('results: ' + this.results)
+          //       }else{
+          //         console.log('erro');
+          //       }
+          //
+          //     }else{
+          //       this.data.users.push(data.users)
+          //
+          //       console.log(this.data)
+          //     }
+          //     this.results.push(this.data);
+          //     console.log(this.results)
+          //   });
+          // }
 
         break;
 
       case 'cursos':
 
-        let params = {
+        let courseParams = {
           wstoken: this.user.moodles[i].token,
           wsfunction:'core_course_search_courses',
           moodlewsrestformat:'json',
@@ -113,7 +133,7 @@ export class SearchComponent implements OnInit {
           criteriavalue: value
         }
 
-        this.moodleApiService.core_course_search_courses(this.user.moodles[i].url, params).subscribe(data => {
+        this.moodleApiService.core_course_search_courses(this.user.moodles[i].url, courseParams).subscribe(data => {
           if(data){
 
             this.data = data;
@@ -124,9 +144,8 @@ export class SearchComponent implements OnInit {
             console.log('erro');
           }
         });
-        break;
+      break;
       }
     }
-
   }
 }
