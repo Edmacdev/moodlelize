@@ -18,12 +18,12 @@
   <div *ngIf="(isResult)">
 
     <div *ngIf="(filter == 'cursos')">
-      <div>
+      <div class="result">
         <h5>Resultado</h5>
         <ul>
           <li *ngFor="let result of results" >
             <ul>
-              <li><h3><strong>Moodle {{result.moodle.name}}</strong></h3></li>
+              <li><h3><strong>Moodle {{result.moodleName}}</strong></h3></li>
               <li *ngFor="let course of result.courses">
                 <ul >
                   <li><p>Nome: {{course.fullname}}</p></li>
@@ -43,7 +43,7 @@
         <ul>
           <li *ngFor="let result of results" >
             <ul>
-              <li><h3><strong> Moodle {{result.moodle.name}}</strong></h3></li>
+              <!-- <li><h3><strong> Moodle {{result.moodleName}}</strong></h3></li> -->
               <li *ngFor="let user of result.users">
                 <ul >
                   <li><p>Nome: {{user.firstname}}</p></li>

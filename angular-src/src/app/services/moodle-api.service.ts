@@ -34,9 +34,9 @@ wsURL: String = '/webservice/rest/server.php';
   }
 
   core_course_search_courses(host, params){
-    return this.http.get("https://" + host + this.wsURL + '?' +
+    return this.http.get("https://" + host + this.wsURL +
 
-    'wstoken=' + params.wstoken +
+    '?wstoken=' + params.wstoken +
     '&wsfunction=' + params.wsfunction +
     '&moodlewsrestformat=' + params.moodlewsrestformat +
     '&criterianame=' + params.criterianame +
@@ -44,22 +44,14 @@ wsURL: String = '/webservice/rest/server.php';
     ).map(res => res.json());
   }
 
-  core_user_get_users(host, params){
+  core_user_get_users(host, params, index){
+    return this.http.get("https://" + host + this.wsURL +
+    '?wstoken=' + params.wstoken +
+    '&wsfunction=' + params.wsfunction +
+    '&moodlewsrestformat=' + params.moodlewsrestformat +
+    '&criteria[0][key]=' + params.criteria[index] +
+    '&criteria[0][value]=' + '%'+ params.value + '%'
 
-      return this.http.get("https://" + host + this.wsURL + '?' +
-      'wstoken=' + params.wstoken +
-      '&wsfunction=' + params.wsfunction +
-      '&moodlewsrestformat=' + params.moodlewsrestformat +
-      '&criteria[0][key]=' + params.criteria[0] +
-      '&criteria[0][value]=' + '%'+ params.value + '%'
-      // '&criteria[1][key]=' + params.criteria[1] +
-      // '&criteria[1][value]=' + params.value
-      // '&criteria[2][key]=' + params.criteria[2] +
-      // '&criteria[2][value]=' + params.value
-      // '&criteria[3][key]=' + params.criteria[3] +
-      // '&criteria[3][value]=' + params.value
-
-
-    ).map(res => res.json());
+  ).map(res => res.json());
   }
 }
