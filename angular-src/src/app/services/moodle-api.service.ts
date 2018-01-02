@@ -44,12 +44,12 @@ wsURL: String = '/webservice/rest/server.php';
     ).map(res => res.json());
   }
 
-  core_user_get_users(host, params, index){
+  core_user_get_users(host, params, criteria){
     return this.http.get("https://" + host + this.wsURL +
     '?wstoken=' + params.wstoken +
     '&wsfunction=' + params.wsfunction +
     '&moodlewsrestformat=' + params.moodlewsrestformat +
-    '&criteria[0][key]=' + params.criteria[index] +
+    '&criteria[0][key]=' + criteria +
     '&criteria[0][value]=' + '%'+ params.value + '%'
 
   ).map(res => res.json());
