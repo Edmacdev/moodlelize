@@ -1,0 +1,17 @@
+<div *ngIf="(userProfile)" class="userProfile">
+  <div>
+    <img [attr.src]="userProfile.profileimageurl" alt="">
+    <h2>{{userProfile.firstname}} {{userProfile.lastname}}</h2>
+  </div>
+
+  <div class="profile_tree">
+    <section>
+      <h5>Detalhes</h5>
+      <p>Email: {{userProfile.email}}</p>
+      <p>Cidade: {{userProfile.city}}</p>
+    </section>
+    <section>
+      
+    </section>
+  </div>
+</div>

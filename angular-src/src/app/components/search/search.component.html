@@ -37,24 +37,20 @@
       </div>
     </div>
 
-    <div *ngIf="(filter == 'usuários')">
-      <div>
-        <h5>Resultado</h5>
-        <ul>
-          <li *ngFor="let result of results" >
-            <ul>
-              <li *ngFor="let user of result.users">
-                <ul>
-                    <li><p>Nome: {{user.firstname}}</p></li>
-                    <li><p>Sobrenome: {{user.lastname}}</p></li>
-                    <li><p>id: {{user.id}}</p></li>
-                    <li><p>email: {{user.email}}</p></li>
-                    <li><p>username: {{user.username}}</p></li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-        </ul>
+    <div *ngIf="(filter == 'usuários')" class="result-users">
+      <div *ngFor="let result of results" >
+        <div *ngFor="let user of result.users">
+          <ul class="result">
+            <li (click)="onListItemClick(user.id)">
+              <h4><strong>{{user.fullname}}</strong></h4>
+              <div class="listItemImg"><img [attr.src]="user.profileimageurl" alt=""></div>
+              <p>id: {{user.id}}</p>
+              <p>email: {{user.email}}</p>
+              <p>username: {{user.username}}</p>
+
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
 
@@ -65,14 +61,14 @@
           <li *ngFor="let result of results" >
             <ul>
               <li><h3><strong> Moodle {{result.moodle.name}}</strong></h3></li>
-              <li *ngFor="let user of result.users">
+              <a  *ngFor="let user of result.users">
                 <ul >
                   <li><p>Nome: {{user.fullname}}</p></li>
                   <li><p>id: {{user.id}}</p></li>
                   <li><p>email: {{user.email}}</p></li>
                   <li><p>username: {{user.username}}</p></li>
                 </ul>
-              </li>
+              </a>
             </ul>
           </li>
         </ul>

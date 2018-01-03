@@ -7,6 +7,7 @@ import { AuthService } from '../services/auth.service';
 export class MoodleApiService {
 wsURL: String = '/webservice/rest/server.php';
 
+
 // wsToken: String = '8672510676f1c09e441042e532b3786a';
 
   constructor(
@@ -45,13 +46,43 @@ wsURL: String = '/webservice/rest/server.php';
   }
 
   core_user_get_users(host, params, criteria){
+    let criteriaValue = '';
+    switch (criteria){
+      case 'firstname':
+       criteriaValue = params.value + ' %';
+      break;
+      case 'lastname':
+       criteriaValue = + '% ' params.value + ' %';
+      break;
+      case 'username':
+       criteriaValue = params.value;
+      break;
+      case 'email':
+        criteriaValue = params.value + '%';
+      break;
+      case 'id':
+        criteriaValue = params.value;
+      break;
+    }
+
+
     return this.http.get("https://" + host + this.wsURL +
     '?wstoken=' + params.wstoken +
     '&wsfunction=' + params.wsfunction +
     '&moodlewsrestformat=' + params.moodlewsrestformat +
     '&criteria[0][key]=' + criteria +
-    '&criteria[0][value]=' + '%'+ params.value + '%'
-
+    '&criteria[0][value]=' + criteriaValue
   ).map(res => res.json());
   }
+
+  // core_user_view_user_profile(host, params){
+  //   return this.http.get("https://" + host + this.wsURL +
+  //   '?wstoken=' + params.wstoken +
+  //   '&wsfunction=' + params.wsfunction +
+  //   '&moodlewsrestformat=' + params.moodlewsrestformat +
+  //   '&userid=' + params.userid
+  //
+  // ).map(res => res.json());
+  // }
+
 }

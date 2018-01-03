@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MoodleApiService } from '../../services/moodle-api.service';
 import { AuthService } from '../../services/auth.service';
 import {Observable} from 'rxjs/Rx'
+import { Router } from '@angular/router';
 import 'rxjs/add/observable/concat';
 import "rxjs/add/operator/distinctUntilChanged";
 import "rxjs/add/operator/distinct";
@@ -48,11 +49,12 @@ export class SearchComponent implements OnInit {
 
   constructor(
     private moodleApiService: MoodleApiService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) { }
 
   ngOnInit() {
-    this.filter = 'tudo'
+    this.filter = 'tudo';
     this.authService.getProfile().subscribe(profile => {
       this.user = profile.user;
 
@@ -69,43 +71,39 @@ export class SearchComponent implements OnInit {
 
       switch(this.filter){
         case 'tudo':
+
+
         break;
 
         case 'usuários':
 
-          let userParams = {
-            wstoken: this.user.moodles[0].token,
-            wsfunction:'core_user_get_users',
-            moodlewsrestformat:'json',
-            value: value,
+          for (let i =0; i<this.user.moodles.length; i++){
+
+            let userParams = {
+              wstoken: this.user.moodles[i].token,
+              wsfunction:'core_user_get_users',
+              moodlewsrestformat:'json',
+              value: value,
+            }
+
+              const req_firstname$ = this.moodleApiService.core_user_get_users(this.user.moodles[i].url, userParams, 'firstname' );
+              const req_lastname$ = this.moodleApiService.core_user_get_users(this.user.moodles[i].url, userParams, 'lastname' );
+              const req_username$ = this.moodleApiService.core_user_get_users(this.user.moodles[i].url, userParams, 'username' );
+              const req_email$ = this.moodleApiService.core_user_get_users(this.user.moodles[i].url, userParams, 'email' );
+              const combined$ = Observable.concat(
+                req_firstname$,
+                req_lastname$,
+                req_username$,
+                req_email$
+              )
+
+              combined$.subscribe(data => {
+                Object.defineProperty(data, "moodleName", {value:this.user.moodles[i].name});
+                console.log(data)
+                this.results.push(data)
+              });
           }
-          const req_firstname$ = this.moodleApiService.core_user_get_users(this.user.moodles[0].url, userParams, 'firstname' );
-          const req_lastname$ = this.moodleApiService.core_user_get_users(this.user.moodles[0].url, userParams, 'lastname' );
-          const req_username$ = this.moodleApiService.core_user_get_users(this.user.moodles[0].url, userParams, 'username' );
-          const req_email$ = this.moodleApiService.core_user_get_users(this.user.moodles[0].url, userParams, 'email' );
-          const combined$ = Observable.merge(
-            req_firstname$,
-            req_lastname$,
-            req_username$,
-            req_email$
 
-            // (...arrays) => arrays.reduce((acc, array) => [...acc, ...array], [])
-          )
-          .map(x => x.users).distinct()
-
-          combined$.subscribe(data => {
-            // this.data = data;
-
-
-            // Object.defineProperty(data.users, "moodleName", {value:this.user.moodles[0].name});
-
-            this.results.push(data);
-            console.log(this.results)
-            // console.log(typeof(this.results[0].users))
-
-              // console.log(data)
-              // console.log(this.results)
-          })
             // this.moodleApiService.core_user_get_users(this.user.moodles[i].url, userParams, j, name).subscribe(data => {
             //
             //   this.data = data;
@@ -116,10 +114,6 @@ export class SearchComponent implements OnInit {
 
           // }
 
-          // console.log(this.results.length)
-          // console.log(this.results.users.length)
-          // this.results = this.dataFilter(this.results)
-          // console.log(this.results)
 
         break;
 
@@ -156,5 +150,8 @@ export class SearchComponent implements OnInit {
       }
     }
     return data;
+  }
+  onListItemClick (id){
+    this.router.navigate(['./user/' + id]);
   }
 }

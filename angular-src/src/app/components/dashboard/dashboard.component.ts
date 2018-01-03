@@ -21,10 +21,8 @@ export class DashboardComponent implements OnInit {
       this.user = profile.user;
 
     },
-    err => {
-      console.log(err);
-      return false;
-    });
+    err => console.log(err)
+    );
 
     this.router.params.subscribe(params => {
       this.index = +params['i'];
