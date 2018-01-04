@@ -34,6 +34,15 @@ wsURL: String = '/webservice/rest/server.php';
     ).map(res => res.json());
   }
 
+  core_course_get_courses(host, params){
+    return this.http.get("https://" + host + this.wsURL +
+
+    '?wstoken=' + params.wstoken +
+    '&wsfunction=' + params.wsfunction +
+    '&moodlewsrestformat=' + params.moodlewsrestformat
+    ).map(res => res.json());
+  }
+
   core_course_search_courses(host, params){
     return this.http.get("https://" + host + this.wsURL +
 
@@ -45,33 +54,30 @@ wsURL: String = '/webservice/rest/server.php';
     ).map(res => res.json());
   }
 
-  core_user_get_users(host, params, criteria){
-    let criteriaValue = '';
-    switch (criteria){
-      case 'firstname':
-       criteriaValue = params.value + ' %';
-      break;
-      case 'lastname':
-       criteriaValue = + '% ' params.value + ' %';
-      break;
-      case 'username':
-       criteriaValue = params.value;
-      break;
-      case 'email':
-        criteriaValue = params.value + '%';
-      break;
-      case 'id':
-        criteriaValue = params.value;
-      break;
-    }
+  core_user_get_users(host, params){
+    // let criteriaValue = '';
+    // switch (criteria){
+    //   case 'firstname':
+    //    criteriaValue =  params.value + '%';
+    //   break;
+    //   case 'lastname':
+    //    criteriaValue = '%' + params.value + '%';
+    //   break;
+    //   case 'email':
+    //     criteriaValue = params.value;
+    //   break;
+    //   case 'id':
+    //     criteriaValue = params.value;
+    //   break;
+    // }
 
 
     return this.http.get("https://" + host + this.wsURL +
     '?wstoken=' + params.wstoken +
     '&wsfunction=' + params.wsfunction +
     '&moodlewsrestformat=' + params.moodlewsrestformat +
-    '&criteria[0][key]=' + criteria +
-    '&criteria[0][value]=' + criteriaValue
+    '&criteria[0][key]=' + params.criteriakey +
+    '&criteria[0][value]=' + params.criteriavalue
   ).map(res => res.json());
   }
 

@@ -42,12 +42,12 @@
         <div *ngFor="let user of result.users">
           <ul class="result">
             <li (click)="onListItemClick(user.id)">
-              <h4><strong>{{user.fullname}}</strong></h4>
+              <!-- <h4><strong>{{user.fullname}}</strong></h4> -->
+              <h4><strong>Nome: {{user.firstname}} Sobrenone: {{user.lastname}}</strong></h4>
               <div class="listItemImg"><img [attr.src]="user.profileimageurl" alt=""></div>
               <p>id: {{user.id}}</p>
               <p>email: {{user.email}}</p>
-              <p>username: {{user.username}}</p>
-
+              <p>moodle: {{result.moodleName}}</p>
             </li>
           </ul>
         </div>

@@ -1,0 +1,52 @@
+.display-users{
+
+  width: 100%;
+  text-align: center;
+
+}
+.display-users h3{
+  background: #5C8297;
+  padding: 10px 0 10px 0;
+  color: white;
+
+}
+.userList{
+  overflow: auto;
+}
+.userResult{
+  overflow: scroll;
+  max-height: 360px;
+}
+
+li p {
+  margin-bottom: 1px;
+  margin-left: 10px;
+}
+ul {
+  list-style-type: none;
+  padding: 0px;
+}
+.result li{
+  padding: 10px;
+  background: #E9EAEC;
+  border: 1px solid #777777;
+  margin-top: 4px;
+  margin-right: 4px;
+  cursor: pointer;
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  float: left;
+}
+li img{
+  width: 60px;
+  height: 60px;
+  float: left;
+  overflow: auto;
+  padding: 2px;
+}
+h4 {
+  background: #940000;
+  padding: 10px 0 10px 0;
+  color: white;
+}

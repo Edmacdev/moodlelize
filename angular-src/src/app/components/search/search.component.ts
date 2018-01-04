@@ -55,14 +55,15 @@ export class SearchComponent implements OnInit {
 
   ngOnInit() {
     this.filter = 'tudo';
+
     this.authService.getProfile().subscribe(profile => {
       this.user = profile.user;
-
     },
     err => {
       console.log(err);
       return false;
     });
+
   }
 
   onSubmit(value){
@@ -88,19 +89,20 @@ export class SearchComponent implements OnInit {
 
               const req_firstname$ = this.moodleApiService.core_user_get_users(this.user.moodles[i].url, userParams, 'firstname' );
               const req_lastname$ = this.moodleApiService.core_user_get_users(this.user.moodles[i].url, userParams, 'lastname' );
-              const req_username$ = this.moodleApiService.core_user_get_users(this.user.moodles[i].url, userParams, 'username' );
               const req_email$ = this.moodleApiService.core_user_get_users(this.user.moodles[i].url, userParams, 'email' );
+              const req_userid$ = this.moodleApiService.core_user_get_users(this.user.moodles[i].url, userParams, 'id' );
               const combined$ = Observable.concat(
                 req_firstname$,
                 req_lastname$,
-                req_username$,
-                req_email$
-              )
+                req_email$,
+                req_userid$,
+              ).take(5)
 
               combined$.subscribe(data => {
                 Object.defineProperty(data, "moodleName", {value:this.user.moodles[i].name});
-                console.log(data)
+
                 this.results.push(data)
+                console.log(this.results)
               });
           }
 

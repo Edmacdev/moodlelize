@@ -22,6 +22,8 @@ import { MoodleApiService } from './services/moodle-api.service';
 import { CoursePageComponent } from './components/course-page/course-page.component';
 import { SearchComponent } from './components/search/search.component';
 import { UserComponent } from './components/user/user.component';
+import { DisplayCoursesComponent } from './components/display-courses/display-courses.component';
+import { DisplayUsersComponent } from './components/display-users/display-users.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +36,9 @@ import { UserComponent } from './components/user/user.component';
     MoodleRegComponent,
     CoursePageComponent,
     SearchComponent,
-    UserComponent
+    UserComponent,
+    DisplayCoursesComponent,
+    DisplayUsersComponent
   ],
   imports: [
     BrowserModule,
