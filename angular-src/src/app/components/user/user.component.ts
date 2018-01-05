@@ -54,7 +54,7 @@ export class UserComponent implements OnInit {
             value: this.route.snapshot.params['id']
           }
 
-          this.moodleApiService.core_user_get_users(this.user.moodles[i].url, params, 'id').subscribe(data => {
+          this.moodleApiService.core_user_get_users(this.user.moodles[i].url, params).subscribe(data => {
             this.userProfile = data.users[0];
             console.log(this.userProfile)
           })

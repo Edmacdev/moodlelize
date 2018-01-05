@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { MoodleApiService } from '../../services/moodle-api.service';
 import { AuthService } from '../../services/auth.service';
+import * as Fuse from 'fuse.js';
+
 
 @Component({
   selector: 'app-display-courses',
@@ -29,7 +31,9 @@ export class DisplayCoursesComponent implements OnInit {
       }
     ]
   };
-  courses: Object[] =[];
+  courses: Object[] = [];
+  result: Object[]= [];
+
   isResult:Boolean = false;
 
   constructor(
@@ -61,7 +65,9 @@ export class DisplayCoursesComponent implements OnInit {
           Object.defineProperty(data, "moodleName", {value:this.user.moodles[i].name});
           this.courses.push(data) ;
 
-          console.log(this.courses);
+          this.result = this.courses;
+
+
         })
 
       }
@@ -69,6 +75,32 @@ export class DisplayCoursesComponent implements OnInit {
       this.isResult = true;
     }
   );
+
+  }
+  onSubmit(value){
+
+    this.result = [];
+
+    var options = {
+    shouldSort: true,
+    tokenize: false,
+    threshold: 0.3,
+    location: 0,
+    distance: 100,
+    maxPatternLength: 32,
+    minMatchCharLength: 1,
+    keys: [
+      "fullname",
+    ]
+  };
+
+    for (let i = 0; i < this.user.moodles.length; i++){
+      var arr = Object.values(this.courses);
+      var fuse = new Fuse(arr[i], options); // "list" is the item array
+      var result = fuse.search(value);
+      Object.defineProperty(result, "moodleName", {value:this.courses[i].moodleName});
+      this.result.push(result)
+    }
 
   }
 

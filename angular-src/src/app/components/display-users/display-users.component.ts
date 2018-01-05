@@ -2,13 +2,16 @@ import { Component, OnInit } from '@angular/core';
 import { MoodleApiService } from '../../services/moodle-api.service';
 import { AuthService } from '../../services/auth.service';
 
+import "rxjs/add/operator/take";
+import * as Fuse from 'fuse.js'
+
 @Component({
   selector: 'app-display-users',
   templateUrl: './display-users.component.html',
   styleUrls: ['./display-users.component.scss']
 })
 export class DisplayUsersComponent implements OnInit {
-  userAdmin: {
+  user: {
     email: {
       type: String,
       require: true
@@ -30,7 +33,11 @@ export class DisplayUsersComponent implements OnInit {
     ]
   };
   users: Object[] = [];
-  isResult:Boolean = false;
+  result: Object[] = [];
+  isDoneLoading: Boolean = false;
+  isResult: Boolean = false;
+
+
   constructor(
     private authService:AuthService,
     private moodleApiService:MoodleApiService
@@ -38,7 +45,7 @@ export class DisplayUsersComponent implements OnInit {
 
   ngOnInit() {
     this.authService.getProfile().subscribe(profile => {
-      this.userAdmin = profile.user;
+      this.user = profile.user;
     },
     err => {
       console.log(err);
@@ -46,24 +53,55 @@ export class DisplayUsersComponent implements OnInit {
     },
     () => {
 
-      const numbOfMoodles = this.userAdmin.moodles.length;
+      const numbOfMoodles = this.user.moodles.length;
 
       for(let i = 0; i < numbOfMoodles; i++){
         let params = {
-          wstoken: this.userAdmin.moodles[i].token,
+          wstoken: this.user.moodles[i].token,
           wsfunction:'core_user_get_users',
           moodlewsrestformat:'json',
-          criteriakey: 'firstname',
+          criteriakey: 'firsname',
           criteriavalue: '%ana%'
         }
-        this.moodleApiService.core_user_get_users(this.userAdmin.moodles[i].url, params).subscribe(data => {
-          Object.defineProperty(data, "moodleName", {value:this.userAdmin.moodles[i].name});
+        this.moodleApiService.core_user_get_users(this.user.moodles[i].url, params).subscribe(data => {
+          Object.defineProperty(data, "moodleName", {value:this.user.moodles[i].name});
           this.users.push(data) ;
-          console.log(this.users);
-        })
+
+          },
+          err => console.log(err),
+          () => {
+            this.isDoneLoading = true;
+          }
+        )
       }
-      this.isResult = true;
+
     }
     );
+  }
+  onSubmit(value){
+
+    this.result = [];
+
+    var options = {
+    shouldSort: true,
+    tokenize: false,
+    threshold: 0.3,
+    location: 0,
+    distance: 100,
+    maxPatternLength: 32,
+    minMatchCharLength: 1,
+    keys: [
+      "fullname",
+    ]
+  };
+
+    for (let i = 0; i < this.user.moodles.length; i++){
+      var arr = Object.values(this.users);
+      var fuse = new Fuse(arr[i], options); // "list" is the item array
+      var result = fuse.search(value);
+      Object.defineProperty(result, "moodleName", {value:this.users[i].moodleName});
+      this.result.push(result)
+    }
+    this.isResult = true;
   }
 }

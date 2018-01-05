@@ -1,22 +1,32 @@
 <div class="display-users">
     <h3>Usuários</h3>
-  <div *ngIf="(isResult)" class="result">
+  <div *ngIf="(isDoneLoading)" class="result">
+
     <form (submit)="onSubmit(searchQuery)">
-      <div class="form-group" >
-        <input type="text" [(ngModel)]="searchQuery" name="searchQuery"  class="searchbar" placeholder="" value="">
-        <input type="submit" name="search-submit" class=" btn btn-primary" value="Buscar {{filter}}">
+      <div *ngIf="isDoneLoading">
+        <div class="form-group">
+          <input type="text" [(ngModel)]="searchQuery" name="searchQuery"  class="searchbar" placeholder="" value="">
+          <input type="submit" name="search-submit" class=" btn btn-primary" value="Buscar {{filter}}">
+        </div>
       </div>
     </form>
-    <div *ngFor="let userArray of users" class="userList">
-      <h4>{{userArray.moodleName}}</h4>
-      <div class="userResult">
-        <ul *ngFor="let user of userArray.users">
-          <li>
-            <img [attr.src]="user.profileimageurl" alt="">
-            <p><strong>{{user.fullname}}</strong></p>
-          </li>
-        </ul>
-      </div>    
+
+    <div *ngIf="(isResult)">
+      <div *ngFor="let userArray of result" class="userList" >
+        <h4>{{userArray.moodleName}}</h4>
+        <div class="userResult">
+          <ul *ngFor="let user of userArray.users">
+            <li>
+              <img [attr.src]="user.profileimageurl" alt="">
+              <p><strong>{{user.fullname}}</strong></p>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
+
+  </div>
+  <div *ngIf="!isDoneLoading" class="alert alert-warning">
+    <p>Aguarde enquanto o banco de dados é carregado</p>
   </div>
 </div>

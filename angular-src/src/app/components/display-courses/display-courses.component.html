@@ -3,17 +3,20 @@
   <div *ngIf="(isResult)" class="result">
     <form (submit)="onSubmit(searchQuery)">
       <div class="form-group" >
-        <input type="text" [(ngModel)]="searchQuery" name="searchQuery"  class="searchbar" placeholder="" value="">
-        <input type="submit" name="search-submit" class=" btn btn-primary" value="Buscar {{filter}}">
+        <input type="text" [(ngModel)]="searchQuery" name="searchQuery"  class="searchbar" placeholder="" ng-change="onSubmit(searchQuery)">
+        <input type="submit" name="search-submit" class=" btn btn-primary">
       </div>
     </form>
-    <div *ngFor="let courseArray of courses" class="coursesResult">
+    <div *ngFor="let courseArray of result" >
       <h4>{{courseArray.moodleName}}</h4>
-      <ul *ngFor="let course of courseArray">
-        <li>
-          <p><strong>{{course.fullname}}</strong></p>
-        </li>
-      </ul>
+      <div class="coursesResult">
+        <ul *ngFor="let course of courseArray">
+          <li>
+            <p><strong>{{course.fullname}}</strong></p>
+          </li>
+        </ul>
+      </div>
+
     </div>
 
   </div>
