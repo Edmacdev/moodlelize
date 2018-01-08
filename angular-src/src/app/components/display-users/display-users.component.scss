@@ -1,13 +1,14 @@
 .display-users{
 
   width: 100%;
-  text-align: center;
+
 
 }
 .display-users h3{
   background: #5C8297;
   padding: 10px 0 10px 0;
   color: white;
+  text-align: center;
 
 }
 .userList{
@@ -17,6 +18,9 @@
   overflow: scroll;
   max-height: 360px;
 }
+.form-group{
+  text-align: center;
+}
 
 li p {
   margin-bottom: 1px;
@@ -24,26 +28,33 @@ li p {
 }
 ul {
   list-style-type: none;
-  padding: 0px;
+
 }
 .result li{
   padding: 10px;
   background: #E9EAEC;
   border: 1px solid #777777;
   margin-top: 4px;
-  margin-right: 4px;
+  margin-right: 20px;
   cursor: pointer;
   display: inline-block;
-  width: 250px;
-  height: 75px;
+  width: 400px;
+  height: 60px;
+  float: left;
+}
+.result h5{
   float: left;
 }
 li img{
-  width: 60px;
-  height: 60px;
+  width: 45px;
+  height: 45px;
   float: left;
   overflow: auto;
   padding: 2px;
+}
+.icons{
+  margin-right: 4px;
+  float: right;
 }
 h4 {
   background: #940000;

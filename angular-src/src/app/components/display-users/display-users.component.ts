@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { MoodleApiService } from '../../services/moodle-api.service';
 import { AuthService } from '../../services/auth.service';
-
-import "rxjs/add/operator/take";
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { DisplayUsersDialogComponent } from '../display-users-dialog/display-users-dialog.component';
 import * as Fuse from 'fuse.js'
 
 @Component({
@@ -36,46 +36,48 @@ export class DisplayUsersComponent implements OnInit {
   result: Object[] = [];
   isDoneLoading: Boolean = false;
   isResult: Boolean = false;
-
+  dialogResult = "";
 
   constructor(
     private authService:AuthService,
-    private moodleApiService:MoodleApiService
+    private moodleApiService:MoodleApiService,
+    public dialog: MatDialog
   ) { }
 
   ngOnInit() {
-    this.authService.getProfile().subscribe(profile => {
-      this.user = profile.user;
-    },
-    err => {
-      console.log(err);
-      return false;
-    },
-    () => {
+    this.authService.getProfile().subscribe(
+      profile => {this.user = profile.user;},
+      err => {
+        console.log(err);
+        return false;
+      },
+      () => {
 
-      const numbOfMoodles = this.user.moodles.length;
+        const numbOfMoodles = this.user.moodles.length;
 
-      for(let i = 0; i < numbOfMoodles; i++){
-        let params = {
-          wstoken: this.user.moodles[i].token,
-          wsfunction:'core_user_get_users',
-          moodlewsrestformat:'json',
-          criteriakey: 'firsname',
-          criteriavalue: '%ana%'
-        }
-        this.moodleApiService.core_user_get_users(this.user.moodles[i].url, params).subscribe(data => {
-          Object.defineProperty(data, "moodleName", {value:this.user.moodles[i].name});
-          this.users.push(data) ;
-
-          },
-          err => console.log(err),
-          () => {
-            this.isDoneLoading = true;
+        for(let i = 0; i < numbOfMoodles; i++){
+          let params = {
+            wstoken: this.user.moodles[i].token,
+            wsfunction:'core_user_get_users',
+            moodlewsrestformat:'json',
+            criteriakey: 'firstname',
+            criteriavalue: 'ana'
           }
-        )
-      }
+          this.moodleApiService.core_user_get_users(this.user.moodles[i].url, params).subscribe(
+            data => {
+              Object.defineProperty(data.users, "moodleName", {value:this.user.moodles[i].name});
+              this.users.push(data.users) ;
+              console.log(this.users)
 
-    }
+            },
+            err => {
+              console.log(err);
+              return false;
+            },
+            () => {this.isDoneLoading = true;}
+          )
+        }
+      }
     );
   }
   onSubmit(value){
@@ -99,9 +101,24 @@ export class DisplayUsersComponent implements OnInit {
       var arr = Object.values(this.users);
       var fuse = new Fuse(arr[i], options); // "list" is the item array
       var result = fuse.search(value);
-      Object.defineProperty(result, "moodleName", {value:this.users[i].moodleName});
+      // Object.defineProperty(result, "moodleName", {value:this.users[i].moodleName});
       this.result.push(result)
+      console.log(this.result)
     }
     this.isResult = true;
+  }
+  userReport(name, id){
+    let dialogRef = this.dialog.open(DisplayUsersDialogComponent, {
+      width: '1500px',
+      height: '800px'
+      data: {
+        nome: name,
+        curso: 'Curso'
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('Dialog closed: ${result}');
+      this.dialogResult = result
+    })
   }
 }

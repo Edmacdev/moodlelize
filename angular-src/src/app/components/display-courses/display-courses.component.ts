@@ -33,7 +33,7 @@ export class DisplayCoursesComponent implements OnInit {
   };
   courses: Object[] = [];
   result: Object[]= [];
-
+  isDoneLoading = false;
   isResult:Boolean = false;
 
   constructor(
@@ -61,18 +61,22 @@ export class DisplayCoursesComponent implements OnInit {
           wsfunction:'core_course_get_courses',
           moodlewsrestformat:'json'
         }
-        this.moodleApiService.core_course_get_courses(this.user.moodles[i].url, params).subscribe(data => {
-          Object.defineProperty(data, "moodleName", {value:this.user.moodles[i].name});
-          this.courses.push(data) ;
 
-          this.result = this.courses;
-
-
-        })
+        this.moodleApiService.core_course_get_courses(this.user.moodles[i].url, params).subscribe(
+          data => {
+            Object.defineProperty(data, "moodleName", {value:this.user.moodles[i].name});
+            this.courses.push(data) ;
+            console.log(data)
+            this.result = this.courses;
+          },
+          err => {
+            console.log(err);
+            return false;
+          },
+          () => {this.isDoneLoading = true;}
+        );
 
       }
-
-      this.isResult = true;
     }
   );
 
@@ -98,7 +102,7 @@ export class DisplayCoursesComponent implements OnInit {
       var arr = Object.values(this.courses);
       var fuse = new Fuse(arr[i], options); // "list" is the item array
       var result = fuse.search(value);
-      Object.defineProperty(result, "moodleName", {value:this.courses[i].moodleName});
+      // Object.defineProperty(result, "moodleName", {value:this.courses[i].moodleName});
       this.result.push(result)
     }
 

@@ -3,11 +3,9 @@
   <div *ngIf="(isDoneLoading)" class="result">
 
     <form (submit)="onSubmit(searchQuery)">
-      <div *ngIf="isDoneLoading">
-        <div class="form-group">
-          <input type="text" [(ngModel)]="searchQuery" name="searchQuery"  class="searchbar" placeholder="" value="">
-          <input type="submit" name="search-submit" class=" btn btn-primary" value="Buscar {{filter}}">
-        </div>
+      <div class="form-group" >
+        <input type="text" [(ngModel)]="searchQuery" name="searchQuery"  class="searchbar">
+        <input type="submit" name="search-submit" class=" btn btn-primary">
       </div>
     </form>
 
@@ -15,10 +13,15 @@
       <div *ngFor="let userArray of result" class="userList" >
         <h4>{{userArray.moodleName}}</h4>
         <div class="userResult">
-          <ul *ngFor="let user of userArray.users">
-            <li>
+          <ul >
+            <li *ngFor="let user of userArray">
               <img [attr.src]="user.profileimageurl" alt="">
-              <p><strong>{{user.fullname}}</strong></p>
+              <h5><strong>{{user.fullname}}</strong></h5>
+              <div class="icons">
+                <i (click)="userReport(user.fullname, user.id)"class="material-icons md-18">content_paste</i>
+                <i class="material-icons md-18">create</i>
+                <i class="material-icons md-18">remove_circle</i>
+              </div>
             </li>
           </ul>
         </div>
@@ -26,7 +29,9 @@
     </div>
 
   </div>
+
   <div *ngIf="!isDoneLoading" class="alert alert-warning">
     <p>Aguarde enquanto o banco de dados é carregado</p>
   </div>
+
 </div>

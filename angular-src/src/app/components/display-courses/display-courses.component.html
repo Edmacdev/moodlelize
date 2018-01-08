@@ -1,12 +1,14 @@
 <div class="display-courses">
   <h3>Cursos</h3>
-  <div *ngIf="(isResult)" class="result">
+  <div *ngIf="(isDoneLoading)" class="result">
+
     <form (submit)="onSubmit(searchQuery)">
       <div class="form-group" >
-        <input type="text" [(ngModel)]="searchQuery" name="searchQuery"  class="searchbar" placeholder="" ng-change="onSubmit(searchQuery)">
+        <input type="text" [(ngModel)]="searchQuery" name="searchQuery"  class="searchbar">
         <input type="submit" name="search-submit" class=" btn btn-primary">
       </div>
     </form>
+
     <div *ngFor="let courseArray of result" >
       <h4>{{courseArray.moodleName}}</h4>
       <div class="coursesResult">
@@ -16,8 +18,12 @@
           </li>
         </ul>
       </div>
-
     </div>
 
   </div>
+
+  <div *ngIf="!isDoneLoading" class="alert alert-warning">
+    <p>Aguarde enquanto o banco de dados é carregado</p>
+  </div>
+
 </div>
