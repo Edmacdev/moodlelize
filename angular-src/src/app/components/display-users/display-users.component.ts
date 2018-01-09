@@ -3,7 +3,9 @@ import { MoodleApiService } from '../../services/moodle-api.service';
 import { AuthService } from '../../services/auth.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { DisplayUsersDialogComponent } from '../display-users-dialog/display-users-dialog.component';
-import * as Fuse from 'fuse.js'
+import * as Fuse from 'fuse.js';
+import {Observable} from 'rxjs/Rx';
+
 
 @Component({
   selector: 'app-display-users',
@@ -55,19 +57,43 @@ export class DisplayUsersComponent implements OnInit {
 
         const numbOfMoodles = this.user.moodles.length;
 
+        // var observablesArray = [];
+        // for(let i = 0 ;i < numbOfMoodles; i++){
+        //   let params = {
+        //     wstoken: this.user.moodles[i].token,
+        //     criteriakey: 'email',
+        //     criteriavalue: '%raleduc%'
+        //   }
+        //   observablesArray.push(this.moodleApiService.core_user_get_users(this.user.moodles[i].url, params))
+        // }
+        //
+        //   Observable.forkJoin(observablesArray).subscribe(
+        //   data => {
+        //     // Object.defineProperty(data.users, "moodleName", {value:this.user.moodles[i].name});
+        //     this.users.push(data.users) ;
+        //
+        //
+        //   },
+        //   err => {
+        //     console.log(err);
+        //     return false;
+        //   },
+        //   () => {this.isDoneLoading = true;}
+        // )
+
         for(let i = 0; i < numbOfMoodles; i++){
           let params = {
             wstoken: this.user.moodles[i].token,
             wsfunction:'core_user_get_users',
             moodlewsrestformat:'json',
-            criteriakey: 'firstname',
-            criteriavalue: 'ana'
+            criteriakey: 'email',
+            criteriavalue: '%raleduc%'
           }
           this.moodleApiService.core_user_get_users(this.user.moodles[i].url, params).subscribe(
             data => {
               Object.defineProperty(data.users, "moodleName", {value:this.user.moodles[i].name});
               this.users.push(data.users) ;
-              console.log(this.users)
+
 
             },
             err => {
@@ -100,25 +126,75 @@ export class DisplayUsersComponent implements OnInit {
     for (let i = 0; i < this.user.moodles.length; i++){
       var arr = Object.values(this.users);
       var fuse = new Fuse(arr[i], options); // "list" is the item array
+
       var result = fuse.search(value);
       // Object.defineProperty(result, "moodleName", {value:this.users[i].moodleName});
       this.result.push(result)
-      console.log(this.result)
+  //
     }
     this.isResult = true;
   }
   userReport(name, id){
-    let dialogRef = this.dialog.open(DisplayUsersDialogComponent, {
-      width: '1500px',
-      height: '800px'
-      data: {
-        nome: name,
-        curso: 'Curso'
+    var resultG;
+    var resultC;
+    let params = {
+      wstoken: this.user.moodles[0].token,
+      wsfunction:'gradereport_overview_get_course_grades',
+      moodlewsrestformat:'json',
+      userid: id
+    }
+
+    this.moodleApiService.gradereport_overview_get_course_grades(this.user.moodles[0].url, params).subscribe(
+      data => { resultG = data; },
+      err => {console.log(err); return false},
+      () => {
+        if (resultG.grades.length !== 0){
+          var courseids = function() {
+            let courseidsString = '';
+            for (let i in resultG.grades){
+              courseidsString += '&options[ids][' + [i] + ']=' + resultG.grades[i].courseid ;
+            }
+            return courseidsString
+          }
+
+          let params = {
+            wstoken: this.user.moodles[0].token,
+            coursesid: courseids()
+          }
+
+          this.moodleApiService.core_course_get_courses(this.user.moodles[0].url, params).subscribe(
+            data => { resultC = data; console.log(data);},
+            err => {},
+            () => {
+              let dialogRef = this.dialog.open(DisplayUsersDialogComponent, {
+                width: '1500px',
+                height: '800px',
+                data: {
+                  name: name,
+                  grades: resultG.grades,
+                  courses: resultC
+
+                }
+              })
+              dialogRef.afterClosed().subscribe(result => {
+
+                this.dialogResult = result
+              })
+            }
+          )
+        }
+        else {
+          let dialogRef = this.dialog.open(DisplayUsersDialogComponent,{
+            width: '1500px',
+            height: '800px',
+            data: {
+              name: name,
+              grades: resultG.grades,
+              courses: resultC
+            }
+          })
+        };
       }
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('Dialog closed: ${result}');
-      this.dialogResult = result
-    })
+    );
   }
 }

@@ -1,5 +1,6 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MoodleApiService } from '../../services/moodle-api.service';
 
 @Component({
   selector: 'app-display-users-dialog',
@@ -9,10 +10,17 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 export class DisplayUsersDialogComponent  {
 
   constructor(
-    public dialogRef: MatDialogRef<DialogOverviewExampleDialog>,
+    private moodleApiService: MoodleApiService,
+    public dialogRef: MatDialogRef<DisplayUsersDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any) { }
 
 
+  ngOnInit(){}
+
+  getCourse(courseid){
+
+    return this.data.courses.find(function(course) {return course.id == courseid})
+  }
   onCloseConfirm() {
     this.dialogRef.close('Confirmar');
   }

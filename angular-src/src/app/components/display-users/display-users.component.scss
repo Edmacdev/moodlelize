@@ -11,11 +11,10 @@
   text-align: center;
 
 }
-.userList{
-  overflow: auto;
-}
+
 .userResult{
   overflow: scroll;
+  min-height: 200px;
   max-height: 360px;
 }
 .form-group{
@@ -30,6 +29,7 @@ ul {
   list-style-type: none;
 
 }
+
 .result li{
   padding: 10px;
   background: #E9EAEC;

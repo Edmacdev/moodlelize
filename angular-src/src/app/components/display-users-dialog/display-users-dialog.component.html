@@ -1,11 +1,23 @@
 <div>
-  <h2 mat-dialog-title>{{data.nome}}</h2>
+  <h2 mat-dialog-title>{{data.name}}</h2>
   <hr>
   <mat-dialog-content>
     <br>
     <br>
-    <p><strong>Cursos matriculados: </strong></p>
-    <p><strong>Notas: </strong></p>
+    <div *ngIf="!data.grades.length == 0">
+      <p><strong>Relatório: </strong></p>
+      <ul>
+        <li *ngFor="let grade of data.grades; let i = index">
+
+          <p><strong>Curso:</strong> {{getCourse(grade.courseid).fullname}}</p>
+          <p><strong>Nota:</strong> {{grade.grade}}</p>
+          <br>
+        </li>
+      </ul>
+    </div>
+    <div *ngIf="data.grades.length == 0">
+      <p>Usuário não está matriculado em nenhum curso</p>
+    </div>
 
 
   </mat-dialog-content>

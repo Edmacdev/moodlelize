@@ -66,7 +66,6 @@ export class DisplayCoursesComponent implements OnInit {
           data => {
             Object.defineProperty(data, "moodleName", {value:this.user.moodles[i].name});
             this.courses.push(data) ;
-            console.log(data)
             this.result = this.courses;
           },
           err => {
