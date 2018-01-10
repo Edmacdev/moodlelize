@@ -13,7 +13,6 @@ declare var $:any;
 })
 export class MoodleRegComponent implements OnInit {
 
-  user:Object;
   userId: String;
   name: String;
   url: String;
@@ -27,10 +26,12 @@ export class MoodleRegComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+
     $('.addItem').hide();
 
-    this.authService.getProfile().subscribe(profile => {
-      this.user = profile.user;
+    this.authService.getProfile().subscribe(
+      profile => {
+
       this.moodles = profile.user.moodles;
       this.userId = profile.user._id;
 

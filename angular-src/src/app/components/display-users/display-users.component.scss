@@ -27,31 +27,23 @@ li p {
 }
 ul {
   list-style-type: none;
+  margin: 0px;
 
 }
 
 .result li{
-  padding: 10px;
+
   background: #E9EAEC;
   border: 1px solid #777777;
   margin-top: 4px;
   margin-right: 20px;
   cursor: pointer;
-  display: inline-block;
   width: 400px;
   height: 60px;
-  float: left;
+  display: inline-block;
+
 }
-.result h5{
-  float: left;
-}
-li img{
-  width: 45px;
-  height: 45px;
-  float: left;
-  overflow: auto;
-  padding: 2px;
-}
+
 .icons{
   margin-right: 4px;
   float: right;
@@ -60,4 +52,28 @@ h4 {
   background: #940000;
   padding: 10px 0 10px 0;
   color: white;
+}
+.user-element{
+  display: inline-block;
+}
+.user-elements{
+  padding: 5px;
+}
+.user-img{
+  float: left;
+  padding: 4px;
+  margin-right: 5px;
+}
+.user-img img{
+  width: 45px;
+  height: 45px;
+}
+
+.user-name h5{
+  padding: 0px;
+
+}
+
+.md-24{
+  font-size: 24px;
 }

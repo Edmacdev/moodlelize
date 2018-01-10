@@ -2,7 +2,18 @@
 <div class="addItemContainer">
   <ul>
     <li *ngFor = "let moodle of moodles; let i = index" [routerLink]="['/dashboard', i]">
-      {{moodle.name}} <span>X</span>
+      <div class="moodle-elements">
+        <div class="moodle-element moodle-status"><i class="material-icons moodle-status">radio_button_unchecked</i></div>
+        <div class="moodle-element moodle-name"><h3>{{moodle.name}}</h3></div>
+        <div class="moodle-element moodle-remove"><i class="material-icons moodle-remove">remove_circle</i></div>
+      </div>
+    </li>
+    <li>
+      <div class="moodle-elements" style="margin-top:30px">
+        <div class="moodle-element moodle-status"><i class="material-icons moodle-status">radio_button_unchecked</i></div>
+        <div class="moodle-element moodle-name"><h3>Todos</h3></div>
+        <div class="moodle-element moodle-remove"><i class="material-icons moodle-remove">remove_circle</i></div>
+      </div>
     </li>
   </ul>
 </div>

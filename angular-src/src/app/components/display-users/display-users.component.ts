@@ -13,32 +13,19 @@ import {Observable} from 'rxjs/Rx';
   styleUrls: ['./display-users.component.scss']
 })
 export class DisplayUsersComponent implements OnInit {
-  user: {
-    email: {
-      type: String,
-      require: true
-    },
-    username: {
-      type: String,
-      require: true
-    },
-    password: {
-      type: String,
-      required: true
-    },
-    moodles: [
-      {
-        url: String,
-        name: String,
-        token:String
-      }
-    ]
-  };
+
   users: Object[] = [];
   result: Object[] = [];
   isDoneLoading: Boolean = false;
   isResult: Boolean = false;
   dialogResult = "";
+  moodles: [
+    {
+      url: String,
+      name: String,
+      token:String
+    }
+  ]
 
   constructor(
     private authService:AuthService,
@@ -48,103 +35,88 @@ export class DisplayUsersComponent implements OnInit {
 
   ngOnInit() {
     this.authService.getProfile().subscribe(
-      profile => {this.user = profile.user;},
+      profile => {
+        this.moodles = profile.user.moodles;
+      },
       err => {
         console.log(err);
         return false;
       },
       () => {
+        const numbOfMoodles = this.moodles.length;
+        var observablesArray = [];
 
-        const numbOfMoodles = this.user.moodles.length;
-
-        // var observablesArray = [];
-        // for(let i = 0 ;i < numbOfMoodles; i++){
-        //   let params = {
-        //     wstoken: this.user.moodles[i].token,
-        //     criteriakey: 'email',
-        //     criteriavalue: '%raleduc%'
-        //   }
-        //   observablesArray.push(this.moodleApiService.core_user_get_users(this.user.moodles[i].url, params))
-        // }
-        //
-        //   Observable.forkJoin(observablesArray).subscribe(
-        //   data => {
-        //     // Object.defineProperty(data.users, "moodleName", {value:this.user.moodles[i].name});
-        //     this.users.push(data.users) ;
-        //
-        //
-        //   },
-        //   err => {
-        //     console.log(err);
-        //     return false;
-        //   },
-        //   () => {this.isDoneLoading = true;}
-        // )
-
-        for(let i = 0; i < numbOfMoodles; i++){
+        for(var i in this.moodles){
+        // for(var index = 0; index < this.moodles.length; index++){
           let params = {
-            wstoken: this.user.moodles[i].token,
-            wsfunction:'core_user_get_users',
-            moodlewsrestformat:'json',
-            criteriakey: 'email',
-            criteriavalue: '%raleduc%'
+            wstoken: this.moodles[i].token,
+            criteriakey: 'firstname',
+            criteriavalue: 'ana',
+            moodleIndex: i,
+            moodleName: this.moodles[i].name
           }
-          this.moodleApiService.core_user_get_users(this.user.moodles[i].url, params).subscribe(
-            data => {
-              Object.defineProperty(data.users, "moodleName", {value:this.user.moodles[i].name});
-              this.users.push(data.users) ;
 
+          const request = this.moodleApiService.core_user_get_users(this.moodles[i].url, params)
 
-            },
-            err => {
-              console.log(err);
-              return false;
-            },
-            () => {this.isDoneLoading = true;}
-          )
+          observablesArray.push(request);
         }
+
+        Observable.forkJoin(observablesArray)
+        .subscribe(
+          data => {
+            // Object.defineProperty(data.users, "moodleName", {value:this.user.moodles[i].name});
+            this.users = data ;
+
+
+          },
+          err => {
+            console.log(err);
+            return false;
+          },
+          () => {this.isDoneLoading = true;}
+        )
       }
     );
   }
+
   onSubmit(value){
 
     this.result = [];
 
     var options = {
-    shouldSort: true,
-    tokenize: false,
-    threshold: 0.3,
-    location: 0,
-    distance: 100,
-    maxPatternLength: 32,
-    minMatchCharLength: 1,
-    keys: [
-      "fullname",
-    ]
-  };
+      shouldSort: true,
+      tokenize: false,
+      threshold: 0.3,
+      location: 0,
+      distance: 100,
+      maxPatternLength: 32,
+      minMatchCharLength: 1,
+      keys: [
+        "fullname",
+      ]
+    };
 
-    for (let i = 0; i < this.user.moodles.length; i++){
-      var arr = Object.values(this.users);
-      var fuse = new Fuse(arr[i], options); // "list" is the item array
-
-      var result = fuse.search(value);
+    for (let i in this.moodles){
+      let arr = Object.values(this.users);
+      let fuse = new Fuse(arr[i].users, options);
+      let result = fuse.search(value);
       // Object.defineProperty(result, "moodleName", {value:this.users[i].moodleName});
-      this.result.push(result)
-  //
+      this.result.push(result);
+      console.log(this.result)
     }
+
     this.isResult = true;
   }
+
   userReport(name, id){
     var resultG;
     var resultC;
     let params = {
-      wstoken: this.user.moodles[0].token,
-      wsfunction:'gradereport_overview_get_course_grades',
-      moodlewsrestformat:'json',
+      wstoken: this.moodles[0].token,
       userid: id
     }
 
-    this.moodleApiService.gradereport_overview_get_course_grades(this.user.moodles[0].url, params).subscribe(
+    this.moodleApiService.gradereport_overview_get_course_grades(this.moodles[0].url, params).subscribe(
       data => { resultG = data; },
       err => {console.log(err); return false},
       () => {
@@ -158,12 +130,12 @@ export class DisplayUsersComponent implements OnInit {
           }
 
           let params = {
-            wstoken: this.user.moodles[0].token,
+            wstoken: this.moodles[0].token,
             coursesid: courseids()
           }
 
-          this.moodleApiService.core_course_get_courses(this.user.moodles[0].url, params).subscribe(
-            data => { resultC = data; console.log(data);},
+          this.moodleApiService.core_course_get_courses(this.moodles[0].url, params).subscribe(
+            data => { resultC = data; },
             err => {},
             () => {
               let dialogRef = this.dialog.open(DisplayUsersDialogComponent, {

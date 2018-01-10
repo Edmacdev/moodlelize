@@ -18,7 +18,6 @@ ul{
 li{
   border-bottom:  1px solid #bfbfbf;
   background-color: #d7d7d7;
-  padding: 10px 0px;
   margin-bottom: 5px;
   cursor: pointer;
 }
@@ -50,4 +49,33 @@ span {
   position: relative;
   float: right;
   margin-right:  10px;
+}
+
+.moodle-element{
+  display: inline-block;
+
+}
+
+.moodle-elements{
+  padding: 10px 0 10px 0;
+}
+.moodle-element:hover{
+
+}
+.moodle-elements:hover{
+  background: #189AD3;
+  color: white;
+}
+.moodle-status{
+  float: left;
+  margin-left: 15px;
+  vertical-align: middle;
+}
+.moodle-remove{
+  float: right;
+  margin-right: 15px;
+}
+.moodle-name h3{
+
+  margin: 0px;
 }
