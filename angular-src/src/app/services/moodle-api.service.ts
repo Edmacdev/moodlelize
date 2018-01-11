@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Http, Headers } from '@angular/http';
+import { UtilService } from './util.service'
 import 'rxjs/add/operator/map';
 
 @Injectable()
@@ -7,10 +8,11 @@ export class MoodleApiService {
 wsURL: String = '/webservice/rest/server.php';
 wsProtocol: String = 'http://';
 
-// wsToken: String = '8672510676f1c09e441042e532b3786a';
+
 
   constructor(
-    private http:Http
+    private http:Http,
+    private utilService:UtilService
   ) { }
 
   core_course_get_courses(host, params){
@@ -21,7 +23,7 @@ wsProtocol: String = 'http://';
     '&moodlewsrestformat=json' +
     params.coursesid
     ).map(res => {
-        res.moodleIndex = params.moodleIndex;
+
         return res.json()
       })
   }
@@ -35,10 +37,13 @@ wsProtocol: String = 'http://';
     '&criteria[0][key]=' + params.criteriakey +
     '&criteria[0][value]=' + params.criteriavalue
     ).map(res => {
-        // res.json().moodleIndex = params.moodleIndex;
+        
         var obj = res.json();
         Object.defineProperty(obj, "moodleIndex", {value:params.moodleIndex});
         Object.defineProperty(obj, "moodleName", {value:params.moodleName});
+        var msg = params.moodleName + ' está pronto';
+        this.utilService.warning(msg);
+
         return obj
       })
   }

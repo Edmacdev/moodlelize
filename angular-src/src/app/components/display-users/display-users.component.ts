@@ -5,6 +5,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { DisplayUsersDialogComponent } from '../display-users-dialog/display-users-dialog.component';
 import * as Fuse from 'fuse.js';
 import {Observable} from 'rxjs/Rx';
+import { UtilService } from '../../services/util.service';
 
 
 @Component({
@@ -30,7 +31,8 @@ export class DisplayUsersComponent implements OnInit {
   constructor(
     private authService:AuthService,
     private moodleApiService:MoodleApiService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private utilService: UtilService
   ) { }
 
   ngOnInit() {
@@ -47,11 +49,11 @@ export class DisplayUsersComponent implements OnInit {
         var observablesArray = [];
 
         for(var i in this.moodles){
-        // for(var index = 0; index < this.moodles.length; index++){
+
           let params = {
             wstoken: this.moodles[i].token,
             criteriakey: 'firstname',
-            criteriavalue: 'ana',
+            criteriavalue: 'ana%',
             moodleIndex: i,
             moodleName: this.moodles[i].name
           }
@@ -62,9 +64,10 @@ export class DisplayUsersComponent implements OnInit {
         }
 
         Observable.forkJoin(observablesArray)
+        // .map(data => {console.log('data!'); return data})
         .subscribe(
           data => {
-            // Object.defineProperty(data.users, "moodleName", {value:this.user.moodles[i].name});
+
             this.users = data ;
 
 
@@ -73,7 +76,11 @@ export class DisplayUsersComponent implements OnInit {
             console.log(err);
             return false;
           },
-          () => {this.isDoneLoading = true;}
+          () => {
+            this.isDoneLoading = true;
+            this.utilService.updateStatus(true);
+            // this.utilService.currentStatus.subscribe(status => console.log(status))
+            }
         )
       }
     );
@@ -97,12 +104,12 @@ export class DisplayUsersComponent implements OnInit {
     };
 
     for (let i in this.moodles){
+
       let arr = Object.values(this.users);
       let fuse = new Fuse(arr[i].users, options);
       let result = fuse.search(value);
-      // Object.defineProperty(result, "moodleName", {value:this.users[i].moodleName});
       this.result.push(result);
-      console.log(this.result)
+
     }
 
     this.isResult = true;

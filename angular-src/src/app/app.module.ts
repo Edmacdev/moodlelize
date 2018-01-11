@@ -20,6 +20,7 @@ import { ValidateService } from './services/validate.service';
 import { AuthService } from './services/auth.service';
 import { AuthGuard } from './guards/auth.guard';
 import { MoodleService } from './services/moodle.service';
+import { UtilService } from './services/util.service';
 
 import { MoodleApiService } from './services/moodle-api.service';
 import { CoursePageComponent } from './components/course-page/course-page.component';
@@ -66,8 +67,8 @@ import { DisplayUsersDialogComponent } from './components/display-users-dialog/d
     AuthService,
     AuthGuard,
     MoodleService,
-    MoodleApiService
-
+    MoodleApiService,
+    UtilService
   ],
   bootstrap: [AppComponent],
   entryComponents:[

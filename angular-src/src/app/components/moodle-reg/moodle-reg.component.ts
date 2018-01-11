@@ -3,6 +3,8 @@ import { AuthService } from '../../services/auth.service';
 import { MoodleService } from '../../services/moodle.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
 import { Router } from '@angular/router';
+import { UtilService } from '../../services/util.service';
+
 
 declare var $:any;
 
@@ -18,14 +20,24 @@ export class MoodleRegComponent implements OnInit {
   url: String;
   token: String;
   moodles:Object;
+  status:boolean;
+
+  statusA: Boolean[] = [];
 
   constructor(
     private authService:AuthService,
     private flashMessage:FlashMessagesService,
-    private router:Router
-  ) { }
+    private router:Router,
+    private utilService: UtilService
+  ) {
+        // utilService.status$.subscribe((newStatus: boolean) => { this.dbStatus = newStatus });
+    }
 
   ngOnInit() {
+
+    this.utilService.currentStatus.subscribe(status => {
+      this.status = status;
+    })
 
     $('.addItem').hide();
 
@@ -39,7 +51,12 @@ export class MoodleRegComponent implements OnInit {
     err => {
       console.log(err);
       return false;
-    });
+    },
+    () => {
+     // this.utilService.initMoodlesStatus(this.moodles);
+
+    }
+  );
   }
   showDiv(){
     $('.addItem').toggle();

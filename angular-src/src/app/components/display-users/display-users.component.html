@@ -11,8 +11,8 @@
 
     <div *ngIf="(isResult)">
 
-      <div *ngFor="let userArray of result" class="userList" >
-        <h4>{{userArray.moodleName}}</h4>
+      <div *ngFor="let userArray of result; let i = index; " class="userList" >
+        <h4>{{users[i].moodleName}}</h4>
         <div class="userResult">
           <ul >
             <li *ngFor="let user of userArray">
