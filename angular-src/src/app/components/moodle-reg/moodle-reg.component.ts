@@ -4,7 +4,8 @@ import { MoodleService } from '../../services/moodle.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
 import { Router } from '@angular/router';
 import { UtilService } from '../../services/util.service';
-
+import {Observable} from 'rxjs/Rx';
+import { MoodleApiService } from '../../services/moodle-api.service';
 
 declare var $:any;
 
@@ -22,22 +23,25 @@ export class MoodleRegComponent implements OnInit {
   moodles:Object;
   status:boolean;
 
-  statusA: Boolean[] = [];
+  moodleIsSelected:Boolean = false;
+
+  statusA: Boolean[] = [false,false];
 
   constructor(
     private authService:AuthService,
     private flashMessage:FlashMessagesService,
     private router:Router,
-    private utilService: UtilService
+    private utilService: UtilService,
+    private moodleApiService: MoodleApiService
   ) {
         // utilService.status$.subscribe((newStatus: boolean) => { this.dbStatus = newStatus });
     }
 
   ngOnInit() {
 
-    this.utilService.currentStatus.subscribe(status => {
-      this.status = status;
-    })
+    this.utilService.currentStatus1.subscribe(status => {this.statusA[0] = status;})
+    this.utilService.currentStatus2.subscribe(status => {this.statusA[1] = status;})
+
 
     $('.addItem').hide();
 
@@ -53,8 +57,8 @@ export class MoodleRegComponent implements OnInit {
       return false;
     },
     () => {
+      this.loadDatabase();
      // this.utilService.initMoodlesStatus(this.moodles);
-
     }
   );
   }
@@ -78,6 +82,51 @@ export class MoodleRegComponent implements OnInit {
         document.location.reload(true);
       }
     });
+  }
+
+  onMoodleSelected(index){
+    if(this.statusA[index] == true){
+      this.utilService.setMoodleSelected(index);
+    }
+    else alert("Aguarde o carregamento do banco de dados")
+
+  }
+  loadDatabase(){
+    for (var i in this.moodles){
+      let params = {
+        wstoken: this.moodles[i].token,
+        criteriakey: 'firstname',
+        criteriavalue: 'ana%',
+        moodleIndex: i,
+        moodleName: this.moodles[i].name
+      }
+      const request1 = this.moodleApiService.core_user_get_users(this.moodles[i].url, params)
+      let params2 = {
+        wstoken: this.moodles[i].token,
+        moodleIndex: i,
+        moodleName: this.moodles[i].name
+      }
+      const request2 = this.moodleApiService.core_course_get_courses(this.moodles[i].url, params2)
+      observablesArray.push(request1);
+      observablesArray.push(request2);
+    }
+    console.log("load")
+    Observable.forkJoin(observablesArray)
+    .subscribe(
+      data => {
+        this.users = data ;
+
+      },
+      err => {
+        console.log(err);
+        return false;
+      },
+      () => {
+        this.isDoneLoading = true;
+        console.log('tudo carregado')
+        }
+    )
+    }
   }
 
 }

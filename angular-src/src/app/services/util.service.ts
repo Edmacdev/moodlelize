@@ -5,43 +5,34 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject'
 
 @Injectable()
 export class UtilService {
-  private status = new BehaviorSubject<boolean>(false);
-  currentStatus = this.status.asObservable();
 
-  // moodlesStatus: BehaviorSubject<boolean>[] = [];
-  moodlesStatus: any[];
+  private status1 = new BehaviorSubject<boolean>(false);
+  private status2 = new BehaviorSubject<boolean>(false);
+  private ismoodleSelected = new BehaviorSubject<boolean>(false);
 
+  private array :BehaviorSubject<boolean>[] =[this.status1,this.status2]
+
+  currentStatus1 = this.array[0].asObservable();
+  currentStatus2 = this.array[1].asObservable();
+
+  currentIsMoodleSelected = this.ismoodleSelected.asObservable();
+
+  moodleSelectedIndex: number = null;
+  
 
   constructor() { }
 
-  updateStatus(status: boolean){
-    this.status.next(status);
+  updateStatus(status: boolean; index){
+    this.array[index].next(status);
   }
-
-  initMoodlesStatus(moodles){
-    var observablesArray = [];
-    for(let i in moodles){
-      let status = new BehaviorSubject<boolean>(false)
-      observablesArray.push(status)
-      // this.moodlesStatus.push(status);
-      // console.log(this.moodlesStatus[i].asObservable())
-      // this.moodlesStatus[i].asObservable().subscribe(data => {console.log(data)})
-    }
-    // console.log(observablesArray)
-
-    Observable.forkJoin(observablesArray).subscribe(
-      data => {this.moodlesStatus = data as any[]; },
-      err => {console.log(err)},
-      () => {}
-
-  );
-
-    // this.moodlesStatus.subscribe(data => {console.log(data)})
-
+  setMoodleSelected(index){
+    this.moodleSelected = this.index;
   }
-
-  warning(msg){
-    console.log(msg)
+  updateStatusIsMoodleSelected(status){
+    this.ismoodleSelected.next(status)
+  }
+  getMoodleSelectedIndex(){
+    return this.moodleSlectedIndex;
   }
 
 }

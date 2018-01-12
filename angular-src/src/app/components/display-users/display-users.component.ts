@@ -62,26 +62,21 @@ export class DisplayUsersComponent implements OnInit {
 
           observablesArray.push(request);
         }
-
-        Observable.forkJoin(observablesArray)
-        // .map(data => {console.log('data!'); return data})
-        .subscribe(
-          data => {
-
-            this.users = data ;
-
-
-          },
-          err => {
-            console.log(err);
-            return false;
-          },
-          () => {
-            this.isDoneLoading = true;
-            this.utilService.updateStatus(true);
-            // this.utilService.currentStatus.subscribe(status => console.log(status))
-            }
-        )
+          Observable.forkJoin(observablesArray)
+          .subscribe(
+            data => {
+              this.users = data ;
+            },
+            err => {
+              console.log(err);
+              return false;
+            },
+            () => {
+              this.isDoneLoading = true;
+              //
+              // this.utilService.currentStatus.subscribe(status => console.log(status))
+              }
+          )
       }
     );
   }

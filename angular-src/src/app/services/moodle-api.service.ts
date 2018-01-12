@@ -23,8 +23,10 @@ wsProtocol: String = 'http://';
     '&moodlewsrestformat=json' +
     params.coursesid
     ).map(res => {
-
-        return res.json()
+      let obj = res.json();
+      Object.defineProperty(obj, "moodleIndex", {value:params.moodleIndex});
+      Object.defineProperty(obj, "moodleName", {value:params.moodleName});
+      return obj
       })
   }
 
@@ -37,12 +39,12 @@ wsProtocol: String = 'http://';
     '&criteria[0][key]=' + params.criteriakey +
     '&criteria[0][value]=' + params.criteriavalue
     ).map(res => {
-        
-        var obj = res.json();
+
+        let obj = res.json();
         Object.defineProperty(obj, "moodleIndex", {value:params.moodleIndex});
         Object.defineProperty(obj, "moodleName", {value:params.moodleName});
-        var msg = params.moodleName + ' está pronto';
-        this.utilService.warning(msg);
+
+        this.utilService.updateStatus(true, params.moodleIndex);
 
         return obj
       })

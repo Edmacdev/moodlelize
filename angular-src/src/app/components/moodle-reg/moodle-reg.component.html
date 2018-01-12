@@ -1,22 +1,24 @@
-<h2>Moodles Registrados</h2>
+<h2>MOODLES</h2>
+<h3>Selecione o moodle que deseja adminstrar</h3>
 <div class="addItemContainer">
+
   <ul>
     <li *ngFor = "let moodle of moodles; let i = index">
-      <div class="moodle-elements">
-        <div [hidden]="status" class="moodle-element moodle-status"><i class="material-icons moodle-status">radio_button_unchecked</i>indisponível</div>
-        <div [hidden]="!status" class="moodle-element moodle-status" style="color:green"><i class="material-icons moodle-status">radio_button_checked</i>disponível</div>
+      <div (click)="onMoodleSelected(i)" class="moodle-elements">
+        <div [hidden]="statusA[i]" class="moodle-element moodle-status"><i class="material-icons moodle-status">radio_button_unchecked</i>indisponível</div>
+        <div [hidden]="!statusA[i]" class="moodle-element moodle-status" style="color:green"><i class="material-icons moodle-status">radio_button_checked</i>disponível</div>
         <div class="moodle-element moodle-name"><h3>{{moodle.name}}</h3></div>
         <div class="moodle-element moodle-remove"><i class="material-icons moodle-remove">remove_circle</i></div>
       </div>
     </li>
-    <li>
+    <!-- <li>
       <div class="moodle-elements" style="margin-top:30px">
         <div [hidden]="status" class="moodle-element moodle-status"><i class="material-icons moodle-status">radio_button_unchecked</i>indisponível</div>
         <div [hidden]="!status" class="moodle-element moodle-status" style="color:green"><i class="material-icons moodle-status">radio_button_checked</i>disponível</div>
         <div class="moodle-element moodle-name"><h3>Todos</h3></div>
         <div class="moodle-element moodle-remove"><i class="material-icons moodle-remove">remove_circle</i></div>
       </div>
-    </li>
+    </li> -->
   </ul>
 </div>
 
