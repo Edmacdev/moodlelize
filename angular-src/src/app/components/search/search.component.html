@@ -1,6 +1,41 @@
-<div >
-  <h4>Buscador</h4>
-  <form (submit)="onSubmit(searchQuery)">
+<div style="text-align:center" class="searchWrapper">
+  <h3>Buscador</h3>
+  <form (submit)="onSubmit(form_query, form_field, form_moodle)">
+    <h4>Buscar
+      <mat-form-field class="mat-form" >
+        <input [(ngModel)]="form_query" name="form_query" matInput placeholder="pesquisar">
+      </mat-form-field>
+       no campo
+      <mat-form-field class="mat-form">
+        <mat-select [(ngModel)]="form_field" name="form_field">
+          <mat-option value="users">Usuários</mat-option>
+          <mat-option value="courses">Cursos</mat-option>
+        </mat-select>
+      </mat-form-field>
+       no moodle
+       <mat-form-field class="mat-form" >
+         <mat-select  [(ngModel)]="form_moodle" name="form_moodle">
+           <mat-option *ngFor="let moodle of moodles let i = index" [value]="i">{{moodle.name}}</mat-option>
+         </mat-select>
+       </mat-form-field>
+       <input style="width:100px"type="submit" name="search-submit" class="form-control btn btn-primary"value="Buscar">
+    </h4>
+  </form>
+  <div class="result">
+    <div *ngIf="courses"class="coursesResult">
+      <ul>
+        <li *ngFor="let course of result">
+          <p><strong>{{course.fullname}}</strong></p>
+        </li>
+      </ul>
+    </div>
+    <div *ngIf="users" class="">
+
+    </div>
+
+  </div>
+
+  <!-- <form (submit)="onSubmit(searchQuery)">
     <div class="form-group" >
       <input type="text" [(ngModel)]="searchQuery" name="searchQuery" class=""  class="form-control" placeholder="" value="">
     </div>
@@ -14,66 +49,5 @@
 
     <input type="submit" name="search-submit" class="form-control btn btn-primary" value="Buscar {{filter}}">
 
-  </form>
-  <div *ngIf="(isResult)">
-
-    <div *ngIf="(filter == 'cursos')">
-      <div class="result">
-        <h5>Resultado</h5>
-        <ul>
-          <li *ngFor="let result of results" >
-            <ul>
-              <!-- <li><h3><strong>Moodle {{result.moodleName}}</strong></h3></li> -->
-              <!-- <li *ngFor="let course of result.courses">
-                <ul >
-                  <li><p>Nome: {{course.fullname}}</p></li>
-                  <li><p>id: {{course.id}}</p></li>
-                  <li><p>Categoria: {{course.categoryname}}</p></li>
-                </ul>
-              </li> -->
-            </ul>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <div *ngIf="(filter == 'usuários')" class="result-users">
-      <div *ngFor="let result of results" >
-        <div *ngFor="let user of result.users">
-          <ul class="result">
-            <li (click)="onListItemClick(user.id)">
-              <!-- <h4><strong>{{user.fullname}}</strong></h4> -->
-              <h4><strong>Nome: {{user.firstname}} Sobrenone: {{user.lastname}}</strong></h4>
-              <div class="listItemImg"><img [attr.src]="user.profileimageurl" alt=""></div>
-              <p>id: {{user.id}}</p>
-              <p>email: {{user.email}}</p>
-              <p>moodle: {{result.moodleName}}</p>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <div *ngIf="(filter == 'tudo')">
-      <div>
-        <h5>Resultado</h5>
-        <ul>
-          <li *ngFor="let result of results" >
-            <ul>
-              <li><h3><strong> Moodle {{result.moodle.name}}</strong></h3></li>
-              <a  *ngFor="let user of result.users">
-                <ul >
-                  <li><p>Nome: {{user.fullname}}</p></li>
-                  <li><p>id: {{user.id}}</p></li>
-                  <li><p>email: {{user.email}}</p></li>
-                  <li><p>username: {{user.username}}</p></li>
-                </ul>
-              </a>
-            </ul>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-  </div>
+  </form> -->
 </div>

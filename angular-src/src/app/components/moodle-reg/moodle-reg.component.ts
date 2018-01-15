@@ -58,7 +58,7 @@ export class MoodleRegComponent implements OnInit {
         return false;
       },
       () => {
-        this.loadDatabase();
+        // this.loadDatabase();
     }
   );
   }
@@ -120,7 +120,7 @@ export class MoodleRegComponent implements OnInit {
     Observable.forkJoin(observablesArray)
     .subscribe(
       data => {
-        console.log(data)
+        // this.utilService.setMoodleData(data)
 
       },
       err => {
@@ -129,6 +129,7 @@ export class MoodleRegComponent implements OnInit {
       },
       () => {
         this.isDoneLoading = true;
+
         console.log('tudo carregado')
         }
     )

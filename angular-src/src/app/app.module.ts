@@ -5,8 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { FlashMessagesModule } from 'angular2-flash-messages'
 import { HttpModule } from '@angular/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatButtonModule, MatCardModule, MatMenuModule, MatToolbarModule, MatIconModule } from '@angular/material';
-import {MatDialogModule} from '@angular/material/dialog';
+import { MatButtonModule, MatCardModule, MatMenuModule, MatToolbarModule,
+        MatIconModule, MatDialogModule, MatSelectModule, MatInputModule } from '@angular/material';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
@@ -60,7 +60,9 @@ import { DisplayUsersDialogComponent } from './components/display-users-dialog/d
     MatMenuModule,
     MatToolbarModule,
     MatIconModule,
-    MatDialogModule
+    MatDialogModule,
+    MatSelectModule,
+    MatInputModule
   ],
   providers: [
     ValidateService,

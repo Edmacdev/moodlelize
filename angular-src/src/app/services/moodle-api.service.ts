@@ -30,6 +30,16 @@ wsProtocol: String = 'https://';
       })
   }
 
+  core_course_get_courses_by_field(host, params){
+    return this.http.get(this.wsProtocol + host + this.wsURL +
+    '?wstoken=' + params.wstoken +
+    '&wsfunction=core_course_get_courses_by_field' +
+    '&moodlewsrestformat=json' +
+    '&field=' + params.field +
+    '&value=' + params.value
+  ).map(res => res.json())
+  }
+
   core_user_get_users(host, params){
 
     return this.http.get(this.wsProtocol + host + this.wsURL +
