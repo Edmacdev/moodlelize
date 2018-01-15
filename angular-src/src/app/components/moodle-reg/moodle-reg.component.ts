@@ -22,6 +22,7 @@ export class MoodleRegComponent implements OnInit {
   token: String;
   moodles:Object;
   status:boolean;
+  isDoneLoading: Boolean = false;
 
   moodleIsSelected:Boolean = false;
 
@@ -51,14 +52,13 @@ export class MoodleRegComponent implements OnInit {
       this.moodles = profile.user.moodles;
       this.userId = profile.user._id;
 
-    },
-    err => {
-      console.log(err);
-      return false;
-    },
-    () => {
-      this.loadDatabase();
-     // this.utilService.initMoodlesStatus(this.moodles);
+      },
+      err => {
+        console.log(err);
+        return false;
+      },
+      () => {
+        this.loadDatabase();
     }
   );
   }
@@ -73,16 +73,20 @@ export class MoodleRegComponent implements OnInit {
       token: this.token
     }
 
-    this.authService.updateMoodle(this.userId, moodle).subscribe(data => {
-      if(data){
+    this.authService.updateMoodle(this.userId, moodle).subscribe(
+      data => {
+
         this.flashMessage.show('Moodle registrado com sucesso', {cssClass: 'alert-success', timeout:3000});
         document.location.reload(true);
-      }else{
+      },
+      err => {
         this.flashMessage.show('Erro ao registrar moodle', {cssClass: 'alert-danger', timeout:3000});
         document.location.reload(true);
       }
-    });
+    );
   }
+  // onRemoveMoodle(this.userId, this.moodles ){
+  // }
 
   onMoodleSelected(index){
     if(this.statusA[index] == true){
@@ -92,6 +96,7 @@ export class MoodleRegComponent implements OnInit {
 
   }
   loadDatabase(){
+    var observablesArray = [];
     for (var i in this.moodles){
       let params = {
         wstoken: this.moodles[i].token,
@@ -110,11 +115,11 @@ export class MoodleRegComponent implements OnInit {
       observablesArray.push(request1);
       observablesArray.push(request2);
     }
-    console.log("load")
+
     Observable.forkJoin(observablesArray)
     .subscribe(
       data => {
-        this.users = data ;
+        console.log(data)
 
       },
       err => {
@@ -127,6 +132,6 @@ export class MoodleRegComponent implements OnInit {
         }
     )
     }
-  }
+
 
 }

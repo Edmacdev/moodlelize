@@ -60,3 +60,6 @@ module.exports.updateMoodle = function(id, moodle, callback){
       callback
     );
 }
+module.exports.removeMoodle = function(id, moodleid,callback){
+  
+}

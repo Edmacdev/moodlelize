@@ -18,21 +18,21 @@ export class UtilService {
   currentIsMoodleSelected = this.ismoodleSelected.asObservable();
 
   moodleSelectedIndex: number = null;
-  
+
 
   constructor() { }
 
-  updateStatus(status: boolean; index){
+  updateStatus(status: boolean, index){
     this.array[index].next(status);
   }
   setMoodleSelected(index){
-    this.moodleSelected = this.index;
+    this.moodleSelectedIndex = index;
   }
   updateStatusIsMoodleSelected(status){
     this.ismoodleSelected.next(status)
   }
   getMoodleSelectedIndex(){
-    return this.moodleSlectedIndex;
+    return this.moodleSelectedIndex;
   }
 
 }

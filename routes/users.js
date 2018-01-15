@@ -62,13 +62,18 @@ router.get('/profile', passport.authenticate('jwt', {session:false}), (req, res,
 });
 
 //Update user
-router.put('/update/:id', (req, res, next) => {
+
+//add moodle
+router.put('/update/add/:id', (req, res, next) => {
   User.updateMoodle(req.params.id, req.body, (err, user) => {
     if(err){
       console.log('erro ocorreu: ' + err);
     }else res.send(user);
   })
 });
+
+//edit moodle 
+
 
 
 

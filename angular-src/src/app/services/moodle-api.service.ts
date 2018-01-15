@@ -6,7 +6,7 @@ import 'rxjs/add/operator/map';
 @Injectable()
 export class MoodleApiService {
 wsURL: String = '/webservice/rest/server.php';
-wsProtocol: String = 'http://';
+wsProtocol: String = 'https://';
 
 
 
@@ -20,8 +20,8 @@ wsProtocol: String = 'http://';
     return this.http.get(this.wsProtocol + host + this.wsURL +
     '?wstoken=' + params.wstoken +
     '&wsfunction=core_course_get_courses' +
-    '&moodlewsrestformat=json' +
-    params.coursesid
+    '&moodlewsrestformat=json'
+
     ).map(res => {
       let obj = res.json();
       Object.defineProperty(obj, "moodleIndex", {value:params.moodleIndex});

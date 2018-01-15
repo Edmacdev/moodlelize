@@ -66,14 +66,17 @@ export class AuthService {
    }
  }
 
-//Moodle
-updateMoodle(id, moodle){
-  let headers = new Headers();
-  let options = new RequestOptions({ headers: headers });
-  headers.append('Content-Type', 'application/json');
-  let body = JSON.stringify(moodle);
-  console.log(body)
-  return this.http.put("http://localhost:3000/users/update/" + id, body, options)
-  .map(res => res.json());
-}
+  //Moodle
+  updateMoodle(id, moodle){
+    let headers = new Headers();
+    let options = new RequestOptions({ headers: headers });
+    headers.append('Content-Type', 'application/json');
+    let body = JSON.stringify(moodle);
+    console.log(body)
+    return this.http.put("http://localhost:3000/users/update/add" + id, body, options)
+    .map(res => res.json());
+  }
+  removeMoodle(id){
+
+  }
 }
