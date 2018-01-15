@@ -91,6 +91,7 @@ export class MoodleRegComponent implements OnInit {
   onMoodleSelected(index){
     if(this.statusA[index] == true){
       this.utilService.setMoodleSelected(index);
+      alert("moodle " + this.moodles[index].name + "selecionado")
     }
     else alert("Aguarde o carregamento do banco de dados")
 

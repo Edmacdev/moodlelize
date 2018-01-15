@@ -3,12 +3,6 @@ import { MoodleApiService } from '../../services/moodle-api.service';
 import { AuthService } from '../../services/auth.service';
 import {Observable} from 'rxjs/Rx'
 import { Router } from '@angular/router';
-import 'rxjs/add/observable/concat';
-import "rxjs/add/operator/distinctUntilChanged";
-import "rxjs/add/operator/distinct";
-import "rxjs/add/operator/merge";
-
-
 
 declare var $:any;
 
