@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { MoodleApiService } from '../../services/moodle-api.service';
 import { AuthService } from '../../services/auth.service';
 import { Observable } from 'rxjs/Rx';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { DisplayUsersDialogComponent } from '../display-users-dialog/display-users-dialog.component';
 import * as Fuse from 'fuse.js';
 
 declare var $:any;
@@ -34,7 +36,8 @@ export class SearchComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private moodleApiService: MoodleApiService
+    private moodleApiService: MoodleApiService,
+    public dialog: MatDialog
   ){}
 
   ngOnInit() {
@@ -49,15 +52,38 @@ export class SearchComponent implements OnInit {
     )
   }
   onSubmit(query, field, moodleIndex){
+
     this.moodleIndex = moodleIndex;
+    this.isEmpty = false;
     var params;
 
     switch(field){
       case 'users':
+
+        this.isCoursesResult = false;
+
+        var criteriakey = '';
+        var criteriavalue = '';
+
+        if(query.indexOf('@') !== -1 ){
+          criteriakey = 'email';
+          criteriavalue = query;
+          console.log('email');
+        }
+        else if(query.match(/^[0-9]*$/gm)){
+          criteriakey = 'id';
+          criteriavalue = query;
+          console.log('id')
+        }
+        else {
+          criteriakey = 'firstname';
+          criteriavalue = query + '%';
+          console.log('firstname')
+        }
         params ={
           wstoken: this.moodles[moodleIndex].token,
-          criteriakey:'firstname',
-          criteriavalue: query + '%'
+          criteriakey: criteriakey,
+          criteriavalue: criteriavalue
         }
         this.moodleApiService.core_user_get_users(this.moodles[moodleIndex].url, params)
         .subscribe(
@@ -69,13 +95,16 @@ export class SearchComponent implements OnInit {
             return false
           },
           () => {
-            console.log(this.users);
-            this.isUsersResult = true;
-          };
+            if(this.users.users.length == 0){
+              this.isEmpty = true;
+            }
+          }
         )
+        this.isUsersResult = true;
       break;
-      case 'courses':
 
+      case 'courses':
+        this.isUsersResult = false;
         if(!this.courses[moodleIndex]){
 
           params = {
@@ -91,7 +120,7 @@ export class SearchComponent implements OnInit {
             () => {
               if(query == ''){
                 this.result[moodleIndex] = this.courses[moodleIndex];
-                console.log(this.result)
+
               }
               else{
                 var options = {
@@ -103,10 +132,14 @@ export class SearchComponent implements OnInit {
                 };
                 let fuse = new Fuse(this.courses[moodleIndex], options);
                 this.result[moodleIndex] = fuse.search(query);
+
+                if(this.result[moodleIndex].length == 0){
+                  this.isEmpty = true;
+                }
               }
-              this.isCoursesResult = true;
             }
           )
+          this.isCoursesResult = true;
         }
         else {
           if(query == ''){
@@ -123,6 +156,10 @@ export class SearchComponent implements OnInit {
             let fuse = new Fuse(this.courses[moodleIndex], options);
             this.result[moodleIndex] = fuse.search(query);
             this.isCoursesResult = true;
+
+            if(this.result[moodleIndex].length == 0){
+              this.isEmpty = true;
+            }
           }
         }
       break
@@ -130,5 +167,66 @@ export class SearchComponent implements OnInit {
         alert('Escolha um campo de pesquisa');
       break
     }
+  }
+  userReport(name, id){
+    var resultG: object[] = [];
+    var resultC;
+    let params = {
+      wstoken: this.moodles[this.moodleIndex].token,
+      userid: id
+    }
+
+    this.moodleApiService.gradereport_overview_get_course_grades(this.moodles[this.moodleIndex].url, params).subscribe(
+      data => { resultG = data; console.log(data)},
+      err => {console.log(err); return false},
+      () => {
+        if (resultG.grades.length !== 0){
+          var courseids = function() {
+            let courseidsString = '';
+            for (let i in resultG.grades){
+              courseidsString += '&options[ids][' + [i] + ']=' + resultG.grades[i].courseid ;
+            }
+            return courseidsString
+          }
+
+          let params = {
+            wstoken: this.moodles[this.moodleIndex].token,
+            coursesid: courseids()
+          }
+
+          this.moodleApiService.core_course_get_courses(this.moodles[this.moodleIndex].url, params).subscribe(
+            data => { resultC = data; },
+            err => {},
+            () => {
+              let dialogRef = this.dialog.open(DisplayUsersDialogComponent, {
+                width: '1500px',
+                height: '800px',
+                data: {
+                  name: name,
+                  grades: resultG.grades,
+                  courses: resultC
+
+                }
+              })
+              dialogRef.afterClosed().subscribe(result => {
+
+                this.dialogResult = result
+              })
+            }
+          )
+        }
+        else {
+          let dialogRef = this.dialog.open(DisplayUsersDialogComponent,{
+            width: '1500px',
+            height: '800px',
+            data: {
+              name: name,
+              grades: resultG.grades,
+              courses: resultC
+            }
+          })
+        };
+      }
+    );
   }
 }

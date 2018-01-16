@@ -22,27 +22,33 @@
     </h4>
   </form>
   <div class="result">
-    <div *ngIf="isCoursesResult"class="coursesResult">
-      <ul>
-        <li *ngFor="let course of result[moodleIndex]">
-          <p><strong>{{course.fullname}}</strong></p>
-        </li>
-      </ul>
-    </div>
-    <div *ngIf="isUsersResult" class="usersResult">
-      <ul>
-        <li *ngFor="let user of users.users">
-          <div class="user-elements">
-            <div class="user-element user-img"><img [attr.src]="user.profileimageurl" alt=""></div>
-            <div class="user-element user-name"><h5><strong>{{user.fullname}}</strong></h5></div>
-            <div class="icons user-element">
-              <i (click)="userReport(user.fullname, user.id)"class="material-icons md-24">content_paste</i>
-              <i class="material-icons md-24">create</i>
-              <i class="material-icons md-24">remove_circle</i>
+    <div *ngIf="!isEmpty">
+      <div *ngIf="isCoursesResult"class="coursesResult">
+        <ul>
+          <li *ngFor="let course of result[moodleIndex]">
+            <h5><strong>{{course.fullname}}</strong></h5>
+          </li>
+        </ul>
+      </div>
+      <div *ngIf="isUsersResult" class="users-result">
+        <ul>
+          <li *ngFor="let user of users.users">
+            <div class="user-elements">
+              <div class="user-element user-img"><img [attr.src]="user.profileimageurl" alt=""></div>
+              <div class="user-element user-name"><h5><strong>{{user.fullname}}</strong></h5></div>
+              <div class="icons user-element">
+                <i (click)="userReport(user.fullname, user.id)"class="material-icons md-24">content_paste</i>
+                <i class="material-icons">create</i>
+                <i class="material-icons">remove_circle</i>
+              </div>
             </div>
-          </div>
-        </li>
-      </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div *ngIf="isEmpty" class="alert alert-warning" role="alert">
+      <p>A busca não retornou resultados, verifique se o objeto da busca foi digitado corretamente e tente outra vez</p>
     </div>
   </div>
 </div>
