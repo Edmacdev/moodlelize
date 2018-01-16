@@ -7,15 +7,15 @@ h3 {
 .mat-form {
   width: 120px;
 }
-li p {
+.coursesResult li p {
   margin-bottom: 1px;
   margin-left: 10px;
 }
-ul {
+.coursesResult ul {
   list-style-type: none;
   padding: 0px;
 }
-.result li{
+.coursesResult li{
   padding: 10px;
   background: #E9EAEC;
   border: 1px solid #777777;
@@ -31,6 +31,81 @@ ul {
   margin-bottom: 100px;
 }
 .coursesResult{
-  overflow: scroll;
+  overflow-x: hidden;
+  overflow: auto;
   max-height: 400px;
+}
+.usersResult{
+  overflow-x: hidden;
+  overflow: auto;
+  max-height: 400px;
+}
+.usersResult h5{
+  text-align: left;
+}
+.display-users{
+  width: 100%;
+}
+.display-users h3{
+  background: #5C8297;
+  padding: 10px 0 10px 0;
+  color: white;
+  text-align: center;
+}
+
+.userResult{
+  overflow: scroll;
+  min-height: 200px;
+  max-height: 360px;
+}
+.form-group{
+  text-align: center;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0px;
+}
+
+.usersResult li{
+
+  background: #E9EAEC;
+  border: 1px solid #777777;
+  margin-top: 4px;
+  margin-right: 20px;
+  cursor: pointer;
+  width: 400px;
+  height: 60px;
+  display: inline-block;
+
+}
+
+.icons{
+  margin-right: 4px;
+  float: right;
+}
+
+.user-element{
+  display: inline-block;
+}
+.user-elements{
+  padding: 5px;
+}
+.user-img{
+  float: left;
+  padding: 4px;
+  margin-right: 5px;
+}
+.user-img img{
+  width: 45px;
+  height: 45px;
+}
+
+.user-name h5{
+  padding: 0px;
+
+}
+
+.md-24{
+  font-size: 24px;
 }

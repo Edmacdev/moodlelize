@@ -5,8 +5,8 @@ import 'rxjs/add/operator/map';
 
 @Injectable()
 export class MoodleApiService {
-wsURL: String = '/webservice/rest/server.php';
-wsProtocol: String = 'https://';
+wsURL: string = '/webservice/rest/server.php';
+wsProtocol: string = 'https://';
 
 
 
@@ -22,12 +22,7 @@ wsProtocol: String = 'https://';
     '&wsfunction=core_course_get_courses' +
     '&moodlewsrestformat=json'
 
-    ).map(res => {
-      let obj = res.json();
-      Object.defineProperty(obj, "moodleIndex", {value:params.moodleIndex});
-      Object.defineProperty(obj, "moodleName", {value:params.moodleName});
-      return obj
-      })
+    ).map(res => res.json())
   }
 
   core_course_get_courses_by_field(host, params){
@@ -48,16 +43,7 @@ wsProtocol: String = 'https://';
     '&moodlewsrestformat=json' +
     '&criteria[0][key]=' + params.criteriakey +
     '&criteria[0][value]=' + params.criteriavalue
-    ).map(res => {
-
-        let obj = res.json();
-        Object.defineProperty(obj, "moodleIndex", {value:params.moodleIndex});
-        Object.defineProperty(obj, "moodleName", {value:params.moodleName});
-
-        this.utilService.updateStatus(true, params.moodleIndex);
-
-        return obj
-      })
+  ).map(res => res.json())
   }
 
   gradereport_overview_get_course_grades(host, params){

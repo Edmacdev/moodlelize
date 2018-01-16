@@ -3,9 +3,7 @@
 
   <ul>
     <li *ngFor = "let moodle of moodles; let i = index">
-      <div (click)="onMoodleSelected(i)" class="moodle-elements">
-        <div [hidden]="statusA[i]" class="moodle-element moodle-status"><i class="material-icons moodle-status">radio_button_unchecked</i>indisponível</div>
-        <div [hidden]="!statusA[i]" class="moodle-element moodle-status" style="color:green"><i class="material-icons moodle-status">radio_button_checked</i>disponível</div>
+      <div (click)="onMoodleSelected(i)" class="moodle-elements">        
         <div class="moodle-element moodle-name"><h3>{{moodle.name}}</h3></div>
         <div class="moodle-element moodle-remove"><i class="material-icons moodle-remove">remove_circle</i></div>
       </div>

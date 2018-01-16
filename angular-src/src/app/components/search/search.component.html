@@ -22,32 +22,27 @@
     </h4>
   </form>
   <div class="result">
-    <div *ngIf="courses"class="coursesResult">
+    <div *ngIf="isCoursesResult"class="coursesResult">
       <ul>
-        <li *ngFor="let course of result">
+        <li *ngFor="let course of result[moodleIndex]">
           <p><strong>{{course.fullname}}</strong></p>
         </li>
       </ul>
     </div>
-    <div *ngIf="users" class="">
-
-    </div>
-
-  </div>
-
-  <!-- <form (submit)="onSubmit(searchQuery)">
-    <div class="form-group" >
-      <input type="text" [(ngModel)]="searchQuery" name="searchQuery" class=""  class="form-control" placeholder="" value="">
-    </div>
-    <div class="filterListBox">
-      <ul class="filterList">
-        <li ><a (click)="filter = 'tudo'">Tudo</a></li>
-        <li ><a (click)="filter = 'usuários'; isResult = false" id="usuarios">Usuários</a></li>
-        <li ><a (click)="filter = 'cursos'; isResult = false">Cursos</a></li>
+    <div *ngIf="isUsersResult" class="usersResult">
+      <ul>
+        <li *ngFor="let user of users.users">
+          <div class="user-elements">
+            <div class="user-element user-img"><img [attr.src]="user.profileimageurl" alt=""></div>
+            <div class="user-element user-name"><h5><strong>{{user.fullname}}</strong></h5></div>
+            <div class="icons user-element">
+              <i (click)="userReport(user.fullname, user.id)"class="material-icons md-24">content_paste</i>
+              <i class="material-icons md-24">create</i>
+              <i class="material-icons md-24">remove_circle</i>
+            </div>
+          </div>
+        </li>
       </ul>
     </div>
-
-    <input type="submit" name="search-submit" class="form-control btn btn-primary" value="Buscar {{filter}}">
-
-  </form> -->
+  </div>
 </div>
