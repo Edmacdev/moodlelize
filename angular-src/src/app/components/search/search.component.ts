@@ -23,7 +23,7 @@ export class SearchComponent implements OnInit {
   ]
   isCoursesResult: boolean = false;
   isUsersResult: boolean = false;
-
+  isEmpty: boolean;
   courses: object[] = [];
   result: object[] = [];
   users: object[] = [];
