@@ -24,8 +24,8 @@ export class SearchComponent implements OnInit {
   isCoursesResult: boolean = false;
   isUsersResult: boolean = false;
   isEmpty: boolean;
-  courses: object[] = [];
-  result: object[] = [];
+  courses: any[] = [];
+  result: any[] = [];
   users: object[] = [];
 
   moodleIndex: number;
@@ -64,6 +64,7 @@ export class SearchComponent implements OnInit {
 
         var criteriakey = '';
         var criteriavalue = '';
+        var extra = '';
 
         if(query.indexOf('@') !== -1 ){
           criteriakey = 'email';
@@ -76,26 +77,43 @@ export class SearchComponent implements OnInit {
           console.log('id')
         }
         else {
-          criteriakey = 'firstname';
-          criteriavalue = query + '%';
-          console.log('firstname')
+          let value: string[] = query.split(' ');
+
+          if(value.length > 1){
+
+            criteriakey = 'firstname';
+            criteriavalue = value[0] + '%';
+            extra =
+            '&criteria[1][key]=lastname' +
+            '&criteria[1][value]=' + '%' + query.split(value[0]).pop() + '%';
+            console.log(query.split(value[0]).pop())
+          }
+          else{
+            criteriakey = 'firstname';
+            criteriavalue = query + '%';
+
+          }
+
         }
         params ={
           wstoken: this.moodles[moodleIndex].token,
           criteriakey: criteriakey,
-          criteriavalue: criteriavalue
+          criteriavalue: criteriavalue,
+          extra: extra
         }
         this.moodleApiService.core_user_get_users(this.moodles[moodleIndex].url, params)
         .subscribe(
           data =>{
-            this.users = data;
+            this.users = data.users;
+            console.log(data)
+
           },
           err => {
             console.log(err)
             return false
           },
           () => {
-            if(this.users.users.length == 0){
+            if(this.users.length == 0){
               this.isEmpty = true;
             }
           }
@@ -169,22 +187,22 @@ export class SearchComponent implements OnInit {
     }
   }
   userReport(name, id){
-    var resultG: object[] = [];
-    var resultC;
+    var resultG: any[] = [];
+    var resultC: any[] = [];
     let params = {
       wstoken: this.moodles[this.moodleIndex].token,
       userid: id
     }
 
     this.moodleApiService.gradereport_overview_get_course_grades(this.moodles[this.moodleIndex].url, params).subscribe(
-      data => { resultG = data; console.log(data)},
+      data => { resultG = data.grades;},
       err => {console.log(err); return false},
       () => {
-        if (resultG.grades.length !== 0){
+        if (resultG.length !== 0){
           var courseids = function() {
             let courseidsString = '';
-            for (let i in resultG.grades){
-              courseidsString += '&options[ids][' + [i] + ']=' + resultG.grades[i].courseid ;
+            for (let i in resultG){
+              courseidsString += '&options[ids][' + [i] + ']=' + resultG[i].courseid ;
             }
             return courseidsString
           }
@@ -203,14 +221,14 @@ export class SearchComponent implements OnInit {
                 height: '800px',
                 data: {
                   name: name,
-                  grades: resultG.grades,
+                  grades: resultG,
                   courses: resultC
 
                 }
               })
               dialogRef.afterClosed().subscribe(result => {
 
-                this.dialogResult = result
+                // this.dialogResult = result
               })
             }
           )
@@ -221,7 +239,7 @@ export class SearchComponent implements OnInit {
             height: '800px',
             data: {
               name: name,
-              grades: resultG.grades,
+              grades: resultG,
               courses: resultC
             }
           })

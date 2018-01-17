@@ -22,10 +22,7 @@
         "styles.scss",
         "../node_modules/jquery-ui-dist/jquery-ui.min.css"
       ],
-      "scripts": [
-        "../node_modules/bootstrap/dist/js/bootstrap.min.js",
-        "../node_modules/fuse.js/dist/fuse.min.js"
-		],
+      "scripts": [],
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",

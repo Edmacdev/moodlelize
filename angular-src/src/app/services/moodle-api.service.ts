@@ -42,7 +42,9 @@ wsProtocol: string = 'https://';
     '&wsfunction=core_user_get_users' +
     '&moodlewsrestformat=json' +
     '&criteria[0][key]=' + params.criteriakey +
-    '&criteria[0][value]=' + params.criteriavalue
+    '&criteria[0][value]=' + params.criteriavalue +
+    params.extra
+
   ).map(res => res.json())
   }
 
@@ -55,5 +57,5 @@ wsProtocol: string = 'https://';
     '&userid=' + params.userid
     ).map(res => res.json());
   }
-  
+
 }

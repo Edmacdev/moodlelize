@@ -11,6 +11,7 @@ ul {
 .icons{
   margin-right: 4px;
   float: right;
+  clear: left;
 }
 .material-icons{
   cursor: pointer;
@@ -53,7 +54,7 @@ ul {
   margin-top: 4px;
   margin-right: 20px;
   width: 400px;
-  height: 60px;
+  height: 80px;
   display: inline-block;
   padding: 5px;
   vertical-align: middle;
