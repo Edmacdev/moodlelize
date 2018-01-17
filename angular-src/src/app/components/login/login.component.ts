@@ -13,12 +13,12 @@ declare var $:any;
 })
 export class LoginComponent implements OnInit {
 
-  log_username: String;
-  log_password: String;
-  reg_username: String;
-  reg_email: String;
-  reg_password: String;
-  reg_confirm_password: String
+  log_username: string;
+  log_password: string;
+  reg_username: string;
+  reg_email: string;
+  reg_password: string;
+  reg_confirm_password: string
 
   constructor(
     private validateService: ValidateService,

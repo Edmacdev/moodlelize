@@ -16,10 +16,12 @@ declare var $:any;
 })
 export class MoodleRegComponent implements OnInit {
 
-  userId: String;
-  name: String;
-  url: String;
-  token: String;
+  step: number = 0;
+
+  userId: string;
+  name: string;
+  url: string;
+  token: string;
   moodles:Object;
   status:boolean;
   isDoneLoading: Boolean = false;
@@ -133,6 +135,17 @@ export class MoodleRegComponent implements OnInit {
         console.log('tudo carregado')
         }
     )
+    }
+    setStep(index: number) {
+      this.step = index;
+    }
+
+    nextStep() {
+      this.step++;
+    }
+
+    prevStep() {
+      this.step--;
     }
 
 

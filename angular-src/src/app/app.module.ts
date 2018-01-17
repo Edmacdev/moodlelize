@@ -6,7 +6,7 @@ import { FlashMessagesModule } from 'angular2-flash-messages'
 import { HttpModule } from '@angular/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule, MatCardModule, MatMenuModule, MatToolbarModule,
-        MatIconModule, MatDialogModule, MatSelectModule, MatInputModule } from '@angular/material';
+        MatIconModule, MatDialogModule, MatSelectModule, MatInputModule,MatExpansionModule } from '@angular/material';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
@@ -21,6 +21,7 @@ import { AuthService } from './services/auth.service';
 import { AuthGuard } from './guards/auth.guard';
 import { MoodleService } from './services/moodle.service';
 import { UtilService } from './services/util.service';
+import { FlashMessagesService } from 'angular2-flash-messages';
 
 import { MoodleApiService } from './services/moodle-api.service';
 import { CoursePageComponent } from './components/course-page/course-page.component';
@@ -31,6 +32,7 @@ import { DisplayUsersComponent } from './components/display-users/display-users.
 
 import 'hammerjs';
 import { DisplayUsersDialogComponent } from './components/display-users-dialog/display-users-dialog.component';
+import { UsersAddComponent } from './components/users-add/users-add.component';
 
 @NgModule({
   declarations: [
@@ -46,7 +48,8 @@ import { DisplayUsersDialogComponent } from './components/display-users-dialog/d
     UserComponent,
     DisplayCoursesComponent,
     DisplayUsersComponent,
-    DisplayUsersDialogComponent
+    DisplayUsersDialogComponent,
+    UsersAddComponent
   ],
   imports: [
     BrowserModule,
@@ -62,7 +65,8 @@ import { DisplayUsersDialogComponent } from './components/display-users-dialog/d
     MatIconModule,
     MatDialogModule,
     MatSelectModule,
-    MatInputModule
+    MatInputModule,
+    MatExpansionModule
   ],
   providers: [
     ValidateService,
@@ -70,7 +74,8 @@ import { DisplayUsersDialogComponent } from './components/display-users-dialog/d
     AuthGuard,
     MoodleService,
     MoodleApiService,
-    UtilService
+    UtilService,
+    FlashMessagesService
   ],
   bootstrap: [AppComponent],
   entryComponents:[

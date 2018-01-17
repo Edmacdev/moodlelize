@@ -1,0 +1,30 @@
+<div class="users-add col-md-6 offset-3">
+  <flash-messages></flash-messages>
+  <h3>
+    Adicionar Usuário ao Moodle
+    <mat-form-field style="width: 140px" >
+      <mat-select  [(ngModel)]="moodleIndex" name="moodleIndex">
+        <mat-option *ngFor="let moodle of moodles let i = index" [value]="i">{{moodle.name}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </h3>
+
+  <form (submit)="onSubmit()">
+    <mat-form-field class="form-field" >
+      <input matInput placeholder="Usuário" [(ngModel)]="form_username" name="username">
+    </mat-form-field>
+    <mat-form-field class="form-field">
+      <input matInput placeholder="email" type="email" [(ngModel)]="form_email" name="email">
+    </mat-form-field>
+    <mat-form-field class="form-field">
+      <input matInput placeholder="senha" type="password"[(ngModel)]="form_password" name="password">
+    </mat-form-field>
+    <mat-form-field class="form-field">
+      <input matInput placeholder="Nome" [(ngModel)]="form_firstname" name="firstname">
+    </mat-form-field>
+    <mat-form-field class="form-field">
+      <input matInput placeholder="Sobrenome" [(ngModel)]="form_lastname" name="lastname">
+    </mat-form-field>
+    <input style="width:100px"type="submit" name="search-submit" class="form-control btn btn-primary"value="Adicionar">
+  </form>
+</div>

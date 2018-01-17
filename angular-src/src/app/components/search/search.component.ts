@@ -55,16 +55,16 @@ export class SearchComponent implements OnInit {
 
     this.moodleIndex = moodleIndex;
     this.isEmpty = false;
-    var params;
+    var params: object;
 
     switch(field){
       case 'users':
 
         this.isCoursesResult = false;
 
-        var criteriakey = '';
-        var criteriavalue = '';
-        var extra = '';
+        var criteriakey: string = '';
+        var criteriavalue: string = '';
+        var extra: string = '';
 
         if(query.indexOf('@') !== -1 ){
           criteriakey = 'email';

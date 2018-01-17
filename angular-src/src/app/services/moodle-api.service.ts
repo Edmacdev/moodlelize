@@ -44,8 +44,19 @@ wsProtocol: string = 'https://';
     '&criteria[0][key]=' + params.criteriakey +
     '&criteria[0][value]=' + params.criteriavalue +
     params.extra
-
-  ).map(res => res.json())
+    ).map(res => res.json())
+  }
+  core_user_create_users(host, params){
+    return this.http.get(this.wsProtocol + host + this.wsURL +
+    '?wstoken=' + params.wstoken +
+    '&wsfunction=core_user_create_users' +
+    '&moodlewsrestformat=json' +
+    '&users[0][username]=' + params.username +
+    '&users[0][password]=' + params.password +
+    '&users[0][firstname]=' + params.firstname +
+    '&users[0][lastname]=' + params.lastname +
+    '&users[0][email]=' + params.email
+    ).map(res => res.json())
   }
 
   gradereport_overview_get_course_grades(host, params){
