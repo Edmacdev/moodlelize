@@ -1,6 +1,6 @@
 <h2>MOODLES REGISTRADOS</h2>
 <div class="moodle-reg-container">
-  <mat-accordion *ngFor="let moodle of moodles; let i = index" class="example-headers-align">
+  <mat-accordion *ngFor="let moodle of user.moodles; let i = index" class="example-headers-align">
     <mat-expansion-panel [expanded]="step !== 0" (opened)="setStep(0)" hideToggle="true">
       <mat-expansion-panel-header>
         <mat-panel-description>

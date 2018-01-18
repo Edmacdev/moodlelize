@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { MoodleApiService } from '../../services/moodle-api.service';
-import { AuthService } from '../../services/auth.service';
-import { Observable } from 'rxjs/Rx';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { DisplayUsersDialogComponent } from '../display-users-dialog/display-users-dialog.component';
+import { UtilService } from '../../services/util.service';
 import * as Fuse from 'fuse.js';
 
 @Component({
@@ -12,13 +11,8 @@ import * as Fuse from 'fuse.js';
   styleUrls: ['./search.component.scss']
 })
 export class SearchComponent implements OnInit {
-  moodles: [
-    {
-      url: string,
-      name: string,
-      token: string
-    }
-  ]
+  user: object;
+
   isCoursesResult: boolean = false;
   isUsersResult: boolean = false;
   isEmpty: boolean;
@@ -33,21 +27,14 @@ export class SearchComponent implements OnInit {
   form_moodle: string ="";
 
   constructor(
-    private authService: AuthService,
     private moodleApiService: MoodleApiService,
-    public dialog: MatDialog
-
+    public dialog: MatDialog,
+    private utilService: UtilService
   ){}
 
   ngOnInit() {
-    this.authService.getProfile().subscribe(
-      profile => {
-        this.moodles = profile.user.moodles;
-      },
-      err => {
-        console.log(err);
-        return false;
-      }
+    this.utilService.currentUser.subscribe(
+      profile => this.user = profile
     )
   }
   onSubmit(query, field, moodleIndex){
@@ -58,9 +45,7 @@ export class SearchComponent implements OnInit {
 
     switch(field){
       case 'users':
-
         this.isCoursesResult = false;
-
         var criteriakey: string = '';
         var criteriavalue: string = '';
         var extra: string = '';
@@ -79,7 +64,6 @@ export class SearchComponent implements OnInit {
           let value: string[] = query.split(' ');
 
           if(value.length > 1){
-
             criteriakey = 'firstname';
             criteriavalue = value[0] + '%';
             extra =
@@ -90,22 +74,21 @@ export class SearchComponent implements OnInit {
           else{
             criteriakey = 'firstname';
             criteriavalue = query + '%';
-
           }
-
         }
+
         params ={
-          wstoken: this.moodles[moodleIndex].token,
+          wstoken: this.user.moodles[moodleIndex].token,
           criteriakey: criteriakey,
           criteriavalue: criteriavalue,
           extra: extra
         }
-        this.moodleApiService.core_user_get_users(this.moodles[moodleIndex].url, params)
+
+        this.moodleApiService.core_user_get_users(this.user.moodles[moodleIndex].url, params)
         .subscribe(
           data =>{
             this.users = data.users;
             console.log(data)
-
           },
           err => {
             console.log(err)
@@ -117,6 +100,7 @@ export class SearchComponent implements OnInit {
             }
           }
         )
+
         this.isUsersResult = true;
       break;
 
@@ -125,10 +109,10 @@ export class SearchComponent implements OnInit {
         if(!this.courses[moodleIndex]){
 
           params = {
-            wstoken: this.moodles[moodleIndex].token
+            wstoken: this.user.moodles[moodleIndex].token
           }
 
-          this.moodleApiService.core_course_get_courses(this.moodles[moodleIndex].url, params)
+          this.moodleApiService.core_course_get_courses(this.user.moodles[moodleIndex].url, params)
           .subscribe(
             data => {
               this.courses.splice(moodleIndex, 0, data);
@@ -189,11 +173,11 @@ export class SearchComponent implements OnInit {
     var resultG: any[] = [];
     var resultC: any[] = [];
     let params = {
-      wstoken: this.moodles[this.moodleIndex].token,
+      wstoken: this.user.moodles[this.moodleIndex].token,
       userid: id
     }
 
-    this.moodleApiService.gradereport_overview_get_course_grades(this.moodles[this.moodleIndex].url, params).subscribe(
+    this.moodleApiService.gradereport_overview_get_course_grades(this.user.moodles[this.moodleIndex].url, params).subscribe(
       data => { resultG = data.grades;},
       err => {console.log(err); return false},
       () => {
@@ -207,11 +191,11 @@ export class SearchComponent implements OnInit {
           }
 
           let params = {
-            wstoken: this.moodles[this.moodleIndex].token,
+            wstoken: this.user.moodles[this.moodleIndex].token,
             coursesid: courseids()
           }
 
-          this.moodleApiService.core_course_get_courses(this.moodles[this.moodleIndex].url, params).subscribe(
+          this.moodleApiService.core_course_get_courses(this.user.moodles[this.moodleIndex].url, params).subscribe(
             data => { resultC = data; },
             err => {},
             () => {
@@ -222,12 +206,11 @@ export class SearchComponent implements OnInit {
                   name: name,
                   grades: resultG,
                   courses: resultC
-
                 }
               })
+
               dialogRef.afterClosed().subscribe(result => {
 
-                // this.dialogResult = result
               })
             }
           )
@@ -241,9 +224,9 @@ export class SearchComponent implements OnInit {
               grades: resultG,
               courses: resultC
             }
-          })
+          });
         };
-      }
+      };
     );
   }
 }

@@ -15,7 +15,7 @@
        no moodle
        <mat-form-field class="mat-form" >
          <mat-select  [(ngModel)]="form_moodle" name="form_moodle">
-           <mat-option *ngFor="let moodle of moodles let i = index" [value]="i">{{moodle.name}}</mat-option>
+           <mat-option *ngFor="let moodle of user.moodles let i = index" [value]="i">{{moodle.name}}</mat-option>
          </mat-select>
        </mat-form-field>
        <input style="width:100px"type="submit" name="search-submit" class="form-control btn btn-primary"value="Buscar">
