@@ -51,21 +51,6 @@ span {
   margin-right:  10px;
 }
 
-.moodle-element{
-  display: inline-block;
-
-}
-
-.moodle-elements{
-  padding: 10px 0 10px 0;
-}
-.moodle-element:hover{
-
-}
-.moodle-elements:hover{
-  background: #189AD3;
-  color: white;
-}
 .moodle-status{
   float: left;
   margin-left: 15px;
@@ -79,7 +64,22 @@ span {
 
   margin: 0px;
 }
+//accordion
+.acc-add-moodle {
+  background-color: #286090 !important;
 
+}
+.acc-add-moodle h3{
+  color: white;
+}
+.acc-add-moodle:hover{
+  // background: #189AD3 !important;
+  background: #286090 !important;
+}
+
+.remove-circle-icon:hover{
+  color: red;
+}
 
 .example-headers-align .mat-expansion-panel-header-title,
 .example-headers-align .mat-expansion-panel-header-description {

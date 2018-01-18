@@ -1,37 +1,51 @@
 <h2>MOODLES REGISTRADOS</h2>
-<div class="addItemContainer">
-  <mat-accordion *ngFor="let moodle of moodles; let i = index" >
+<div class="moodle-reg-container">
+  <mat-accordion *ngFor="let moodle of moodles; let i = index" class="example-headers-align">
     <mat-expansion-panel [expanded]="step !== 0" (opened)="setStep(0)" hideToggle="true">
       <mat-expansion-panel-header>
-        <mat-panel-title>
-
-        </mat-panel-title>
         <mat-panel-description>
           <h3>{{moodle.name}}</h3>
+          <mat-icon (click)="removeMoodle(moodle._id)" class="remove-circle-icon">remove_circle</mat-icon>
         </mat-panel-description>
       </mat-expansion-panel-header>
-      <mat-form-field>
-        <input matInput type="text" [(ngModel)]="name" name="name"class="addText" placeholder="Nome do moodle">
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput type="text" [(ngModel)]="url" name="url" class="addText" placeholder="Endereço do moodle">
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput type="text" [(ngModel)]="token" name="token" class="addText" placeholder="Token">
-      </mat-form-field>
+      <form (click)="onUpdateSubmit()">
+        <mat-form-field>
+          <input matInput type="text" class="addText" placeholder="Nome do moodle">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput type="text"  class="addText" placeholder="Endereço do moodle">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput type="text"  class="addText" placeholder="Token">
+        </mat-form-field>
+        <input class="btn btn-primary" type="submit" name="update-submit" value="Atualizar">
+      </form>
     </mat-expansion-panel>
   </mat-accordion>
-  <!-- <ul>
-    <li *ngFor = "let moodle of moodles; let i = index">
-      <div (click)="onMoodleSelected(i)" class="moodle-elements">
-        <div class="moodle-element moodle-name"><h3>{{moodle.name}}</h3></div>
-        <div class="moodle-element moodle-remove"><i class="material-icons moodle-remove">remove_circle</i></div>
-      </div>
-    </li>
-  </ul> -->
+  <mat-accordion class="example-headers-align ">
+    <mat-expansion-panel [expanded]="step !== 0" (opened)="setStep(0)" hideToggle="true" >
+      <mat-expansion-panel-header class="acc-add-moodle">
+        <mat-panel-description>
+          <h3>Adicionar novo moodle</h3>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <form (submit)="onAddSubmit()">
+        <mat-form-field>
+          <input matInput type="text" [(ngModel)]="name" name="name"class="addText" placeholder="Nome do moodle">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput type="text" [(ngModel)]="url" name="url" class="addText" placeholder="Endereço do moodle">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput type="text" [(ngModel)]="token" name="token" class="addText" placeholder="Token">
+        </mat-form-field>
+        <input class="btn btn-primary" type="submit" name="update-submit" value="Adicionar">
+      </form>
+    </mat-expansion-panel>
+  </mat-accordion>
 </div>
 
-<button  (click)="showDiv()" class="btn btn-primary">+</button>
+<!-- <button  (click)="showDiv()" class="btn btn-primary">+</button>
 <div ng-hide="showDiv()"  class="addItem">
   <h3>Adicionar novo moodle</h3>
   <form (submit)="onAddSubmit()">
@@ -46,4 +60,4 @@
     </div>
     <input class="btn btn-primary" type="submit" name="addItem-submit" value="Adicionar">
   </form>
-</div>
+</div> -->

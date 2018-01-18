@@ -52,7 +52,7 @@ module.exports.comparePassword = function(candidatePassword, hash, callback){
     callback(null, isMatch);
   });
 }
-module.exports.updateMoodle = function(id, moodle, callback){
+module.exports.addMoodle = function(id, moodle, callback){
 
   User.update(
     {"_id": id},
@@ -60,6 +60,17 @@ module.exports.updateMoodle = function(id, moodle, callback){
       callback
     );
 }
-module.exports.removeMoodle = function(id, moodleid,callback){
-  
+module.exports.updateMoodle = function(id, callback){
+  User.update(
+
+  )
+}
+module.exports.removeMoodle = function(id, moodleid, callback){
+  User.update(
+    {"_id": id},
+    {$pull: {
+      "moodles": {"_id": moodleid}
+    }},
+    callback
+  )
 }

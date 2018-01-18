@@ -6,8 +6,6 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { DisplayUsersDialogComponent } from '../display-users-dialog/display-users-dialog.component';
 import * as Fuse from 'fuse.js';
 
-declare var $:any;
-
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
@@ -38,6 +36,7 @@ export class SearchComponent implements OnInit {
     private authService: AuthService,
     private moodleApiService: MoodleApiService,
     public dialog: MatDialog
+
   ){}
 
   ngOnInit() {

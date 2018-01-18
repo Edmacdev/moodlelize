@@ -46,6 +46,7 @@ ul {
 .users-result{
   overflow-x: hidden;
   overflow: auto;
+  min-height: 200px;
   max-height: 400px;
 }
 .users-result li{

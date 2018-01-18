@@ -64,15 +64,23 @@ router.get('/profile', passport.authenticate('jwt', {session:false}), (req, res,
 //Update user
 
 //add moodle
-router.put('/update/add/:id', (req, res, next) => {
-  User.updateMoodle(req.params.id, req.body, (err, user) => {
+router.put('/update/moodle/add:id', (req, res, next) => {
+  User.addMoodle(req.params.id, req.body, (err, user) => {
     if(err){
       console.log('erro ocorreu: ' + err);
     }else res.send(user);
   })
 });
 
-//edit moodle 
+//edit moodle
+//remove moodle
+router.put('/update/moodle/remove/:id/:moodleid', (req, res, next) => {
+  User.removeMoodle(req.params.id, req.params.moodleid, (err, user) => {
+    if(err){
+      console.log('erro ocorreu: ' + err);
+    }else res.send(user);
+  })
+})
 
 
 
