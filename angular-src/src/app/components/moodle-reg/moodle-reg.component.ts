@@ -11,13 +11,12 @@ import {Observable} from 'rxjs/Rx';
 })
 export class MoodleRegComponent implements OnInit {
 
-  user: object;
+  user: any;
   step: number = 0;
 
   name: string;
   url: string;
   token: string;
-  moodles:object[];
 
   isDoneLoading: Boolean = false;
 
@@ -30,7 +29,7 @@ export class MoodleRegComponent implements OnInit {
 
   ngOnInit() {
     this.utilService.currentUser.subscribe(
-      profile => {this.user = profile; console.log(this.user)};
+      profile => {this.user = profile; console.log(this.user)}
     )
   }
   onAddSubmit(){

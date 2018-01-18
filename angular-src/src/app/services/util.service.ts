@@ -9,7 +9,7 @@ export class UtilService {
   currentUser = this.user.asObservable();
 
   constructor(
-    private authService: AuthService;
+    private authService: AuthService
   ) { }
 
   updateUser(){

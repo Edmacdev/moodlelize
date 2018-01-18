@@ -11,7 +11,7 @@ import * as Fuse from 'fuse.js';
   styleUrls: ['./search.component.scss']
 })
 export class SearchComponent implements OnInit {
-  user: object;
+  user: any;
 
   isCoursesResult: boolean = false;
   isUsersResult: boolean = false;
@@ -226,7 +226,7 @@ export class SearchComponent implements OnInit {
             }
           });
         };
-      };
-    );
+      }
+    )
   }
 }
