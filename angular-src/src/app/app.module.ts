@@ -27,8 +27,6 @@ import { MoodleApiService } from './services/moodle-api.service';
 import { CoursePageComponent } from './components/course-page/course-page.component';
 import { SearchComponent } from './components/search/search.component';
 import { UserComponent } from './components/user/user.component';
-import { DisplayCoursesComponent } from './components/display-courses/display-courses.component';
-import { DisplayUsersComponent } from './components/display-users/display-users.component';
 
 import 'hammerjs';
 import { DisplayUsersDialogComponent } from './components/display-users-dialog/display-users-dialog.component';
@@ -46,8 +44,6 @@ import { UsersAddComponent } from './components/users-add/users-add.component';
     CoursePageComponent,
     SearchComponent,
     UserComponent,
-    DisplayCoursesComponent,
-    DisplayUsersComponent,
     DisplayUsersDialogComponent,
     UsersAddComponent
   ],
