@@ -29,12 +29,11 @@ h2{
   color: white;
 }
 .addText{
-  width: 80%;
+  width: 100%;
   height: 30px;
   padding: 15px;
-  padding-right: 10px;
-  margin-top: 10px;
-  font-size: 20px;
+  margin-top: 5px;
+  font-size: 18px;
 }
 button {
   width: 40px;
@@ -80,7 +79,13 @@ span {
 .remove-circle-icon:hover{
   color: red;
 }
+.mat-form-field{
+  margin-right: 20px;
+  width: 280px;
+}
+.mat-form-field-infix{
 
+}
 .example-headers-align .mat-expansion-panel-header-title,
 .example-headers-align .mat-expansion-panel-header-description {
   flex-basis: 0;
@@ -89,4 +94,8 @@ span {
 .example-headers-align .mat-expansion-panel-header-description {
   justify-content: space-between;
   align-items: center;
+}
+.btn{
+  float: right;
+  margin-top: 20px;
 }

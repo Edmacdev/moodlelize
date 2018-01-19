@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FlashMessagesModule } from 'angular2-flash-messages'
 import { HttpModule } from '@angular/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -51,6 +51,7 @@ import { UsersAddComponent } from './components/users-add/users-add.component';
     BrowserModule,
     AppRoutingModule,
     FormsModule,
+    ReactiveFormsModule,
     FlashMessagesModule.forRoot(),
     HttpModule,
     BrowserAnimationsModule,
