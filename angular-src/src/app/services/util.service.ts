@@ -5,6 +5,7 @@ import { AuthService } from './auth.service';
 
 @Injectable()
 export class UtilService {
+
   private user = new BehaviorSubject<object>({});
   currentUser = this.user.asObservable();
 
@@ -16,6 +17,7 @@ export class UtilService {
     this.authService.getProfile().subscribe(
       profile => {
         this.user.next(profile.user);
+        // this.user = profile.user;
       },
         err => console.log(err)
     )

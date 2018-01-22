@@ -29,6 +29,7 @@ export class MoodleRegComponent implements OnInit {
   //Forms properties
 
     rForm: FormGroup;
+    rFormA: FormGroup[] = [];
     post: any;
     description: string = '';
     name: string = '';
@@ -41,14 +42,32 @@ export class MoodleRegComponent implements OnInit {
   ) {
     this.rForm = fb.group({
       'name': [null, Validators.required],
-      'description': [null, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(30)])],
-      'validate': ''
+      'url': [null, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(30)])],
+      'token': [null, Validators.required]
     })
   }
 
   ngOnInit() {
-    this.utilService.currentUser.subscribe(
-      profile => {this.user = profile; console.log(this.user)}
+
+    this.utilService.user.subscribe(
+      profile => {
+        this.user = profile;
+          //
+          // setTimeout(
+          //   () => {
+          //     for (let i =0; i<this.user.moodles; i++){
+          //       let rForm = this.fb.group({
+          //         'name': ["nome", Validators.required],
+          //         'url': [null, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(30)])],
+          //         'token': [null, Validators.required]
+          //       })
+          //     this.rFormA.push(rForm);
+          //     console.log(this.rFormA)
+          //     }, 300
+          //   }
+          // )
+
+      }
     )
   }
   onAddSubmit(){
@@ -66,7 +85,7 @@ export class MoodleRegComponent implements OnInit {
     );
   }
   onUpdateSubmit(post, moodleid){
-    console.log(post)
+    console.log(post.value)
     // const moodle ={
     //   name: post.name,
     //   url: post.url,

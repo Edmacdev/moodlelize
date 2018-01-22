@@ -48,6 +48,7 @@ export class SearchComponent implements OnInit {
     switch(field){
       case 'users':
         this.isCoursesResult = false;
+        this.users = []
         var criteriakey: string = '';
         var criteriavalue: string = '';
         var extra: string = '';
@@ -55,12 +56,12 @@ export class SearchComponent implements OnInit {
         if(query.indexOf('@') !== -1 ){
           criteriakey = 'email';
           criteriavalue = query;
-          console.log('email');
+
         }
         else if(query.match(/^[0-9]*$/gm)){
           criteriakey = 'id';
           criteriavalue = query;
-          console.log('id')
+
         }
         else {
           let value: string[] = query.split(' ');
@@ -71,7 +72,7 @@ export class SearchComponent implements OnInit {
             extra =
             '&criteria[1][key]=lastname' +
             '&criteria[1][value]=' + '%' + query.split(value[0]).pop() + '%';
-            console.log(query.split(value[0]).pop())
+
           }
           else{
             criteriakey = 'firstname';
@@ -90,7 +91,7 @@ export class SearchComponent implements OnInit {
         .subscribe(
           data =>{
             this.users = data.users;
-            console.log(data)
+
           },
           err => {
             console.log(err)
@@ -232,8 +233,8 @@ export class SearchComponent implements OnInit {
     )
   }
   onChange(){
-    if (this.form_field == "courses"){
+    // if (this.form_field == "courses"){
       this.onSubmit(this.form_query, this.form_field, this.form_moodle)
-    }
+    // }
   }
 }
