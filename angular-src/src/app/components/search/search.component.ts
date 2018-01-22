@@ -6,7 +6,7 @@ import { UtilService } from '../../services/util.service';
 import * as Fuse from 'fuse.js';
 
 @Component({
-  selector: 'app-search',
+  selector: 'search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
 })

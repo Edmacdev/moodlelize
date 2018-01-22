@@ -6,7 +6,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {Observable} from 'rxjs/Rx';
 
 @Component({
-  selector: 'app-moodle-reg',
+  selector: 'moodle-reg',
   templateUrl: './moodle-reg.component.html',
   styleUrls: ['./moodle-reg.component.scss']
 })
@@ -36,7 +36,7 @@ export class MoodleRegComponent implements OnInit {
   constructor(
     private authService:AuthService,
     private flashMessage:FlashMessagesService,
-    private utilService: UtilService
+    private utilService: UtilService,
     private fb: FormBuilder
   ) {
     this.rForm = fb.group({
