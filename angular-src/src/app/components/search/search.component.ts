@@ -23,8 +23,8 @@ export class SearchComponent implements OnInit {
   moodleIndex: number;
 
   form_query: string ="";
-  form_field: string ="";
-  form_moodle: string ="";
+  form_field: string ="users";
+  form_moodle: number = 0;
 
   constructor(
     private moodleApiService: MoodleApiService,
@@ -34,7 +34,9 @@ export class SearchComponent implements OnInit {
 
   ngOnInit() {
     this.utilService.currentUser.subscribe(
-      profile => this.user = profile
+      profile => {
+        this.user = profile;
+      }
     )
   }
   onSubmit(query, field, moodleIndex){
@@ -228,5 +230,10 @@ export class SearchComponent implements OnInit {
         };
       }
     )
+  }
+  onChange(){
+    if (this.form_field == "courses"){
+      this.onSubmit(this.form_query, this.form_field, this.form_moodle)
+    }
   }
 }

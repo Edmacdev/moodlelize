@@ -3,7 +3,7 @@
   <form (submit)="onSubmit(form_query, form_field, form_moodle)">
     <h4>Buscar
       <mat-form-field class="mat-form" >
-        <input [(ngModel)]="form_query" name="form_query" matInput placeholder="pesquisar">
+        <input [(ngModel)]="form_query" (ngModelChange)="onChange()" name="form_query" matInput placeholder="pesquisar">
       </mat-form-field>
        no campo
       <mat-form-field class="mat-form">
