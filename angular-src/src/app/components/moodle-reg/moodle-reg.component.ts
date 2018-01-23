@@ -31,8 +31,7 @@ export class MoodleRegComponent implements OnInit {
 
   //Forms properties
 
-    rForm: FormGroup;
-    rFormA: FormGroup[] = [];
+    fg_add_moodle: FormGroup;
     post: any;
     description: string = '';
     name: string = '';
@@ -44,7 +43,7 @@ export class MoodleRegComponent implements OnInit {
     private fb: FormBuilder,
     public dialog: MatDialog,
   ) {
-    this.rForm = fb.group({
+    this.fg_add_moodle = fb.group({
       'name': [null, Validators.required],
       'url': [null, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(30)])],
       'token': [null, Validators.required]
@@ -57,7 +56,6 @@ export class MoodleRegComponent implements OnInit {
       profile => {
         this.user = profile;
       }
-
     )
   }
   onAddSubmit(){
