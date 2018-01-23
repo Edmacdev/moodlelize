@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 @Component({
   selector: 'app-remove-moodle-dialog',
@@ -7,9 +8,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class RemoveMoodleDialogComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    public dialogRef: MatDialogRef<EditMoodleDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) { }
 
   ngOnInit() {
   }
-
+  onCloseConfirm(){
+    this.dialogRef.close('confirm');
+  }
+  onCloseCancel(){
+    this.dialogRef.close("cancel")
+  }
 }

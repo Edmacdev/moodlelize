@@ -5,6 +5,7 @@ import { UtilService } from '../../services/util.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { EditMoodleDialogComponent } from '../edit-moodle-dialog/edit-moodle-dialog.component';
+import { RemoveMoodleDialogComponent } from '../remove-moodle-dialog/remove-moodle-dialog.component';
 import {Observable} from 'rxjs/Rx';
 
 @Component({
@@ -102,10 +103,21 @@ export class MoodleRegComponent implements OnInit {
       }
     )
   }
-  removeMoodle(moodleid){
-
-    this.authService.removeMoodle(this.user._id, moodleid).subscribe(
-      () => {this.utilService.updateUser()}
+  removeMoodle(moodle){
+    let dialogRef = this.dialog.open(
+      RemoveMoodleDialogComponent,{
+        width: '800px',
+        data:  moodle
+      }
+    )
+    dialogRef.afterClosed().subscribe(
+      result => {
+        if(result == "confirm"){
+          this.authService.removeMoodle(this.user._id, moodle._id).subscribe(
+            () => {this.utilService.updateUser()}
+          )
+        }
+      }
     )
   }
   resetModels(){

@@ -1,3 +1,13 @@
-<p>
-  remove-moodle-dialog works!
-</p>
+<div class="">
+
+  <h2 mat-dialog-title> <mat-icon class="i-warning">warning</mat-icon>Remover {{data.name}}</h2>
+  <hr>
+  <mat-dialog-content>
+    <p><strong>Você tem certeza que deseja remover o moodle {{data.name}}?</strong></p>
+  </mat-dialog-content>
+  <hr>
+  <mat-dialog-actions>
+    <button md-raised-button (click)="onCloseConfirm()" class="btn btn-primary">Confirmar</button>
+    <button md-raised-button (click)="onCloseCancel()" class="btn btn-primary" >Cancelar</button>
+  </mat-dialog-actions>
+</div>
