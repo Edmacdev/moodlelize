@@ -50,15 +50,6 @@ span {
   margin-right:  10px;
 }
 
-.moodle-status{
-  float: left;
-  margin-left: 15px;
-  vertical-align: middle;
-}
-.moodle-remove{
-  float: right;
-  margin-right: 15px;
-}
 .moodle-name h3{
 
   margin: 0px;
@@ -76,9 +67,6 @@ span {
   background: #286090 !important;
 }
 
-.remove-circle-icon:hover{
-  color: red;
-}
 .mat-form-field{
   margin-right: 20px;
   width: 280px;
@@ -102,17 +90,20 @@ span {
 .tb_moodleInfo{
   width: 100%;
 }
-.i_mode_edit{
+.icons{
+  float: right;
+}
+.icon-mode-edit{
   margin-left: 10px;
-  font-size: 18px;
+  font-size: 24px;
 }
-.iconCell{
-  width: 90px;
-  padding: 5px 0px 5px 10px;
-  background: #286090;
-  color: white;
-  cursor: pointer;
+.icon-remove-circle{
+  margin-left: 10px;
+  font-size: 24px;
 }
-.iconCell:hover{
-
+.icon-remove-circle:hover{
+  color: red;
+}
+.icon-mode-edit:hover{
+  color: blue;
 }

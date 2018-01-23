@@ -5,7 +5,11 @@
       <mat-expansion-panel-header>
         <mat-panel-description>
           <h3>{{moodle.name}}</h3>
-          <mat-icon (click)="removeMoodle(moodle)" class="remove-circle-icon">remove_circle</mat-icon>
+          <div class="icons">
+            <mat-icon (click)="editMoodle(moodle)" class="icon-mode-edit">mode_edit</mat-icon>
+            <mat-icon (click)="removeMoodle(moodle)" class="icon-remove-circle">remove_circle</mat-icon>
+          </div>
+
         </mat-panel-description>
       </mat-expansion-panel-header>
       <div class="moodleInforWrapper">
@@ -19,7 +23,7 @@
             <td>{{moodle.name}}</td>
             <td>{{moodle.url}}</td>
             <td>{{moodle.token}}</td>
-            <td  (click)="editMoodle(moodle)"class="iconCell">Editar<mat-icon class="i_mode_edit">mode_edit</mat-icon></td>
+            <!-- <td  (click)="editMoodle(moodle)"class="iconCell">Editar<mat-icon class="i_mode_edit">mode_edit</mat-icon></td> -->
           </tr>
         </table>
 
