@@ -8,7 +8,24 @@
           <mat-icon (click)="removeMoodle(moodle._id)" class="remove-circle-icon">remove_circle</mat-icon>
         </mat-panel-description>
       </mat-expansion-panel-header>
-      <form [formGroup]="rForm" (submit)="onUpdateSubmit(rForm, moodle._id)">
+      <div class="moodleInforWrapper">
+        <table class="tb_moodleInfo">
+          <tr>
+            <th>Nome do moodle</th>
+            <th>Endereço url</th>
+            <th>Token</th>
+          </tr>
+          <tr>
+            <td>{{moodle.name}}</td>
+            <td>{{moodle.url}}</td>
+            <td>{{moodle.token}}</td>
+            <td  (click)="editMoodle(moodle)"class="iconCell">Editar<mat-icon class="i_mode_edit">mode_edit</mat-icon></td>
+          </tr>
+        </table>
+
+      </div>
+
+      <!-- <form [formGroup]="rForm" (submit)="onUpdateSubmit(rForm, moodle._id)">
         <mat-form-field>
           <input formControlName="name" matInput required type="text" class="addText" placeholder="Nome do moodle" value="{{moodle.name}}">
         </mat-form-field>
@@ -19,7 +36,7 @@
           <input formControlName="token" matInput type="password"  class="addText" placeholder="Token" value="{{moodle.token}}">
         </mat-form-field>
         <input class="btn btn-primary" type="submit" name="update-submit" value="Atualizar">
-      </form>
+      </form> -->
     </mat-expansion-panel>
   </mat-accordion>
   <mat-accordion class="example-headers-align ">

@@ -60,9 +60,15 @@ module.exports.addMoodle = function(id, moodle, callback){
       callback
     );
 }
-module.exports.updateMoodle = function(id, callback){
+module.exports.updateMoodle = function(id, moodleid, moodle, callback){
+  console.log(moodle.name + ' ' + moodle.url)
   User.update(
-
+    {"_id": id, "moodles._id": moodleid},
+    {$set:{"moodles.$.name": moodle.name,"moodles.$.url": moodle.url, "moodles.$.token": moodle.token}},
+    callback
+    // {"_id": id, "moodles": {"_id": moodleid}},
+    // {$set:{"moodles.$.name": moodle.name,"moodles.$.url": moodle.url, "moodles.$.token": moodle.token}},
+    // callback
   )
 }
 module.exports.removeMoodle = function(id, moodleid, callback){

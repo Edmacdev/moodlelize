@@ -3,6 +3,8 @@ import { AuthService } from '../../services/auth.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
 import { UtilService } from '../../services/util.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { EditMoodleDialogComponent } from '../edit-moodle-dialog/edit-moodle-dialog.component';
 import {Observable} from 'rxjs/Rx';
 
 @Component({
@@ -38,7 +40,8 @@ export class MoodleRegComponent implements OnInit {
     private authService:AuthService,
     private flashMessage:FlashMessagesService,
     private utilService: UtilService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    public dialog: MatDialog,
   ) {
     this.rForm = fb.group({
       'name': [null, Validators.required],
@@ -49,25 +52,11 @@ export class MoodleRegComponent implements OnInit {
 
   ngOnInit() {
 
-    this.utilService.user.subscribe(
+    this.utilService.currentUser.subscribe(
       profile => {
         this.user = profile;
-          //
-          // setTimeout(
-          //   () => {
-          //     for (let i =0; i<this.user.moodles; i++){
-          //       let rForm = this.fb.group({
-          //         'name': ["nome", Validators.required],
-          //         'url': [null, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(30)])],
-          //         'token': [null, Validators.required]
-          //       })
-          //     this.rFormA.push(rForm);
-          //     console.log(this.rFormA)
-          //     }, 300
-          //   }
-          // )
-
       }
+
     )
   }
   onAddSubmit(){
@@ -96,7 +85,25 @@ export class MoodleRegComponent implements OnInit {
     // )
 
   }
+  editMoodle(moodle){
+    let dialogRef = this.dialog.open(
+      EditMoodleDialogComponent,{
+        width: '800px',
+        data: moodle
+      }
+    )
+    dialogRef.afterClosed().subscribe(
+      result => {
+        if(result.status == "confirm"){
+          this.authService.updateMoodle(this.user._id, result.value).subscribe(
+            () => {this.utilService.updateUser()}
+          )
+        }
+      }
+    )
+  }
   removeMoodle(moodleid){
+
     this.authService.removeMoodle(this.user._id, moodleid).subscribe(
       () => {this.utilService.updateUser()}
     )

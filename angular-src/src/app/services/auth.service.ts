@@ -72,14 +72,22 @@ export class AuthService {
     let options = new RequestOptions({ headers: headers });
     headers.append('Content-Type', 'application/json');
     let body = JSON.stringify(moodle);
-    return this.http.put("http://localhost:3000/users/update/moodle/add" + id, body, options)
+    return this.http.put("http://localhost:3000/users/moodle/add/" + id, body, options)
+    .map(res => res.json());
+  }
+  updateMoodle(id, moodle){
+    let headers = new Headers();
+    let options = new RequestOptions({ headers: headers });
+    headers.append('Content-Type', 'application/json');
+    let body = JSON.stringify(moodle);
+    return this.http.put("http://localhost:3000/users/moodle/update/" + id + '/' + moodle._id, body, options)
     .map(res => res.json());
   }
   removeMoodle(id, moodleid){
     let headers = new Headers();
     let options = new RequestOptions({ headers: headers });
     headers.append('Content-Type', 'application/json');
-    return this.http.put("http://localhost:3000/users/update/moodle/remove/" + id + "/" + moodleid, options)
+    return this.http.put("http://localhost:3000/users/moodle/remove/" + id + '/' + moodleid, options)
     .map(res => res.json());
   }
 }

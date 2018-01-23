@@ -1,0 +1,21 @@
+<div class="">
+  <h2 mat-dialog-title>Editar {{data.name}}</h2>
+  <hr>
+  <mat-dialog-content>
+    <form [formGroup]="rForm">
+      <mat-form-field>
+        <input formControlName="name" required [(ngModel)]="form_name" matInput type="text" class="addText" placeholder="Nome do moodle" value="{{data.name}}">
+      </mat-form-field>
+      <mat-form-field>
+        <input formControlName="url" required [(ngModel)]="form_url" matInput type="text"  class="addText" placeholder="Endereço do moodle" value="{{data.url}}">
+      </mat-form-field>
+      <mat-form-field>
+        <input formControlName="token" required [(ngModel)]="form_token" matInput type="password"  class="addText" placeholder="Token" value="{{data.token}}">
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button md-raised-button (click)="onCloseConfirm()" class="btn btn-primary">Confirmar</button>
+    <button md-raised-button (click)="onCloseConfirm()"class="btn btn-primary" >Cancelar</button>
+  </mat-dialog-actions>
+</div>

@@ -31,6 +31,8 @@ import { UserComponent } from './components/user/user.component';
 import 'hammerjs';
 import { DisplayUsersDialogComponent } from './components/display-users-dialog/display-users-dialog.component';
 import { UsersAddComponent } from './components/users-add/users-add.component';
+import { RemoveMoodleDialogComponent } from './components/remove-moodle-dialog/remove-moodle-dialog.component';
+import { EditMoodleDialogComponent } from './components/edit-moodle-dialog/edit-moodle-dialog.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +47,9 @@ import { UsersAddComponent } from './components/users-add/users-add.component';
     SearchComponent,
     UserComponent,
     DisplayUsersDialogComponent,
-    UsersAddComponent
+    UsersAddComponent,
+    RemoveMoodleDialogComponent,
+    EditMoodleDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -76,7 +80,9 @@ import { UsersAddComponent } from './components/users-add/users-add.component';
   ],
   bootstrap: [AppComponent],
   entryComponents:[
-    DisplayUsersDialogComponent
+    DisplayUsersDialogComponent,
+    EditMoodleDialogComponent,
+    RemoveMoodleDialogComponent
   ]
 })
 export class AppModule { }
