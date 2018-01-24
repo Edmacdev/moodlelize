@@ -1,32 +1,15 @@
-.addItemContainer{
-  width: 100%;
-  text-align: center;
-  margin: 0 auto;
-  border: 2px solid #d7d7d7;
-
-  margin-top: 20px;
-  font-family: sans-serif;
-}
-ul{
-  list-style: none;
-  font-size: none;
-  color: #686868;
-  margin-top: 10px;
-  margin-left:  -40px;
-  margin-bottom: 10px;
-}
-li{
-  border-bottom:  1px solid #bfbfbf;
-  background-color: #d7d7d7;
-  margin-bottom: 5px;
-  cursor: pointer;
-}
 h2{
   text-align: center;
   background-color: #5c8297;
   padding: 30px 0px;
   margin-top: 0px;
   color: white;
+}
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px white inset;
+}
+.tb_moodleInfo{
+  width: 100%;
 }
 .addText{
   width: 100%;
@@ -35,67 +18,26 @@ h2{
   margin-top: 5px;
   font-size: 18px;
 }
-button {
-  width: 40px;
-  height: 40px;
-
-  margin-top: 15px;
-  padding: 10px;
-}
-
-span {
-  cursor: pointer;
-  position: relative;
-  float: right;
-  margin-right:  10px;
-}
-input:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0 30px white inset;
-}
-.btn-primary{
-  width: 100px;
-}
-
-.moodle-name h3{
-
-  margin: 0px;
-}
 //accordion
 .acc-add-moodle {
   background-color: #286090 !important;
-
 }
 .acc-add-moodle h3{
   color: white;
 }
-.acc-add-moodle:hover{
-  // background: #189AD3 !important;
-  background: #286090 !important;
-}
-
 .mat-form-field{
   margin-right: 20px;
-  width: 280px;
-}
-.mat-form-field-infix{
-
+  width: 25%;
 }
 .example-headers-align .mat-expansion-panel-header-title,
 .example-headers-align .mat-expansion-panel-header-description {
   flex-basis: 0;
 }
-
 .example-headers-align .mat-expansion-panel-header-description {
   justify-content: space-between;
   align-items: center;
 }
-.btn{
-  float: right;
-  margin-top: 20px;
-}
-.tb_moodleInfo{
-  width: 100%;
-}
+//ICONS
 .icons{
   float: right;
 }
