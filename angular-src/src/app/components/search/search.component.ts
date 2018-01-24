@@ -45,6 +45,7 @@ export class SearchComponent implements OnInit {
 
     this.moodleIndex = moodleIndex;
     this.isEmpty = false;
+    var isError = false;
     var params: object;
 
     switch(field){
@@ -91,25 +92,23 @@ export class SearchComponent implements OnInit {
         this.moodleApiService.core_user_get_users(this.user.moodles[moodleIndex].url, params)
         .subscribe(
           data =>{
-            console.log(data)
             if(data.errorcode){
               this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
-              return false;
+              isError = true;
             }
             else this.users = data.users;
           },
           err => {
             if(err.status == 0){
               this.flashMessage.show('Endereço do moodle não encontrado',{cssClass: 'alert-danger', timeout:3000})
-              return false;
             }
             return false;
           },
           () => {
-            if(this.users.length == 0){
+            if(this.users.length == 0 && !isError){
               this.isEmpty = true;
-              this.isUsersResult = true;
             }
+            else this.isUsersResult = true;
           }
         )
       break;
@@ -144,7 +143,7 @@ export class SearchComponent implements OnInit {
             () => {
               if(query == ''){
                 this.result[moodleIndex] = this.courses[moodleIndex];
-
+                this.isCoursesResult = true;
               }
               else{
                 var options = {
@@ -160,10 +159,10 @@ export class SearchComponent implements OnInit {
                 if(this.result[moodleIndex].length == 0){
                   this.isEmpty = true;
                 }
+                else this.isCoursesResult = true;
               }
             }
           )
-          this.isCoursesResult = true;
         }
         else {
           if(query == ''){
