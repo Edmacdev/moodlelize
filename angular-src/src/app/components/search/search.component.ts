@@ -3,6 +3,7 @@ import { MoodleApiService } from '../../services/moodle-api.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { DisplayUsersDialogComponent } from '../display-users-dialog/display-users-dialog.component';
 import { UtilService } from '../../services/util.service';
+import { FlashMessagesService } from 'angular2-flash-messages';
 import * as Fuse from 'fuse.js';
 
 @Component({
@@ -29,7 +30,8 @@ export class SearchComponent implements OnInit {
   constructor(
     private moodleApiService: MoodleApiService,
     public dialog: MatDialog,
-    private utilService: UtilService
+    private utilService: UtilService,
+    private flashMessage: FlashMessagesService
   ){}
 
   ngOnInit() {
@@ -48,7 +50,6 @@ export class SearchComponent implements OnInit {
     switch(field){
       case 'users':
         this.isCoursesResult = false;
-        this.users = []
         var criteriakey: string = '';
         var criteriavalue: string = '';
         var extra: string = '';
@@ -90,21 +91,27 @@ export class SearchComponent implements OnInit {
         this.moodleApiService.core_user_get_users(this.user.moodles[moodleIndex].url, params)
         .subscribe(
           data =>{
-            this.users = data.users;
-
+            console.log(data)
+            if(data.errorcode){
+              this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
+              return false;
+            }
+            else this.users = data.users;
           },
           err => {
-            console.log(err)
-            return false
+            if(err.status == 0){
+              this.flashMessage.show('Endereço do moodle não encontrado',{cssClass: 'alert-danger', timeout:3000})
+              return false;
+            }
+            return false;
           },
           () => {
             if(this.users.length == 0){
               this.isEmpty = true;
+              this.isUsersResult = true;
             }
           }
         )
-
-        this.isUsersResult = true;
       break;
 
       case 'courses':
@@ -118,9 +125,22 @@ export class SearchComponent implements OnInit {
           this.moodleApiService.core_course_get_courses(this.user.moodles[moodleIndex].url, params)
           .subscribe(
             data => {
-              this.courses.splice(moodleIndex, 0, data);
+              if(data.errorcode){
+                this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
+                return false;
+              }
+              else{
+                console.log(data)
+                this.courses.splice(moodleIndex, 0, data);
+              }
             },
-            err => {},
+            err => {
+              if(err.status == 0){
+                this.flashMessage.show('Endereço do moodle não encontrado',{cssClass: 'alert-danger', timeout:3000})
+                return false
+              }
+              return false;
+            },
             () => {
               if(query == ''){
                 this.result[moodleIndex] = this.courses[moodleIndex];
