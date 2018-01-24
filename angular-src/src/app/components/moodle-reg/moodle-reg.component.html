@@ -23,10 +23,8 @@
             <td>{{moodle.name}}</td>
             <td>{{moodle.url}}</td>
             <td>{{moodle.token}}</td>
-            <!-- <td  (click)="editMoodle(moodle)"class="iconCell">Editar<mat-icon class="i_mode_edit">mode_edit</mat-icon></td> -->
           </tr>
         </table>
-
       </div>
 
       <!-- <form [formGroup]="rForm" (submit)="onUpdateSubmit(rForm, moodle._id)">
@@ -50,18 +48,18 @@
           <h3>Adicionar novo moodle</h3>
         </mat-panel-description>
       </mat-expansion-panel-header>
-      <form (submit)="onAddSubmit()">
+      <form  [formGroup]="fg_add_moodle">
         <mat-form-field>
-          <input matInput type="text" [(ngModel)]="add_moodle_name" #nameModel="ngModel" name="name"class="addText" placeholder="Nome do moodle">
-          <!-- <div class="alert alert-danger" *ngIf="nameModel.touched && !nameModel.valid">Campo requerido</div> -->
+          <input matInput type="text" [(ngModel)]="add_moodle_name"  name="name"class="addText" placeholder="Nome do moodle" formControlName="name">
         </mat-form-field>
         <mat-form-field>
-          <input matInput type="text" [(ngModel)]="add_moodle_url" name="url" class="addText" placeholder="Endereço do moodle">
+          <input matInput type="url" [(ngModel)]="add_moodle_url" name="url" class="addText" placeholder="Endereço do moodle" formControlName="url">
         </mat-form-field>
         <mat-form-field>
-          <input matInput type="text" [(ngModel)]="add_moodle_token" name="token" class="addText" placeholder="Token">
+          <input matInput type="text" [(ngModel)]="add_moodle_token" name="token" class="addText" placeholder="Token" formControlName="token">
         </mat-form-field>
-        <input class="btn btn-primary" type="submit" name="update-submit" value="Adicionar">
+        <button type="button" name="button" class="btn btn-primary" (click)="addMoodle()" [disabled]="!fg_add_moodle.valid">Adicionar</button>
+        <!-- <input class="btn btn-primary" type="submit" name="update-submit" value="Adicionar"> -->
       </form>
     </mat-expansion-panel>
   </mat-accordion>

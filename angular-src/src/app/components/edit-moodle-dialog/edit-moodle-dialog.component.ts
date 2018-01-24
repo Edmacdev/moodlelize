@@ -8,7 +8,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
   styleUrls: ['./edit-moodle-dialog.component.scss']
 })
 export class EditMoodleDialogComponent implements OnInit {
-  rForm: FormGroup;
+  fg_edit_moodle: FormGroup;
 
   form_name: string;
   form_url: string;
@@ -18,10 +18,10 @@ export class EditMoodleDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<EditMoodleDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-    this.rForm = fb.group({
-      'name': [this.form_name, Validators.required],
-      'url': [this.form_url, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(30)])],
-      'token': [this.form_token, Validators.required]
+    this.fg_edit_moodle = fb.group({
+      'name': [null, Validators.compose([Validators.required, Validators.minLength(1), Validators.maxLength(30)])],
+      'url': [null, Validators.compose([Validators.required, Validators.minLength(4), Validators.maxLength(30)])],
+      'token': [null, Validators.compose([Validators.required, Validators.minLength(32)])]
     })
   }
 
@@ -31,10 +31,10 @@ export class EditMoodleDialogComponent implements OnInit {
     this.form_token = this.data.token;
   }
   onCloseConfirm(){
-    this.rForm.value._id = this.data._id
-    let data {
+    this.fg_edit_moodle.value._id = this.data._id
+    let data ={
       status: 'confirm',
-      value: this.rForm.value
+      value: this.fg_edit_moodle.value
     }
     this.dialogRef.close(data)
 

@@ -9,7 +9,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 export class RemoveMoodleDialogComponent implements OnInit {
 
   constructor(
-    public dialogRef: MatDialogRef<EditMoodleDialogComponent>,
+    public dialogRef: MatDialogRef<RemoveMoodleDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 

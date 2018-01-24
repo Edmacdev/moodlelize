@@ -44,21 +44,20 @@ export class MoodleRegComponent implements OnInit {
     public dialog: MatDialog,
   ) {
     this.fg_add_moodle = fb.group({
-      'name': [null, Validators.required],
-      'url': [null, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(30)])],
-      'token': [null, Validators.required]
+      'name': [null, Validators.compose([Validators.required, Validators.minLength(1), Validators.maxLength(30)])],
+      'url': [null, Validators.compose([Validators.required, Validators.minLength(4), Validators.maxLength(30)])],
+      'token': [null, Validators.compose([Validators.required, Validators.minLength(32)])]
     })
   }
 
   ngOnInit() {
-
     this.utilService.currentUser.subscribe(
       profile => {
         this.user = profile;
       }
     )
   }
-  onAddSubmit(){
+  addMoodle(){
     const moodle ={
       name: this.add_moodle_name,
       url: this.add_moodle_url,
@@ -67,22 +66,10 @@ export class MoodleRegComponent implements OnInit {
 
     this.authService.addMoodle(this.user._id, moodle).subscribe(
       () => {
-        this.utilService.updateUser()
-        this.resetModels();
+        this.fg_add_moodle.reset();
+        this.utilService.updateUser();
       }
     );
-  }
-  onUpdateSubmit(post, moodleid){
-    console.log(post.value)
-    // const moodle ={
-    //   name: post.name,
-    //   url: post.url,
-    //   token: post.token
-    // }
-    // this.authService.removeMoodle(this.user._id, moodleid).subscribe(
-    //   () => {this.utilService.apdateUser()}
-    // )
-
   }
   editMoodle(moodle){
     let dialogRef = this.dialog.open(
@@ -118,10 +105,9 @@ export class MoodleRegComponent implements OnInit {
       }
     )
   }
-  resetModels(){
-    this.add_moodle_name = '';
-    this.add_moodle_url = '';
-    this.add_moodle_token = '';
+  resetF(){
+    this.fg_add_moodle.reset();
+    console.log(this.fg_add_moodle)
   }
   //material
     setStep(index: number) {
