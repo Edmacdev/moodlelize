@@ -2,16 +2,16 @@
   <a class="navbar-brand" [routerLink]="['']">Moodlelize</a>
 
   <ul class="nav navbar-nav navbar-right" style="float:right">
-    <li *ngIf="authService.loggedIn()" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
+    <li *ngIf="user" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
       <a class="nav-link" [routerLink]="['/dashboard']">Dashboard</a>
     </li>
-    <li *ngIf="authService.loggedIn()" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
+    <li *ngIf="user" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
       <a class="nav-link" [routerLink]="['/profile']">Perfil</a>
     </li>
-    <li *ngIf="!authService.loggedIn()"[routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
+    <li *ngIf="!user"[routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
       <a class="nav-link" [routerLink]="['/login']">Entrar</a>
     </li>
-    <li *ngIf="authService.loggedIn()" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
+    <li *ngIf="user" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
       <a class="nav-link" (click)="onLogoutClick()" href="#">Sair</a>
     </li>
   </ul>

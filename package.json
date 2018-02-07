@@ -12,6 +12,7 @@
     "body-parser": "*",
     "cors": "*",
     "express": "*",
+    "firebase": "^4.9.1",
     "jsonwebtoken": "*",
     "mongoose": "*",
     "passport": "*",
