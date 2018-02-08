@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
-  user: object;
+  user: object =null;
 
   constructor(
     private validateService: ValidateService,

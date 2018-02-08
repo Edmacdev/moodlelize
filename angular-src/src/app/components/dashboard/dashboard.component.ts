@@ -13,6 +13,6 @@ export class DashboardComponent {
   ) { }
 
   ngOnInit() {
-    this.utilService.updateUser();
+    // this.utilService.updateUser();
   }
 }

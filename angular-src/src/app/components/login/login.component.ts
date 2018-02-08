@@ -13,7 +13,7 @@ declare var $:any;
 })
 export class LoginComponent implements OnInit {
 
-  log_username: string;
+  log_email: string;
   log_password: string;
   reg_username: string;
   reg_email: string;
@@ -57,7 +57,7 @@ export class LoginComponent implements OnInit {
       return false;
     }
     //Register user
-    this.authService.registerUser(user).subscribe(data => {
+    this.authService.registerUser(user.email, user.password).subscribe(data => {
       if(data.success){
         this.flashMessage.show('Usuário registrado com sucesso', {cssClass: 'alert-success', timeout:3000});
         document.location.reload(true);
@@ -69,7 +69,7 @@ export class LoginComponent implements OnInit {
   }
   onLoginSubmit(){
     const user = {
-      username: this.log_username,
+      email: this.log_email,
       password: this.log_password
     }
     //Required Fields
@@ -79,16 +79,13 @@ export class LoginComponent implements OnInit {
       return false;
     }
 
-    this.authService.authenticateUser(user).subscribe(data => {
-      if(data.success){
-        this.authService.storeUserData(data.token, data.user);
-        this.flashMessage.show('Você está logado', {cssClass: 'alert-success', timeout: 5000});
-        document.location.reload(true);
-      }else{
-        this.flashMessage.show(data.msg, {cssClass: 'alert-danger', timeout:3000});
-        this.router.navigate(['']);
-      }
-    });
+    this.authService.signIn(user.email, user.password)
+    .then(
+      data => {console.log(data)}
+    )
+    .catch(
+      e => {console.error(e)}
+    )
   }
 
   form(){

@@ -14,12 +14,12 @@ export class UtilService {
   ) { }
 
   updateUser(){
-    this.authService.getProfile().subscribe(
-      profile => {
-        this.user.next(profile.user);
-        // this.user = profile.user;
-      },
-        err => console.log(err)
-    )
+    // this.authService.getProfile().subscribe(
+    //   profile => {
+    //     this.user.next(profile.user);
+    //     // this.user = profile.user;
+    //   },
+    //     err => console.log(err)
+    // )
   }
 }
