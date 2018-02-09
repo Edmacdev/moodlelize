@@ -6,11 +6,11 @@
 export const environment = {
   production: false,
   firebase: {
-    apiKey: "AIzaSyA9KEEAdNrm6XqRviIHEPamPuZnCro5ZxI",
-    authDomain: "moodlelize.firebaseapp.com",
-    databaseURL: "https://moodlelize.firebaseio.com",
-    projectId: "moodlelize",
-    storageBucket: "moodlelize.appspot.com",
-    messagingSenderId: "85783477610"
+    apiKey: "AIzaSyBG56khGtfcj1zAT0Qp1ApZs5URTV8RAtU",
+    authDomain: "moodlelize-dev.firebaseapp.com",
+    databaseURL: "https://moodlelize-dev.firebaseio.com",
+    projectId: "moodlelize-dev",
+    storageBucket: "moodlelize-dev.appspot.com",
+    messagingSenderId: "709060654841"
   }
 };
