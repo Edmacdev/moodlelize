@@ -49,8 +49,19 @@ export class AuthService {
        this.updateUserData(credential.user)
      })
    }
+   pprivate updateUserData(user){
+     const data: User
+   }
+
    signIn(username, password){
     return this.fbAuth.signInWithEmailAndPassword(username, password);
+   }
+   private updateUserData(user){
+
+     const userRef: AngularFirestoreDocument<User> = this.afs.doc('users/${user.uid}');
+     const data: User = {
+
+     }
    }
 // User
 
