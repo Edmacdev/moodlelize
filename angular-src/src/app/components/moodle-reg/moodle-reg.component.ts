@@ -15,7 +15,7 @@ import {Observable} from 'rxjs/Rx';
 })
 export class MoodleRegComponent implements OnInit {
 
-  user: any;
+  user: object;
   step: number = 0;
 
 //Moodles properties
@@ -51,9 +51,9 @@ export class MoodleRegComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.utilService.currentUser.subscribe(
-      profile => {
-        this.user = profile;
+    this.authService.user.subscribe(
+      user => {
+        this.user = user
       }
     )
   }
@@ -63,52 +63,47 @@ export class MoodleRegComponent implements OnInit {
       url: this.add_moodle_url,
       token: this.add_moodle_token
     }
-
-    this.authService.addMoodle(this.user._id, moodle).subscribe(
-      () => {
-        this.fg_add_moodle.reset();
-        this.utilService.updateUser();
-      }
-    );
+    console.log(this.user)
+    this.authService.addMoodle(this.user.uid, moodle);
   }
-  editMoodle(moodle){
-    let dialogRef = this.dialog.open(
-      EditMoodleDialogComponent,{
-        width: '800px',
-        data: moodle
-      }
-    )
-    dialogRef.afterClosed().subscribe(
-      result => {
-        if(result.status == "confirm"){
-          this.authService.updateMoodle(this.user._id, result.value).subscribe(
-            () => {this.utilService.updateUser()}
-          )
-        }
-      }
-    )
-  }
-  removeMoodle(moodle){
-    let dialogRef = this.dialog.open(
-      RemoveMoodleDialogComponent,{
-        width: '800px',
-        data:  moodle
-      }
-    )
-    dialogRef.afterClosed().subscribe(
-      result => {
-        if(result == "confirm"){
-          this.authService.removeMoodle(this.user._id, moodle._id).subscribe(
-            () => {this.utilService.updateUser()}
-          )
-        }
-      }
-    )
-  }
-  resetF(){
-    this.fg_add_moodle.reset();
-    console.log(this.fg_add_moodle)
-  }
+  // editMoodle(moodle){
+  //   let dialogRef = this.dialog.open(
+  //     EditMoodleDialogComponent,{
+  //       width: '800px',
+  //       data: moodle
+  //     }
+  //   )
+  //   dialogRef.afterClosed().subscribe(
+  //     result => {
+  //       if(result.status == "confirm"){
+  //         this.authService.updateMoodle(this.user._id, result.value).subscribe(
+  //           () => {this.utilService.updateUser()}
+  //         )
+  //       }
+  //     }
+  //   )
+  // }
+  // removeMoodle(moodle){
+  //   let dialogRef = this.dialog.open(
+  //     RemoveMoodleDialogComponent,{
+  //       width: '800px',
+  //       data:  moodle
+  //     }
+  //   )
+  //   dialogRef.afterClosed().subscribe(
+  //     result => {
+  //       if(result == "confirm"){
+  //         this.authService.removeMoodle(this.user._id, moodle._id).subscribe(
+  //           () => {this.utilService.updateUser()}
+  //         )
+  //       }
+  //     }
+  //   )
+  // }
+  // resetF(){
+  //   this.fg_add_moodle.reset();
+  //   console.log(this.fg_add_moodle)
+  // }
   //material
     setStep(index: number) {
       this.step = index;

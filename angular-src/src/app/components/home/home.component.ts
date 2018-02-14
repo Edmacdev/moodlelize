@@ -20,7 +20,7 @@ username:string;
   ) { }
 
   ngOnInit() {
-    this.utilService.currentUser.subscribe(
+    this.authService.user.subscribe(
       user => {this.user = user}
     )
   }
