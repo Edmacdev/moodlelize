@@ -31,7 +31,7 @@ export class EditMoodleDialogComponent implements OnInit {
     this.form_token = this.data.token;
   }
   onCloseConfirm(){
-    this.fg_edit_moodle.value._id = this.data._id
+    this.fg_edit_moodle.value.id = this.data.id
     let data ={
       status: 'confirm',
       value: this.fg_edit_moodle.value

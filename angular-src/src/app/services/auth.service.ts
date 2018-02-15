@@ -2,24 +2,13 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import * as firebase from 'firebase/app';
 import { AngularFireAuth } from 'angularfire2/auth';
-import { AnuglarFirestore, AngularFirestoreDocument } from 'angularfire2/firestore';
+import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from 'angularfire2/firestore';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/switchMap';
 import { Http, Headers, RequestOptions } from '@angular/http';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { AngularFirestore } from 'angularfire2/firestore';
-
-interface User{
-  uid: string;
-  email: string;
-  displayName?: string;
-  moodles?: [
-    {
-      nome: string,
-      url: string,
-      token: string
-    }
-}
+import { User } from '../components/models/User';
+import { Moodle } from '../components/models/Moodle';
 @Injectable()
 export class AuthService {
 
@@ -27,7 +16,6 @@ export class AuthService {
 
    constructor(
      private http: Http,
-     private db: AngularFirestore,
      private afAuth: AngularFireAuth,
      private afStore: AngularFirestore,
      private router: Router
@@ -36,11 +24,17 @@ export class AuthService {
      .switchMap(
        user => {
          if(user){
+
            return this.afStore.doc<User>('Usuários/' + user.uid).valueChanges()
+
          }else{
            return Observable.of(null)
          }
       })
+
+   }
+   getUser(){
+     return this.user;
    }
    googleLogin(){
      const provider = new firebase.auth.GoogleAuthProvider()
@@ -70,19 +64,13 @@ export class AuthService {
    }
 
    signIn(username, password){
-    return this.afAuth.signInWithEmailAndPassword(username, password);
+    return this.afAuth.auth.signInWithEmailAndPassword(username, password);
    }
    signOut(){
      return this.afAuth.auth.signOut();
    }
   registerUser(email, password){
-    return this.afAuth.createUserWithEmailAndPassword(email, password);
-  }
-  //Moodle
-  addMoodle(uid:string, moodle: object){
-
-  const userRef: AngularfirestoreDocument<User> = this.afStore.doc('Usuários/' + uid);
-    return userRef.set(moodle, {merge: true})
+    return this.afAuth.auth.createUserWithEmailAndPassword(email, password);
   }
 
 }

@@ -56,15 +56,15 @@ export class LoginComponent implements OnInit {
       return false;
     }
     //Register user
-    this.authService.registerUser(user.email, user.password).subscribe(data => {
-      if(data.success){
-        this.flashMessage.show('Usuário registrado com sucesso', {cssClass: 'alert-success', timeout:3000});
-        document.location.reload(true);
-      }else{
-        this.flashMessage.show('Erro ao registrar usuário', {cssClass: 'alert-danger', timeout:3000});
-        this.router.navigate(['']);
-      }
-    });
+    // this.authService.registerUser(user.email, user.password).subscribe(data => {
+    //   if(data.success){
+    //     this.flashMessage.show('Usuário registrado com sucesso', {cssClass: 'alert-success', timeout:3000});
+    //     document.location.reload(true);
+    //   }else{
+    //     this.flashMessage.show('Erro ao registrar usuário', {cssClass: 'alert-danger', timeout:3000});
+    //     this.router.navigate(['']);
+    //   }
+    // });
   }
   onLoginSubmit(){
     const user = {
