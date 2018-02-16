@@ -2,10 +2,10 @@
   <div class="container">
     <h1 class="display-3">Moodlelize</h1>
     <p>Plataforma de acesso e administração de moodles</p>
-    <!-- <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p> -->
   </div>
 </div>
 <div *ngIf="!user">
   <p>Para utilizar a plataforma, faça o login ou cadastre-se</p>
+  <flash-messages></flash-messages>
   <app-login></app-login>
 </div>

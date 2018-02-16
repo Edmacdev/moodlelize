@@ -18,11 +18,11 @@ export class SearchComponent implements OnInit {
   isCoursesResult: boolean = false;
   isUsersResult: boolean = false;
   isEmpty: boolean;
-  courses: any[] = [];
-  result: any[] = [];
+  courses: object[] = [];
+  result: object[] = [];
   users: object[] = [];
 
-  currentMoodle: object;
+  currentMoodle: any;
 
   form_query: string ="";
   form_field: string ="users";
@@ -39,19 +39,18 @@ export class SearchComponent implements OnInit {
   ngOnInit() {
     this.authService.getUser().subscribe(
       user => {
-        this.user = user;
-        this.moodleService.getMoodles(this.user.uid).subscribe(
-          moodles => {
-            this.moodles = moodles;
-
-          }
-        )
+        if(user){
+          this.user = user;
+          this.moodleService.getMoodles(this.user.uid).subscribe(
+            moodles => {
+              this.moodles = moodles;
+            }
+          )
+        }    
       }
     )
   }
   onSubmit(query, field, moodle){
-
-    // this.moodleIndex = moodleIndex;
     this.isEmpty = false;
     this.currentMoodle = moodle;
     var isError = false;
@@ -67,12 +66,10 @@ export class SearchComponent implements OnInit {
         if(query.indexOf('@') !== -1 ){
           criteriakey = 'email';
           criteriavalue = query;
-
         }
         else if(query.match(/^[0-9]*$/gm)){
           criteriakey = 'id';
           criteriavalue = query;
-
         }
         else {
           let value: string[] = query.split(' ');
@@ -83,7 +80,6 @@ export class SearchComponent implements OnInit {
             extra =
             '&criteria[1][key]=lastname' +
             '&criteria[1][value]=' + '%' + query.split(value[0]).pop() + '%';
-
           }
           else{
             criteriakey = 'firstname';
@@ -176,7 +172,6 @@ export class SearchComponent implements OnInit {
       wstoken: this.currentMoodle.token,
       userid: id
     }
-
     this.moodleApiService.gradereport_overview_get_course_grades(this.currentMoodle.url, params).subscribe(
       data => { resultG = data.grades;},
       err => {console.log(err); return false},
@@ -228,10 +223,5 @@ export class SearchComponent implements OnInit {
         };
       }
     )
-  }
-  onChange(){
-    // if (this.form_field == "courses"){
-      this.onSubmit(this.form_query, this.form_field, this.form_moodle)
-    // }
   }
 }

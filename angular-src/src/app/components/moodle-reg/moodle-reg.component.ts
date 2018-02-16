@@ -2,12 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { MoodleService } from '../../services/moodle.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
-import { UtilService } from '../../services/util.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { EditMoodleDialogComponent } from '../edit-moodle-dialog/edit-moodle-dialog.component';
 import { RemoveMoodleDialogComponent } from '../remove-moodle-dialog/remove-moodle-dialog.component';
-import {Observable} from 'rxjs/Rx';
+import { Observable } from 'rxjs/Rx';
 import { Moodle } from '../models/Moodle';
 
 @Component({
@@ -16,38 +15,28 @@ import { Moodle } from '../models/Moodle';
   styleUrls: ['./moodle-reg.component.scss']
 })
 export class MoodleRegComponent implements OnInit {
-
-  user: any;
-  moodles: any;
-  step: number = 0;
-
+  user: any; //usuário logado e autenticado
+  moodles: any; //moodloes do usuário
+  step: number = 0; //atributo para lógica do material accordion
 
 //Moodles properties
   add_moodle_name: string;
   add_moodle_url: string;
   add_moodle_token: string;
 
-  update_moodle_name: string;
-  update_moodle_url: string;
-  update_moodle_token: string;
-
-  isDoneLoading: Boolean = false;
+  isDoneLoading: boolean = false;
 
   //Forms properties
-
     fg_add_moodle: FormGroup;
-    post: any;
-    description: string = '';
-    name: string = '';
 
   constructor(
     private authService:AuthService,
     private moodleService:MoodleService,
     private flashMessage:FlashMessagesService,
-    private utilService: UtilService,
     private fb: FormBuilder,
     public dialog: MatDialog
   ) {
+    //Controle de formulário
     this.fg_add_moodle = fb.group({
       'name': [null, Validators.compose([Validators.required, Validators.minLength(1), Validators.maxLength(30)])],
       'url': [null, Validators.compose([Validators.required, Validators.minLength(4), Validators.maxLength(30)])],
@@ -56,15 +45,17 @@ export class MoodleRegComponent implements OnInit {
   }
 
   ngOnInit() {
+    //Buscar informações de usuário
     this.authService.getUser().subscribe(
       user => {
-        this.user = user
-        this.moodleService.getMoodles(this.user.uid).subscribe(
-          moodles => {
-            this.moodles = moodles;
-            console.log(this.moodles)
-          }
-        )
+        if(user){
+          this.user = user
+          this.moodleService.getMoodles(this.user.uid).subscribe(
+            moodles => {
+              this.moodles = moodles;
+            }
+          )
+        }
       }
     )
   }
@@ -79,7 +70,6 @@ export class MoodleRegComponent implements OnInit {
     this.moodleService.getMoodles(this.user.uid)
   }
   editMoodle(moodle){
-    console.log(moodle)
     let dialogRef = this.dialog.open(
       EditMoodleDialogComponent,{
         width: '800px',
@@ -109,10 +99,6 @@ export class MoodleRegComponent implements OnInit {
       }
     )
   }
-  // resetF(){
-  //   this.fg_add_moodle.reset();
-  //   console.log(this.fg_add_moodle)
-  // }
   //material
   setStep(index: number) {
     this.step = index;

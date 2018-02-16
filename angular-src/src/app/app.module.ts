@@ -24,7 +24,6 @@ import { ValidateService } from './services/validate.service';
 import { AuthService } from './services/auth.service';
 import { AuthGuard } from './guards/auth.guard';
 import { MoodleService } from './services/moodle.service';
-import { UtilService } from './services/util.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
 
 import { MoodleApiService } from './services/moodle-api.service';
@@ -86,7 +85,6 @@ import { EditMoodleDialogComponent } from './components/edit-moodle-dialog/edit-
     AuthGuard,
     MoodleService,
     MoodleApiService,
-    UtilService,
     FlashMessagesService
   ],
   bootstrap: [AppComponent],

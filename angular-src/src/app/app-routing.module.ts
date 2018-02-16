@@ -14,13 +14,13 @@ const routes: Routes = [
 
   {
     path: 'profile',
-    component: ProfileComponent
-    // canActivate: [AuthGuard]
+    component: ProfileComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'dashboard',
-    component: DashboardComponent
-    // canActivate: [AuthGuard]
+    component: DashboardComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'user/:id/:moodle',

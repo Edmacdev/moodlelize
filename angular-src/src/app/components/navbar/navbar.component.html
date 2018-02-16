@@ -8,9 +8,6 @@
     <li *ngIf="user" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
       <a class="nav-link" [routerLink]="['/profile']">Perfil</a>
     </li>
-    <li *ngIf="!user"[routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
-      <a class="nav-link" [routerLink]="['/login']">Entrar</a>
-    </li>
     <li *ngIf="user" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
       <a class="nav-link" (click)="authService.signOut()">Sair</a>
     </li>

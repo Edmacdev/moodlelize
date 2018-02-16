@@ -18,7 +18,7 @@ export class LoginComponent implements OnInit {
   reg_username: string;
   reg_email: string;
   reg_password: string;
-  reg_confirm_password: string
+  reg_confirm_password: string;
 
   constructor(
     private validateService: ValidateService,
@@ -28,10 +28,11 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+  //inicia o código de interação com o formulário
     this.form();
   }
+  //Registro de usuário
   onRegisterSubmit() {
-
     const user = {
       email: this.reg_email,
       username: this.reg_username,
@@ -43,28 +44,37 @@ export class LoginComponent implements OnInit {
       this.flashMessage.show('Por favor preencha todos os campos', {cssClass: 'alert-danger', timeout:3000});
       return false;
     }
-
     //Validate Email
     if(!this.validateService.validateEmail(user.email)){
       this.flashMessage.show('Por favor use um email válido', {cssClass: 'alert-danger', timeout:3000});
-
       return false;
     }
-
+    //Faz a confirmação de senha
     if(!this.validateService.validateConfirmPassword(user.password, user.confirm_password)){
       this.flashMessage.show('A senha não foi confirmada corretamente', {cssClass: 'alert-danger', timeout:3000});
       return false;
     }
     //Register user
-    // this.authService.registerUser(user.email, user.password).subscribe(data => {
-    //   if(data.success){
-    //     this.flashMessage.show('Usuário registrado com sucesso', {cssClass: 'alert-success', timeout:3000});
-    //     document.location.reload(true);
-    //   }else{
-    //     this.flashMessage.show('Erro ao registrar usuário', {cssClass: 'alert-danger', timeout:3000});
-    //     this.router.navigate(['']);
-    //   }
-    // });
+    this.authService.registerUser(user.email, user.password)
+      .then(data => {
+          this.flashMessage.show('Usuário registrado com sucesso', {cssClass: 'alert-success', timeout:3000});
+          document.location.reload(true);
+      })
+      .catch(
+        e => {
+          switch(e.code){
+            case 'auth/email-already-in-use':
+              this.flashMessage.show('O email cadastrado já existe', {cssClass: 'alert-danger', timeout:3000});
+            break
+            case 'auth/invalid-email':
+              this.flashMessage.show('O email cadastrado é inválido', {cssClass: 'alert-danger', timeout:3000});
+            break
+            default:
+              console.log(e)
+            break
+          }
+        }
+      )
   }
   onLoginSubmit(){
     const user = {
@@ -74,19 +84,11 @@ export class LoginComponent implements OnInit {
     //Required Fields
     if(!this.validateService.validateLogin(user)){
       this.flashMessage.show('Por favor preencha todos os campos', {cssClass: 'alert-danger', timeout:3000});
-
       return false;
     }
-
     this.authService.signIn(user.email, user.password)
-    .then(
-      data => {console.log(data)}
-    )
-    .catch(
-      e => {console.error(e)}
-    )
   }
-
+//formulario
   form(){
     $('#login-form-link').click(function(e) {
       $("#login-form").delay(100).fadeIn(100);

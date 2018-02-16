@@ -9,7 +9,6 @@
             <mat-icon (click)="editMoodle(moodle)" class="icon-mode-edit">mode_edit</mat-icon>
             <mat-icon (click)="removeMoodle(moodle)" class="icon-remove-circle">remove_circle</mat-icon>
           </div>
-
         </mat-panel-description>
       </mat-expansion-panel-header>
       <div class="moodleInforWrapper">
@@ -26,19 +25,6 @@
           </tr>
         </table>
       </div>
-
-      <!-- <form [formGroup]="rForm" (submit)="onUpdateSubmit(rForm, moodle._id)">
-        <mat-form-field>
-          <input formControlName="name" matInput required type="text" class="addText" placeholder="Nome do moodle" value="{{moodle.name}}">
-        </mat-form-field>
-        <mat-form-field>
-          <input formControlName="url" matInput type="text"  class="addText" placeholder="Endereço do moodle" value="{{moodle.url}}">
-        </mat-form-field>
-        <mat-form-field>
-          <input formControlName="token" matInput type="password"  class="addText" placeholder="Token" value="{{moodle.token}}">
-        </mat-form-field>
-        <input class="btn btn-primary" type="submit" name="update-submit" value="Atualizar">
-      </form> -->
     </mat-expansion-panel>
   </mat-accordion>
   <mat-accordion class="example-headers-align ">

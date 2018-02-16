@@ -23,7 +23,7 @@ export class AuthGuard implements CanActivate {
       .do(loggedIn => {
         if(!loggedIn){
           console.log('acesso negado')
-          this.router.navigate(['/login']);
+          this.router.navigate(['']);
         }
       })
   }

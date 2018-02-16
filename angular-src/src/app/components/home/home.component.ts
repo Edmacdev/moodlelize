@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { UtilService } from '../../services/util.service';
 
 @Component({
   selector: 'app-home',
@@ -10,22 +9,18 @@ import { UtilService } from '../../services/util.service';
 })
 export class HomeComponent implements OnInit {
 
-user: object;
-username:string;
-
   constructor(
     private router: Router,
-    private authService: AuthService,
-    private utilService: UtilService
+    private authService: AuthService
   ) { }
 
   ngOnInit() {
     this.authService.user.subscribe(
-      user => {this.user = user}
+      user => {
+        if(user){
+          this.router.navigate(['dashboard']);
+        }
+      }
     )
   }
-  navigate(){
-    this.router.navigate(['dashboard']);
-  }
-
 }
