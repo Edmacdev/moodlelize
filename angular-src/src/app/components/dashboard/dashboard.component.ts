@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UtilService } from '../../services/util.service';
+
 
 @Component({
   selector: 'app-dashboard',
@@ -9,10 +9,9 @@ import { UtilService } from '../../services/util.service';
 export class DashboardComponent {
 
   constructor(
-    private utilService: UtilService
-  ) { }
+  ) {}
 
   ngOnInit() {
-    this.utilService.updateUser();
+
   }
 }

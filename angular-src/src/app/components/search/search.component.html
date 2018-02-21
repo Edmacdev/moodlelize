@@ -15,7 +15,7 @@
        no moodle
        <mat-form-field class="mat-form" >
          <mat-select  [(ngModel)]="form_moodle" name="form_moodle">
-           <mat-option *ngFor="let moodle of user.moodles let i = index" [value]="i">{{moodle.name}}</mat-option>
+           <mat-option *ngFor="let moodle of moodles let i = index" [value]="moodle">{{moodle.name}}</mat-option>
          </mat-select>
        </mat-form-field>
        <input style="width:100px"type="submit" name="search-submit" class="form-control btn btn-primary"value="Buscar">
@@ -26,7 +26,7 @@
     <div *ngIf="!isEmpty">
       <div *ngIf="isCoursesResult"class="coursesResult">
         <ul>
-          <li *ngFor="let course of result[moodleIndex]">
+          <li *ngFor="let course of result">
             <h5><strong>{{course.fullname}}</strong></h5>
           </li>
         </ul>
@@ -47,7 +47,6 @@
         </ul>
       </div>
     </div>
-
     <div *ngIf="isEmpty" class="alert alert-warning" role="alert">
       <p>A busca não retornou resultados, verifique se o objeto da busca foi digitado corretamente e tente outra vez</p>
     </div>

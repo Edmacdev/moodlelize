@@ -1,93 +1,78 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, RequestOptions } from '@angular/http';
-import 'rxjs/add/operator/map';
-import { tokenNotExpired } from 'angular2-jwt';
-
+import { Router } from '@angular/router';
+import * as firebase from 'firebase/app';
+import { AngularFireAuth } from 'angularfire2/auth';
+import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from 'angularfire2/firestore';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/switchMap';
+import { User } from '../components/models/User';
+import { Moodle } from '../components/models/Moodle';
 @Injectable()
 export class AuthService {
-  authToken: any;
-  user: any;
-  isDev:boolean;
-  protocol: String = 'http://';
-  host: any = window.location.hostname;
-  port: any = ':3000';
-   constructor(private http: Http) {
-     this.isDev = true; // Change to false before deployment
+
+  user: Observable<User>;
+
+   constructor(
+     private afAuth: AngularFireAuth,
+     private afStore: AngularFirestore,
+     private router: Router
+   ) {
+     this.user = this.afAuth.authState
+     .switchMap(
+       user => {
+         if(user){
+           return this.afStore.doc<User>('Usuários/' + user.uid).valueChanges()
+         }else{
+           return Observable.of(null)
+         }
+      })
+    }
+
+   getUser(){
+     return this.user;
    }
-// User
-  registerUser(user){
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-    return this.http.post(this.protocol + this.host + this.port + '/users/register', user,{headers: headers})
-    .map(res => res.json());
-  }
 
-  authenticateUser(user){
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-    return this.http.post(this.protocol + this.host + this.port + '/users/authenticate', user,{headers: headers})
-    .map(res => res.json());
-  }
-
-  getProfile(){
-    let headers = new Headers();
-    this.loadToken();
-    headers.append('Authorization', this.authToken)
-    headers.append('Content-Type', 'application/json');
-    return this.http.get(this.protocol + this.host + this.port + '/users/profile', {headers: headers})
-    .map(res => res.json());
-  }
-  storeUserData(token, user){
-    localStorage.setItem('id_token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-    this.authToken = token;
-    this.user = user;
-  }
-
-  loadToken(){
-    const token = localStorage.getItem('id_token');
-    this.authToken = token;
-  }
-
-  loggedIn() {
-    return tokenNotExpired('id_token');
-  }
-
-  logout(){
-    this.authToken = null;
-    this.user = null;
-    localStorage.clear();
-  }
-  prepEndpoint(ep){
-   if(this.isDev){
-     return ep;
-   } else {
-     return 'http://localhost:8080/'+ep;
+   googleLogin(){
+     const provider = new firebase.auth.GoogleAuthProvider()
+     return this.oAuthLogin(provider);
    }
- }
 
-  //Moodle
-  addMoodle(id, moodle){
-    let headers = new Headers();
-    let options = new RequestOptions({ headers: headers });
-    headers.append('Content-Type', 'application/json');
-    let body = JSON.stringify(moodle);
-    return this.http.put("http://localhost:3000/users/moodle/add/" + id, body, options)
-    .map(res => res.json());
+   private oAuthLogin(provider){
+     return this.afAuth.auth.signInWithPopup(provider)
+     .then((credential) => {
+       this.updateUserData(credential.user)
+       this.router.navigate(['dashboard']);
+     })
+     .catch(e => console.error(e))
+   }
+
+   private updateUserData(user){
+     const userRef: AngularFirestoreDocument<User> = this.afStore.doc('Usuários/'+ user.uid);
+     const data: User = {
+       uid: user.uid,
+       email: user.email,
+       displayName: user.displayName
+     }
+     return userRef.set(data);
+   }
+
+   signIn(username, password){
+    this.afAuth.auth.signInWithEmailAndPassword(username, password)
+      .then(
+        user => {
+          this.updateUserData(user)
+        }
+      )
+      .catch(e => {console.error(e)})
+   }
+
+   signOut(){
+     this.afAuth.auth.signOut();
+     this.router.navigate(['']);
+   }
+
+  registerUser(email, password){
+   return this.afAuth.auth.createUserWithEmailAndPassword(email, password)
   }
-  updateMoodle(id, moodle){
-    let headers = new Headers();
-    let options = new RequestOptions({ headers: headers });
-    headers.append('Content-Type', 'application/json');
-    let body = JSON.stringify(moodle);
-    return this.http.put("http://localhost:3000/users/moodle/update/" + id + '/' + moodle._id, body, options)
-    .map(res => res.json());
-  }
-  removeMoodle(id, moodleid){
-    let headers = new Headers();
-    let options = new RequestOptions({ headers: headers });
-    headers.append('Content-Type', 'application/json');
-    return this.http.put("http://localhost:3000/users/moodle/remove/" + id + '/' + moodleid, options)
-    .map(res => res.json());
-  }
+
 }

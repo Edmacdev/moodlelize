@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { MoodleApiService } from '../../services/moodle-api.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { DisplayUsersDialogComponent } from '../display-users-dialog/display-users-dialog.component';
-import { UtilService } from '../../services/util.service';
+import { AuthService } from '../../services/auth.service';
+import { MoodleService } from '../../services/moodle.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
 import * as Fuse from 'fuse.js';
 
@@ -13,125 +14,122 @@ import * as Fuse from 'fuse.js';
 })
 export class SearchComponent implements OnInit {
   user: any;
-
+  moodles: any;
   isCoursesResult: boolean = false;
   isUsersResult: boolean = false;
   isEmpty: boolean;
-  courses: any[] = [];
-  result: any[] = [];
+  courses: object[] = [];
+  result: object[] = [];
   users: object[] = [];
 
-  moodleIndex: number;
+  currentMoodle: any;
 
-  form_query: string ="";
-  form_field: string ="users";
-  form_moodle: number = 0;
+  form_query: string;
+  form_field: string;
+  form_moodle: object;
 
   constructor(
     private moodleApiService: MoodleApiService,
     public dialog: MatDialog,
-    private utilService: UtilService,
+    private authService: AuthService,
+    private moodleService: MoodleService,
     private flashMessage: FlashMessagesService
   ){}
 
   ngOnInit() {
-    this.utilService.currentUser.subscribe(
-      profile => {
-        this.user = profile;
+    this.authService.getUser().subscribe(
+      user => {
+        if(user){
+          this.user = user;
+          this.moodleService.getMoodles(this.user.uid).subscribe(
+            moodles => {
+              this.moodles = moodles;
+            }
+          )
+        }
       }
     )
   }
-  onSubmit(query, field, moodleIndex){
+  onSubmit(query, field, moodle){
+    if(field && moodle ){
+      this.isEmpty = false;
+      this.currentMoodle = moodle;
+      var isError = false;
+      var params: object;
 
-    this.moodleIndex = moodleIndex;
-    this.isEmpty = false;
-    var isError = false;
-    var params: object;
+      switch(field){
+        case 'users':
+          this.isCoursesResult = false;
+          var criteriakey: string = '';
+          var criteriavalue: string = '';
+          var extra: string = '';
 
-    switch(field){
-      case 'users':
-        this.isCoursesResult = false;
-        var criteriakey: string = '';
-        var criteriavalue: string = '';
-        var extra: string = '';
-
-        if(query.indexOf('@') !== -1 ){
-          criteriakey = 'email';
-          criteriavalue = query;
-
-        }
-        else if(query.match(/^[0-9]*$/gm)){
-          criteriakey = 'id';
-          criteriavalue = query;
-
-        }
-        else {
-          let value: string[] = query.split(' ');
-
-          if(value.length > 1){
-            criteriakey = 'firstname';
-            criteriavalue = value[0] + '%';
-            extra =
-            '&criteria[1][key]=lastname' +
-            '&criteria[1][value]=' + '%' + query.split(value[0]).pop() + '%';
-
+          if(query.indexOf('@') !== -1 ){
+            criteriakey = 'email';
+            criteriavalue = query;
           }
-          else{
-            criteriakey = 'firstname';
-            criteriavalue = query + '%';
+          else if(query.match(/^[0-9]*$/gm)){
+            criteriakey = 'id';
+            criteriavalue = query;
           }
-        }
+          else {
+            let value: string[] = query.split(' ');
 
-        params ={
-          wstoken: this.user.moodles[moodleIndex].token,
-          criteriakey: criteriakey,
-          criteriavalue: criteriavalue,
-          extra: extra
-        }
-
-        this.moodleApiService.core_user_get_users(this.user.moodles[moodleIndex].url, params)
-        .subscribe(
-          data =>{
-            if(data.errorcode){
-              this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
-              isError = true;
+            if(value.length > 1){
+              criteriakey = 'firstname';
+              criteriavalue = value[0] + '%';
+              extra =
+              '&criteria[1][key]=lastname' +
+              '&criteria[1][value]=' + '%' + query.split(value[0]).pop() + '%';
             }
-            else this.users = data.users;
-          },
-          err => {
-            if(err.status == 0){
-              this.flashMessage.show('Endereço do moodle não encontrado',{cssClass: 'alert-danger', timeout:3000})
+            else{
+              criteriakey = 'firstname';
+              criteriavalue = query + '%';
             }
-            return false;
-          },
-          () => {
-            if(this.users.length == 0 && !isError){
-              this.isEmpty = true;
-            }
-            else this.isUsersResult = true;
-          }
-        )
-      break;
-
-      case 'courses':
-        this.isUsersResult = false;
-        if(!this.courses[moodleIndex]){
-
-          params = {
-            wstoken: this.user.moodles[moodleIndex].token
           }
 
-          this.moodleApiService.core_course_get_courses(this.user.moodles[moodleIndex].url, params)
+          params ={
+            wstoken: moodle.token,
+            criteriakey: criteriakey,
+            criteriavalue: criteriavalue,
+            extra: extra
+          }
+
+          this.moodleApiService.core_user_get_users(moodle.url, params)
           .subscribe(
+            data =>{
+              if(data.errorcode){
+                this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
+                isError = true;
+              }
+              else this.users = data.users;
+            },
+            err => {
+              if(err.status == 0){
+                this.flashMessage.show('Endereço do moodle não encontrado',{cssClass: 'alert-danger', timeout:3000})
+              }
+              return false;
+            },
+            () => {
+              if(this.users.length == 0 && !isError){
+                this.isEmpty = true;
+              }
+              else this.isUsersResult = true;
+            }
+          )
+        break;
+        case 'courses':
+          this.isUsersResult = false;
+          params = {
+            wstoken: moodle.token
+          }
+          this.moodleApiService.core_course_get_courses(moodle.url, params).subscribe(
             data => {
               if(data.errorcode){
                 this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
                 return false;
               }
-              else{
-                console.log(data)
-                this.courses.splice(moodleIndex, 0, data);
-              }
+              this.courses = data
             },
             err => {
               if(err.status == 0){
@@ -142,7 +140,7 @@ export class SearchComponent implements OnInit {
             },
             () => {
               if(query == ''){
-                this.result[moodleIndex] = this.courses[moodleIndex];
+                this.result = this.courses;
                 this.isCoursesResult = true;
               }
               else{
@@ -153,53 +151,33 @@ export class SearchComponent implements OnInit {
                     "fullname"
                   ]
                 };
-                let fuse = new Fuse(this.courses[moodleIndex], options);
-                this.result[moodleIndex] = fuse.search(query);
-
-                if(this.result[moodleIndex].length == 0){
+                let fuse = new Fuse(this.courses, options);
+                this.result = fuse.search(query);
+                if(this.result.length == 0){
                   this.isEmpty = true;
                 }
                 else this.isCoursesResult = true;
               }
             }
           )
-        }
-        else {
-          if(query == ''){
-            this.result[moodleIndex] = this.courses[moodleIndex];
-          }
-          else{
-            var options = {
-              shouldSort: true,
-              threshold: 0.3,
-              keys: [
-                "fullname"
-              ]
-            };
-            let fuse = new Fuse(this.courses[moodleIndex], options);
-            this.result[moodleIndex] = fuse.search(query);
-            this.isCoursesResult = true;
-
-            if(this.result[moodleIndex].length == 0){
-              this.isEmpty = true;
-            }
-          }
-        }
-      break
-      default:
-        alert('Escolha um campo de pesquisa');
-      break
+        break
+        default:
+          alert('Escolha um campo de pesquisa');
+        break
+      }
+    }
+    else{
+      alert("Preencha todos os campos de pesquisa")
     }
   }
   userReport(name, id){
     var resultG: any[] = [];
     var resultC: any[] = [];
     let params = {
-      wstoken: this.user.moodles[this.moodleIndex].token,
+      wstoken: this.currentMoodle.token,
       userid: id
     }
-
-    this.moodleApiService.gradereport_overview_get_course_grades(this.user.moodles[this.moodleIndex].url, params).subscribe(
+    this.moodleApiService.gradereport_overview_get_course_grades(this.currentMoodle.url, params).subscribe(
       data => { resultG = data.grades;},
       err => {console.log(err); return false},
       () => {
@@ -213,11 +191,11 @@ export class SearchComponent implements OnInit {
           }
 
           let params = {
-            wstoken: this.user.moodles[this.moodleIndex].token,
+            wstoken: this.currentMoodle.token,
             coursesid: courseids()
           }
 
-          this.moodleApiService.core_course_get_courses(this.user.moodles[this.moodleIndex].url, params).subscribe(
+          this.moodleApiService.core_course_get_courses(this.currentMoodle.url, params).subscribe(
             data => { resultC = data; },
             err => {},
             () => {
@@ -250,10 +228,5 @@ export class SearchComponent implements OnInit {
         };
       }
     )
-  }
-  onChange(){
-    // if (this.form_field == "courses"){
-      this.onSubmit(this.form_query, this.form_field, this.form_moodle)
-    // }
   }
 }

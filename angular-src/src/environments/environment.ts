@@ -4,5 +4,13 @@
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  firebase: {
+    apiKey: "AIzaSyBG56khGtfcj1zAT0Qp1ApZs5URTV8RAtU",
+    authDomain: "moodlelize-dev.firebaseapp.com",
+    databaseURL: "https://moodlelize-dev.firebaseio.com",
+    projectId: "moodlelize-dev",
+    storageBucket: "moodlelize-dev.appspot.com",
+    messagingSenderId: "709060654841"
+  }
 };

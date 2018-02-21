@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
+import { MoodleService } from '../../services/moodle.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
-import { UtilService } from '../../services/util.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { EditMoodleDialogComponent } from '../edit-moodle-dialog/edit-moodle-dialog.component';
 import { RemoveMoodleDialogComponent } from '../remove-moodle-dialog/remove-moodle-dialog.component';
-import {Observable} from 'rxjs/Rx';
+import { Observable } from 'rxjs/Rx';
+import { Moodle } from '../models/Moodle';
 
 @Component({
   selector: 'moodle-reg',
@@ -14,35 +15,28 @@ import {Observable} from 'rxjs/Rx';
   styleUrls: ['./moodle-reg.component.scss']
 })
 export class MoodleRegComponent implements OnInit {
-
-  user: any;
-  step: number = 0;
+  user: any; //usuário logado e autenticado
+  moodles: any; //moodloes do usuário
+  step: number = 0; //atributo para lógica do material accordion
 
 //Moodles properties
   add_moodle_name: string;
   add_moodle_url: string;
   add_moodle_token: string;
 
-  update_moodle_name: string;
-  update_moodle_url: string;
-  update_moodle_token: string;
-
-  isDoneLoading: Boolean = false;
+  isDoneLoading: boolean = false;
 
   //Forms properties
-
     fg_add_moodle: FormGroup;
-    post: any;
-    description: string = '';
-    name: string = '';
 
   constructor(
     private authService:AuthService,
+    private moodleService:MoodleService,
     private flashMessage:FlashMessagesService,
-    private utilService: UtilService,
     private fb: FormBuilder,
-    public dialog: MatDialog,
+    public dialog: MatDialog
   ) {
+    //Controle de formulário
     this.fg_add_moodle = fb.group({
       'name': [null, Validators.compose([Validators.required, Validators.minLength(1), Validators.maxLength(30)])],
       'url': [null, Validators.compose([Validators.required, Validators.minLength(4), Validators.maxLength(30)])],
@@ -51,25 +45,29 @@ export class MoodleRegComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.utilService.currentUser.subscribe(
-      profile => {
-        this.user = profile;
+    //Buscar informações de usuário
+    this.authService.getUser().subscribe(
+      user => {
+        if(user){
+          this.user = user
+          this.moodleService.getMoodles(this.user.uid).subscribe(
+            moodles => {
+              this.moodles = moodles;
+            }
+          )
+        }
       }
     )
   }
   addMoodle(){
-    const moodle ={
+    const moodle={
       name: this.add_moodle_name,
       url: this.add_moodle_url,
       token: this.add_moodle_token
     }
-
-    this.authService.addMoodle(this.user._id, moodle).subscribe(
-      () => {
-        this.fg_add_moodle.reset();
-        this.utilService.updateUser();
-      }
-    );
+    this.moodleService.addMoodle(this.user.uid, moodle);
+    this.fg_add_moodle.reset();
+    this.moodleService.getMoodles(this.user.uid)
   }
   editMoodle(moodle){
     let dialogRef = this.dialog.open(
@@ -81,9 +79,7 @@ export class MoodleRegComponent implements OnInit {
     dialogRef.afterClosed().subscribe(
       result => {
         if(result.status == "confirm"){
-          this.authService.updateMoodle(this.user._id, result.value).subscribe(
-            () => {this.utilService.updateUser()}
-          )
+          this.moodleService.updateMoodle(this.user.uid, result.value.id, result.value)
         }
       }
     )
@@ -98,25 +94,19 @@ export class MoodleRegComponent implements OnInit {
     dialogRef.afterClosed().subscribe(
       result => {
         if(result == "confirm"){
-          this.authService.removeMoodle(this.user._id, moodle._id).subscribe(
-            () => {this.utilService.updateUser()}
-          )
+          this.moodleService.removeMoodle(this.user.uid, moodle.id)
         }
       }
     )
   }
-  resetF(){
-    this.fg_add_moodle.reset();
-    console.log(this.fg_add_moodle)
-  }
   //material
-    setStep(index: number) {
-      this.step = index;
-    }
-    nextStep() {
-      this.step++;
-    }
-    prevStep() {
-      this.step--;
-    }
+  setStep(index: number) {
+    this.step = index;
+  }
+  nextStep() {
+    this.step++;
+  }
+  prevStep() {
+    this.step--;
+  }
 }

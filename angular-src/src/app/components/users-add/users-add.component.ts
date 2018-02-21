@@ -47,17 +47,7 @@ export class UsersAddComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.authService.getProfile().subscribe(
-      profile => {
-
-        this.moodles = profile.user.moodles;
-
-      },
-      err => {
-        console.log(err);
-        return false;
-      }
-    )
+    
   }
   onSubmit(){
 

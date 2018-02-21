@@ -7,6 +7,10 @@ import { HttpModule } from '@angular/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule, MatCardModule, MatMenuModule, MatToolbarModule,
         MatIconModule, MatDialogModule, MatSelectModule, MatInputModule,MatExpansionModule } from '@angular/material';
+import { AngularFireModule  } from 'angularfire2';
+import { AngularFireAuthModule } from 'angularfire2/auth';
+import { AngularFirestoreModule } from 'angularfire2/firestore';
+import { AngularFireStorageModule } from 'angularfire2/storage';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
@@ -20,13 +24,14 @@ import { ValidateService } from './services/validate.service';
 import { AuthService } from './services/auth.service';
 import { AuthGuard } from './guards/auth.guard';
 import { MoodleService } from './services/moodle.service';
-import { UtilService } from './services/util.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
 
 import { MoodleApiService } from './services/moodle-api.service';
 import { CoursePageComponent } from './components/course-page/course-page.component';
 import { SearchComponent } from './components/search/search.component';
 import { UserComponent } from './components/user/user.component';
+
+import { environment } from '../environments/environment';
 
 import 'hammerjs';
 import { DisplayUsersDialogComponent } from './components/display-users-dialog/display-users-dialog.component';
@@ -50,6 +55,7 @@ import { EditMoodleDialogComponent } from './components/edit-moodle-dialog/edit-
     UsersAddComponent,
     RemoveMoodleDialogComponent,
     EditMoodleDialogComponent
+
   ],
   imports: [
     BrowserModule,
@@ -67,7 +73,11 @@ import { EditMoodleDialogComponent } from './components/edit-moodle-dialog/edit-
     MatDialogModule,
     MatSelectModule,
     MatInputModule,
-    MatExpansionModule
+    MatExpansionModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFirestoreModule, // imports firebase/firestore, only needed for database features
+    AngularFireAuthModule, // imports firebase/auth, only needed for auth features,
+    AngularFireStorageModule // imports firebase/storage only needed for storage features
   ],
   providers: [
     ValidateService,
@@ -75,7 +85,6 @@ import { EditMoodleDialogComponent } from './components/edit-moodle-dialog/edit-
     AuthGuard,
     MoodleService,
     MoodleApiService,
-    UtilService,
     FlashMessagesService
   ],
   bootstrap: [AppComponent],
