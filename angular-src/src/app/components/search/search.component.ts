@@ -24,8 +24,8 @@ export class SearchComponent implements OnInit {
 
   currentMoodle: any;
 
-  form_query: string ="";
-  form_field: string ="users";
+  form_query: string;
+  form_field: string;
   form_moodle: object;
 
   constructor(
@@ -46,123 +46,128 @@ export class SearchComponent implements OnInit {
               this.moodles = moodles;
             }
           )
-        }    
+        }
       }
     )
   }
   onSubmit(query, field, moodle){
-    this.isEmpty = false;
-    this.currentMoodle = moodle;
-    var isError = false;
-    var params: object;
+    if(field && moodle ){
+      this.isEmpty = false;
+      this.currentMoodle = moodle;
+      var isError = false;
+      var params: object;
 
-    switch(field){
-      case 'users':
-        this.isCoursesResult = false;
-        var criteriakey: string = '';
-        var criteriavalue: string = '';
-        var extra: string = '';
+      switch(field){
+        case 'users':
+          this.isCoursesResult = false;
+          var criteriakey: string = '';
+          var criteriavalue: string = '';
+          var extra: string = '';
 
-        if(query.indexOf('@') !== -1 ){
-          criteriakey = 'email';
-          criteriavalue = query;
-        }
-        else if(query.match(/^[0-9]*$/gm)){
-          criteriakey = 'id';
-          criteriavalue = query;
-        }
-        else {
-          let value: string[] = query.split(' ');
-
-          if(value.length > 1){
-            criteriakey = 'firstname';
-            criteriavalue = value[0] + '%';
-            extra =
-            '&criteria[1][key]=lastname' +
-            '&criteria[1][value]=' + '%' + query.split(value[0]).pop() + '%';
+          if(query.indexOf('@') !== -1 ){
+            criteriakey = 'email';
+            criteriavalue = query;
           }
-          else{
-            criteriakey = 'firstname';
-            criteriavalue = query + '%';
+          else if(query.match(/^[0-9]*$/gm)){
+            criteriakey = 'id';
+            criteriavalue = query;
           }
-        }
+          else {
+            let value: string[] = query.split(' ');
 
-        params ={
-          wstoken: moodle.token,
-          criteriakey: criteriakey,
-          criteriavalue: criteriavalue,
-          extra: extra
-        }
-
-        this.moodleApiService.core_user_get_users(moodle.url, params)
-        .subscribe(
-          data =>{
-            if(data.errorcode){
-              this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
-              isError = true;
-            }
-            else this.users = data.users;
-          },
-          err => {
-            if(err.status == 0){
-              this.flashMessage.show('Endereço do moodle não encontrado',{cssClass: 'alert-danger', timeout:3000})
-            }
-            return false;
-          },
-          () => {
-            if(this.users.length == 0 && !isError){
-              this.isEmpty = true;
-            }
-            else this.isUsersResult = true;
-          }
-        )
-      break;
-      case 'courses':
-        this.isUsersResult = false;
-        params = {
-          wstoken: moodle.token
-        }
-        this.moodleApiService.core_course_get_courses(moodle.url, params).subscribe(
-          data => {
-            if(data.errorcode){
-              this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
-              return false;
-            }
-            this.courses = data
-          },
-          err => {
-            if(err.status == 0){
-              this.flashMessage.show('Endereço do moodle não encontrado',{cssClass: 'alert-danger', timeout:3000})
-              return false
-            }
-            return false;
-          },
-          () => {
-            if(query == ''){
-              this.result = this.courses;
-              this.isCoursesResult = true;
+            if(value.length > 1){
+              criteriakey = 'firstname';
+              criteriavalue = value[0] + '%';
+              extra =
+              '&criteria[1][key]=lastname' +
+              '&criteria[1][value]=' + '%' + query.split(value[0]).pop() + '%';
             }
             else{
-              var options = {
-                shouldSort: true,
-                threshold: 0.3,
-                keys: [
-                  "fullname"
-                ]
-              };
-              let fuse = new Fuse(this.courses, options);
-              this.result = fuse.search(query);
-              if(this.result.length == 0){
-                this.isEmpty = true;
-              }
-              else this.isCoursesResult = true;
+              criteriakey = 'firstname';
+              criteriavalue = query + '%';
             }
           }
-        )
-      break
-      default:
-        alert('Escolha um campo de pesquisa');
-      break
+
+          params ={
+            wstoken: moodle.token,
+            criteriakey: criteriakey,
+            criteriavalue: criteriavalue,
+            extra: extra
+          }
+
+          this.moodleApiService.core_user_get_users(moodle.url, params)
+          .subscribe(
+            data =>{
+              if(data.errorcode){
+                this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
+                isError = true;
+              }
+              else this.users = data.users;
+            },
+            err => {
+              if(err.status == 0){
+                this.flashMessage.show('Endereço do moodle não encontrado',{cssClass: 'alert-danger', timeout:3000})
+              }
+              return false;
+            },
+            () => {
+              if(this.users.length == 0 && !isError){
+                this.isEmpty = true;
+              }
+              else this.isUsersResult = true;
+            }
+          )
+        break;
+        case 'courses':
+          this.isUsersResult = false;
+          params = {
+            wstoken: moodle.token
+          }
+          this.moodleApiService.core_course_get_courses(moodle.url, params).subscribe(
+            data => {
+              if(data.errorcode){
+                this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
+                return false;
+              }
+              this.courses = data
+            },
+            err => {
+              if(err.status == 0){
+                this.flashMessage.show('Endereço do moodle não encontrado',{cssClass: 'alert-danger', timeout:3000})
+                return false
+              }
+              return false;
+            },
+            () => {
+              if(query == ''){
+                this.result = this.courses;
+                this.isCoursesResult = true;
+              }
+              else{
+                var options = {
+                  shouldSort: true,
+                  threshold: 0.3,
+                  keys: [
+                    "fullname"
+                  ]
+                };
+                let fuse = new Fuse(this.courses, options);
+                this.result = fuse.search(query);
+                if(this.result.length == 0){
+                  this.isEmpty = true;
+                }
+                else this.isCoursesResult = true;
+              }
+            }
+          )
+        break
+        default:
+          alert('Escolha um campo de pesquisa');
+        break
+      }
+    }
+    else{
+      alert("Preencha todos os campos de pesquisa")
     }
   }
   userReport(name, id){
