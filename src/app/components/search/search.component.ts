@@ -5,6 +5,7 @@ import { DisplayUsersDialogComponent } from '../display-users-dialog/display-use
 import { AuthService } from '../../services/auth.service';
 import { MoodleService } from '../../services/moodle.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
+import { Router } from '@angular/router';
 import * as Fuse from 'fuse.js';
 
 @Component({
@@ -33,7 +34,8 @@ export class SearchComponent implements OnInit {
     public dialog: MatDialog,
     private authService: AuthService,
     private moodleService: MoodleService,
-    private flashMessage: FlashMessagesService
+    private flashMessage: FlashMessagesService,
+    private router: Router
   ){}
 
   ngOnInit() {
@@ -178,21 +180,21 @@ export class SearchComponent implements OnInit {
       userid: id
     }
     this.moodleApiService.gradereport_overview_get_course_grades(this.currentMoodle.url, params).subscribe(
-      data => { resultG = data.grades;},
+      data => { resultG = data.grades; console.log(resultG)},
       err => {console.log(err); return false},
       () => {
         if (resultG.length !== 0){
-          var courseids = function() {
-            let courseidsString = '';
-            for (let i in resultG){
-              courseidsString += '&options[ids][' + [i] + ']=' + resultG[i].courseid ;
-            }
-            return courseidsString
-          }
+          // var courseids = function() {
+          //   let courseidsString = '';
+          //   for (let i in resultG){
+          //     courseidsString += '&options[ids][' + [i] + ']=' + resultG[i].courseid ;
+          //   }
+          //   return courseidsString
+          // }
 
           let params = {
             wstoken: this.currentMoodle.token,
-            coursesid: courseids()
+            // coursesid: courseids()
           }
 
           this.moodleApiService.core_course_get_courses(this.currentMoodle.url, params).subscribe(
@@ -228,5 +230,8 @@ export class SearchComponent implements OnInit {
         };
       }
     )
+  }
+  goToCoursePage(courseid){
+    this.router.navigate(['curso/' + courseid]);
   }
 }

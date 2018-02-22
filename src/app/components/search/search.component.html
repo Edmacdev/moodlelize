@@ -26,7 +26,7 @@
     <div *ngIf="!isEmpty">
       <div *ngIf="isCoursesResult"class="coursesResult">
         <ul>
-          <li *ngFor="let course of result">
+          <li *ngFor="let course of result" (click)="goToCoursePage(course.id)">
             <h5><strong>{{course.fullname}}</strong></h5>
           </li>
         </ul>
