@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ValidateService } from '../../services/validate.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
 import { AuthService } from '../../services/auth.service';
-import { Router } from '@angular/router';
 
 declare var $:any;
 
@@ -22,8 +21,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private validateService: ValidateService,
     private flashMessage:FlashMessagesService,
-    private authService: AuthService,
-    private router:Router
+    private authService: AuthService
+
   ) {}
 
   ngOnInit() {
