@@ -46,7 +46,7 @@ export class AuthService {
      .catch(e => console.error(e))
    }
 
-   private updateUserData(user){
+   updateUserData(user){
      const userRef: AngularFirestoreDocument<User> = this.afStore.doc('Usuários/'+ user.uid);
      const data: User = {
        uid: user.uid,
@@ -58,7 +58,7 @@ export class AuthService {
 
    signIn(username, password){
     return this.afAuth.auth.signInWithEmailAndPassword(username, password)
-  }  
+  }
 
    signOut(){
      this.afAuth.auth.signOut();

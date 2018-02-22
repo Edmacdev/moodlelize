@@ -1,1 +1,0 @@
-db.users.update({"_id": ObjectId("5a37de89ff5f4d0ec815b274"),"moodles._id": ObjectId("5a67536dd53fce0dacded923")},{$set:{"moodles.$.name": "Raleduc 3", "moodles.$.url": "ead.raleduc.com"}})
