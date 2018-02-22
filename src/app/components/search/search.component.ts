@@ -24,7 +24,7 @@ export class SearchComponent implements OnInit {
 
   currentMoodle: any;
 
-  form_query: string;
+  form_query: string ="";
   form_field: string;
   form_moodle: object;
 
