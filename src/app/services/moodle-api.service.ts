@@ -16,7 +16,8 @@ wsProtocol: string = 'https://';
     return this.http.get(this.wsProtocol + host + this.wsURL +
     '?wstoken=' + params.wstoken +
     '&wsfunction=core_course_get_courses' +
-    '&moodlewsrestformat=json'
+    '&moodlewsrestformat=json' +
+    params.coursesid
 
     ).map(res => res.json())
   }

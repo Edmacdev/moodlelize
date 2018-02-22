@@ -123,7 +123,8 @@ export class SearchComponent implements OnInit {
         case 'courses':
           this.isUsersResult = false;
           params = {
-            wstoken: moodle.token
+            wstoken: moodle.token,
+            coursesid: ''
           }
           this.moodleApiService.core_course_get_courses(moodle.url, params).subscribe(
             data => {
@@ -180,26 +181,27 @@ export class SearchComponent implements OnInit {
       userid: id
     }
     this.moodleApiService.gradereport_overview_get_course_grades(this.currentMoodle.url, params).subscribe(
-      data => { resultG = data.grades; console.log(resultG)},
+      data => { resultG = data.grades;},
       err => {console.log(err); return false},
       () => {
         if (resultG.length !== 0){
-          // var courseids = function() {
-          //   let courseidsString = '';
-          //   for (let i in resultG){
-          //     courseidsString += '&options[ids][' + [i] + ']=' + resultG[i].courseid ;
-          //   }
-          //   return courseidsString
-          // }
+
+          var courseids = function() {
+            let courseidsString:string = '';
+            for (let i in resultG){
+              courseidsString += '&options[ids][' + [i] + ']=' + resultG[i].courseid ;
+            }
+            return courseidsString
+          }
 
           let params = {
             wstoken: this.currentMoodle.token,
-            // coursesid: courseids()
+            coursesid: courseids()
           }
 
           this.moodleApiService.core_course_get_courses(this.currentMoodle.url, params).subscribe(
-            data => { resultC = data; },
-            err => {},
+            data => { resultC = data; console.log(resultC)},
+            err => { console.log(err)},
             () => {
               let dialogRef = this.dialog.open(DisplayUsersDialogComponent, {
                 width: '1500px',
