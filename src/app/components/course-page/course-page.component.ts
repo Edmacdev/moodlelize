@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MoodleApiService } from '../../services/moodle-api.service';
 
 @Component({
   selector: 'app-course-page',
@@ -7,9 +8,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CoursePageComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private moodleApi: MoodleApiService
+  ) { }
 
   ngOnInit() {
+    // this.moodleApi.
   }
 
 }
