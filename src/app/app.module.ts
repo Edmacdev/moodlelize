@@ -25,6 +25,7 @@ import { AuthService } from './services/auth.service';
 import { AuthGuard } from './guards/auth.guard';
 import { MoodleService } from './services/moodle.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
+import { DataShareService } from './services/data-share.service';
 
 import { MoodleApiService } from './services/moodle-api.service';
 import { CoursePageComponent } from './components/course-page/course-page.component';
@@ -85,7 +86,9 @@ import { EditMoodleDialogComponent } from './components/edit-moodle-dialog/edit-
     AuthGuard,
     MoodleService,
     MoodleApiService,
-    FlashMessagesService
+    FlashMessagesService,
+    DataShareService
+
   ],
   bootstrap: [AppComponent],
   entryComponents:[
