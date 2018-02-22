@@ -15,7 +15,6 @@ export class LoginComponent implements OnInit {
 
   log_email: string;
   log_password: string;
-  reg_username: string;
   reg_email: string;
   reg_password: string;
   reg_confirm_password: string;
@@ -35,7 +34,6 @@ export class LoginComponent implements OnInit {
   onRegisterSubmit() {
     const user = {
       email: this.reg_email,
-      username: this.reg_username,
       password: this.reg_password,
       confirm_password: this.reg_confirm_password
     }
@@ -87,6 +85,25 @@ export class LoginComponent implements OnInit {
       return false;
     }
     this.authService.signIn(user.email, user.password)
+      .then(
+        user => {
+          this.authService.updateUserData(user)
+        }
+      )
+      .catch(e => {
+        if (e.code == "auth/invalid-email"){
+          this.flashMessage.show('O email digitado é inválido', {cssClass: 'alert-danger', timeout:3000});
+          return false;
+        }
+        else if(e.code == "auth/wrong-password"){
+          this.flashMessage.show('A senha está incorreta', {cssClass: 'alert-danger', timeout:3000});
+          return false;
+        }
+        else if(e.code == "auth/user-not-found"){
+          this.flashMessage.show('Usuário não existe', {cssClass: 'alert-danger', timeout:3000});
+        }
+        else {console.log(e)}
+      })
   }
 //formulario
   form(){

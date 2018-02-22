@@ -57,14 +57,8 @@ export class AuthService {
    }
 
    signIn(username, password){
-    this.afAuth.auth.signInWithEmailAndPassword(username, password)
-      .then(
-        user => {
-          this.updateUserData(user)
-        }
-      )
-      .catch(e => {console.error(e)})
-   }
+    return this.afAuth.auth.signInWithEmailAndPassword(username, password)
+  }  
 
    signOut(){
      this.afAuth.auth.signOut();
