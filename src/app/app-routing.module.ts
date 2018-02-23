@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { UserComponent } from './components/user/user.component';
+import { ReportComponent } from './components/report/report.component';
 import { CoursePageComponent } from './components/course-page/course-page.component';
 
 import { AuthGuard } from './guards/auth.guard';
@@ -25,6 +26,10 @@ const routes: Routes = [
   {
     path: 'curso/:id',
     component: CoursePageComponent
+  },
+  {
+    path: 'relatorio',
+    component: ReportComponent
   },
   {
     path: '',

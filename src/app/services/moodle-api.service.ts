@@ -65,5 +65,13 @@ wsProtocol: string = 'https://';
     '&userid=' + params.userid
     ).map(res => res.json());
   }
+  core_enrol_get_enrolled_users(host, params){
+    return this.http.get(this.wsProtocol + host + this.wsURL +
+    '?wstoken=' + params.wstoken +
+    '&wsfunction=core_enrol_get_enrolled_users' +
+    '&moodlewsrestformat=json' +
+    '&courseid=' + params.courseid
+    ).map(res => res.json())
+  }
 
 }

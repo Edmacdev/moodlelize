@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MoodleApiService } from '../../services/moodle-api.service';
 import { MoodleService } from '../../services/moodle.service';
 import { AuthService } from '../../services/auth.service';
+import { DataShareService } from '../../services/data-share.service';
 
 @Component({
   selector: 'app-course-page',
@@ -9,31 +10,17 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./course-page.component.scss']
 })
 export class CoursePageComponent implements OnInit {
-  user: any;
-  moodles: any[];
+  course: object;
   constructor(
     private moodleApi: MoodleApiService,
     private moodleService: MoodleService,
-    private authService: AuthService
+    private authService: AuthService,
+    private dataShare: DataShareService
   ) { }
 
   ngOnInit() {
-    // this.authService.getUser().subscribe(
-    //   user => {
-    //     if(user){
-    //       this.user = user;
-    //       this.moodleService.getMoodles(this.user.uid).subscribe(
-    //         moodles => {
-    //           this.moodles = moodles;
-    //         },
-    //         () => {
-    //           this.moodleApi.core_course_get_courses(this)
-    //         }
-    //       )
-    //     }
-    //   }
-    // )
-    //
+    this.course = this.dataShare.getData();
+    console.log(this.course)
   }
 
 }

@@ -1,0 +1,27 @@
+<div class="topbar">
+  <form class="" action="index.html" method="post">
+    <mat-form-field class="mat-form" >
+      <mat-select [(ngModel)]="form_moodle" name="form_moodle" (change)="getCourses()">
+        <mat-option *ngFor="let moodle of moodles let i = index" [value]="moodle">{{moodle.name}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-select [(ngModel)]="form_courseid" name="form_courseid" (change)="getCourse(form_courseid)">
+        <mat-option  *ngFor="let course of courses let i = index" [value]="i">{{course.fullname}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+</div>
+<div class="content">
+  <div class="row">
+    <div class="report" *ngIf="isCourseSelected">
+      <ul>
+        <li><h2>Curso {{course.fullname}}</h2></li>
+        <li>Data de Início: {{dateConverter(course.startdate)}}</li>
+      </ul>
+    </div>
+      <div class="enrolled-users">
+    </div>
+  </div>
+</div>
+<flash-messages></flash-messages>

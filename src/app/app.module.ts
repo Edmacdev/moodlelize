@@ -19,6 +19,8 @@ import { HomeComponent } from './components/home/home.component';
 import { MoodleRegComponent } from './components/moodle-reg/moodle-reg.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ProfileComponent } from './components/profile/profile.component';
+import { SearchComponent } from './components/search/search.component';
+import { UserComponent } from './components/user/user.component';
 
 import { ValidateService } from './services/validate.service';
 import { AuthService } from './services/auth.service';
@@ -29,8 +31,7 @@ import { DataShareService } from './services/data-share.service';
 
 import { MoodleApiService } from './services/moodle-api.service';
 import { CoursePageComponent } from './components/course-page/course-page.component';
-import { SearchComponent } from './components/search/search.component';
-import { UserComponent } from './components/user/user.component';
+
 
 import { environment } from '../environments/environment';
 
@@ -39,6 +40,7 @@ import { DisplayUsersDialogComponent } from './components/display-users-dialog/d
 import { UsersAddComponent } from './components/users-add/users-add.component';
 import { RemoveMoodleDialogComponent } from './components/remove-moodle-dialog/remove-moodle-dialog.component';
 import { EditMoodleDialogComponent } from './components/edit-moodle-dialog/edit-moodle-dialog.component';
+import { ReportComponent } from './components/report/report.component';
 
 @NgModule({
   declarations: [
@@ -55,7 +57,8 @@ import { EditMoodleDialogComponent } from './components/edit-moodle-dialog/edit-
     DisplayUsersDialogComponent,
     UsersAddComponent,
     RemoveMoodleDialogComponent,
-    EditMoodleDialogComponent
+    EditMoodleDialogComponent,
+    ReportComponent
 
   ],
   imports: [
