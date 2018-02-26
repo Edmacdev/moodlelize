@@ -34,7 +34,6 @@ import { CoursePageComponent } from './components/course-page/course-page.compon
 
 
 import { environment } from '../environments/environment';
-
 import 'hammerjs';
 import { DisplayUsersDialogComponent } from './components/display-users-dialog/display-users-dialog.component';
 import { UsersAddComponent } from './components/users-add/users-add.component';

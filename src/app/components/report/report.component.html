@@ -12,16 +12,19 @@
     </mat-form-field>
   </form>
 </div>
-<div class="content">
-  <div class="row">
+<div class="container">
+  <div class="row col-md-6 col-md-offset-3">
     <div class="report" *ngIf="isCourseSelected">
-      <ul>
-        <li><h2>Curso {{course.fullname}}</h2></li>
-        <li>Data de Início: {{dateConverter(course.startdate)}}</li>
-      </ul>
+        <h2>Curso {{course.fullname}}</h2>
+        <p>Data de Início: {{dateConverter(course.startdate)}}</p>
+        <p>Data de Término: {{dateConverter(course.enddate)}}</p>
+        <p *ngIf="enrolledUsers">Alunos matriculados: {{enrolledUsers.length}}</p>
     </div>
       <div class="enrolled-users">
     </div>
   </div>
 </div>
 <flash-messages></flash-messages>
+<div class="">
+  <canvas id="chart" width="30" height="30"></canvas>
+</div>
