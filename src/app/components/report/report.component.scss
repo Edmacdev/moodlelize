@@ -1,3 +1,39 @@
+
+mat-sidenav-container{
+  float: right;
+}
 .report{
   text-align: center;
+}
+.topbar{
+  background: #F8F8FA;
+}
+.title{
+  margin-top: 50px;
+  text-align: center;
+}
+.chart{
+  margin-top: 30px;
+}
+.mat-form{
+  margin-right: 65px;
+  margin-left: 15px;
+}
+.select{
+  text-align: center;
+}
+.users-container {
+  position: absolute;
+  top: 60px;
+  bottom: 60px;
+  left: 0;
+  right: 0;
+}
+
+.users-sidenav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+  background: rgba(255, 0, 0, 0.5);
 }

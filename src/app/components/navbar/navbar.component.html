@@ -3,16 +3,32 @@
 
   <ul class="nav navbar-nav navbar-right" style="float:right">
     <li *ngIf="user" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
-      <a class="nav-link" [routerLink]="['/dashboard']">Dashboard</a>
+      <a class="nav-link" [routerLink]="['/dashboard']">
+        <div class="icon" style="padding-bottom:6px"><span><img id="moodle-logo"src="assets/images/moodle-logo-unselected.png" alt=""></span></div>
+
+        <p>Moodles</p>
+      </a>
     </li>
     <li *ngIf="user" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
-      <a class="nav-link" [routerLink]="['/profile']">Perfil</a>
+
+      <a class="nav-link" [routerLink]="['/profile']">
+        <div>
+          <mat-icon class="icon">assignment_ind</mat-icon>
+          <p>Perfil</p>
+        </div>
+      </a>
     </li>
     <li *ngIf="user" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
-      <a class="nav-link" [routerLink]="['relatorio']">Relatório</a>
+
+      <a class="nav-link" [routerLink]="['relatorio']">
+        <div>
+          <mat-icon class="icon">content_paste</mat-icon>
+          <p>Relatório</p>
+        </div>
+      </a>
     </li>
-    <li *ngIf="user" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
+    <!-- <li *ngIf="user" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
       <a class="nav-link" (click)="authService.signOut()">Sair</a>
-    </li>
+    </li> -->
   </ul>
 </nav>

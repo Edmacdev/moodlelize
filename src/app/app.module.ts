@@ -6,7 +6,8 @@ import { FlashMessagesModule } from 'angular2-flash-messages'
 import { HttpModule } from '@angular/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule, MatCardModule, MatMenuModule, MatToolbarModule,
-        MatIconModule, MatDialogModule, MatSelectModule, MatInputModule,MatExpansionModule } from '@angular/material';
+        MatIconModule, MatDialogModule, MatSelectModule, MatInputModule,
+        MatExpansionModule, MatSidenavModule, MatCheckboxModule  } from '@angular/material';
 import { AngularFireModule  } from 'angularfire2';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
@@ -77,6 +78,8 @@ import { ReportComponent } from './components/report/report.component';
     MatSelectModule,
     MatInputModule,
     MatExpansionModule,
+    MatSidenavModule,
+    MatCheckboxModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule, // imports firebase/firestore, only needed for database features
     AngularFireAuthModule, // imports firebase/auth, only needed for auth features,

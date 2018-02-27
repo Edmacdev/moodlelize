@@ -1,30 +1,38 @@
 <div class="topbar">
-  <form class="" action="index.html" method="post">
-    <mat-form-field class="mat-form" >
-      <mat-select [(ngModel)]="form_moodle" name="form_moodle" (change)="getCourses()">
-        <mat-option *ngFor="let moodle of moodles let i = index" [value]="moodle">{{moodle.name}}</mat-option>
-      </mat-select>
-    </mat-form-field>
-    <mat-form-field>
-      <mat-select [(ngModel)]="form_courseid" name="form_courseid" (change)="getCourse(form_courseid)">
-        <mat-option  *ngFor="let course of courses let i = index" [value]="i">{{course.fullname}}</mat-option>
-      </mat-select>
-    </mat-form-field>
-  </form>
-</div>
-<div class="container">
-  <div class="row col-md-6 col-md-offset-3">
-    <div class="report" *ngIf="isCourseSelected">
-        <h2>Curso {{course.fullname}}</h2>
-        <p>Data de Início: {{dateConverter(course.startdate)}}</p>
-        <p>Data de Término: {{dateConverter(course.enddate)}}</p>
-        <p *ngIf="enrolledUsers">Alunos matriculados: {{enrolledUsers.length}}</p>
-    </div>
-      <div class="enrolled-users">
+  <div class="container">
+    <div class="row">
+      <form class="col-md-12 select" action="index.html" method="post">
+        <strong>Moodle:</strong>
+        <mat-form-field class="mat-form" >
+          <mat-select [(ngModel)]="form_moodle" name="form_moodle" (change)="getCourses()">
+            <mat-option *ngFor="let moodle of moodles let i = index" [value]="moodle">{{moodle.name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <strong>Curso:</strong>
+        <mat-form-field class="mat-form">
+          <mat-select [(ngModel)]="form_courseid" name="form_courseid" (change)="getCourse(form_courseid)">
+            <mat-option  *ngFor="let course of courses let i = index" [value]="i">{{course.fullname}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </form>
     </div>
   </div>
 </div>
-<flash-messages></flash-messages>
-<div class="">
-  <canvas id="chart" width="30" height="30"></canvas>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 title" *ngIf="isCourseSelected">
+      <h2>{{course.fullname}}</h2>
+      <p *ngIf="enrolledUsers">Alunos matriculados: {{enrolledUsers.length}}</p>
+    </div>
+    <div class="enrolled-users"></div>
+  </div>
+  <flash-messages></flash-messages>
+  <div class="row">
+    <div class="chart col-md-6"><canvas id="doughnut"></canvas></div>
+    <div class="chart col-md-6"><canvas id="bar"></canvas></div>
+  </div>
+  <div class="row">
+    <div class="chart col-md-12"><canvas id="line"></canvas></div>
+  </div>
 </div>

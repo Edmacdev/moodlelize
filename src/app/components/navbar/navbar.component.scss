@@ -1,6 +1,27 @@
+
+li p{
+  padding: 0px;
+  margin: 0px;
+}
+span{
+  padding-bottom: 4px;
+}
+
+.navbar-brand{
+  margin-right: 50px;
+}
 .nav-link{
   cursor: pointer;
+  text-align: center;
+  margin-right: 20px;
 }
 .nav, .navbar-nav, .nav-link, .active:hover {
   background: rgba(0,0,0,0) !important;
+
+}
+.navbar{
+  margin-bottom: 0px;
+}
+.icon{
+  font-size: 24px;
 }
