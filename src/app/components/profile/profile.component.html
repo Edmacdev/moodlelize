@@ -1,7 +1,12 @@
-<div *ngIf="user">
-  <h2><strong>{{user.displayName}}</strong></h2>
-  <ul class="list-group">
-    <li class="list-group-item">Email: {{user.email}}</li>
-    <li class="list-group-item">userId: {{user.uid}}</li>
-  </ul>
+<div class="container">
+  <div class="row">
+    <div *ngIf="user" class="user-profile col-md-6 col-md-offset-3">
+      <div class="user-image"><img [src]=user.photoURL alt=""></div>
+      <h2><strong>{{user.displayName}}</strong></h2>
+      <ul class="list-group">
+        <li class="list-group-item">Email: {{user.email}}</li>
+        <li class="list-group-item">userId: {{user.uid}}</li>
+      </ul>
+    </div>
+  </div>
 </div>

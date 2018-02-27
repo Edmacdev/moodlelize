@@ -41,7 +41,7 @@ export class AuthService {
      return this.afAuth.auth.signInWithPopup(provider)
      .then((credential) => {
        this.updateUserData(credential.user)
-       this.router.navigate(['dashboard']);
+       this.router.navigate(['']);
      })
      .catch(e => console.error(e))
    }
@@ -51,7 +51,8 @@ export class AuthService {
      const data: User = {
        uid: user.uid,
        email: user.email,
-       displayName: user.displayName
+       displayName: user.displayName,
+       photoURL: user.photoURL
      }
      return userRef.set(data);
    }

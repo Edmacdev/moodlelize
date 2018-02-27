@@ -8,7 +8,7 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
-
+  user: any;
   constructor(
     private router: Router,
     private authService: AuthService
@@ -17,9 +17,7 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     this.authService.user.subscribe(
       user => {
-        if(user){
-          this.router.navigate(['dashboard']);
-        }
+        this.user = user
       }
     )
   }

@@ -2,6 +2,12 @@
   <a class="navbar-brand" [routerLink]="['']">Moodlelize</a>
 
   <ul class="nav navbar-nav navbar-right" style="float:right">
+    <li [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
+      <a class="nav-link" [routerLink]="['']">
+        <mat-icon class="icon">home</mat-icon>
+        <p>Home</p>
+      </a>
+    </li>
     <li *ngIf="user" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
       <a class="nav-link" [routerLink]="['/dashboard']">
         <div class="icon" style="padding-bottom:6px"><span><img id="moodle-logo"src="assets/images/moodle-logo-unselected.png" alt=""></span></div>
@@ -11,7 +17,7 @@
     </li>
     <li *ngIf="user" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
 
-      <a class="nav-link" [routerLink]="['/profile']">
+      <a class="nav-link" [routerLink]="['perfil']">
         <div>
           <mat-icon class="icon">assignment_ind</mat-icon>
           <p>Perfil</p>
@@ -27,8 +33,11 @@
         </div>
       </a>
     </li>
-    <!-- <li *ngIf="user" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
-      <a class="nav-link" (click)="authService.signOut()">Sair</a>
-    </li> -->
+    <li *ngIf="user" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}" class="nav-item">
+      <a class="nav-link" (click)="authService.signOut()">
+        <mat-icon class="icon">power_settings_new</mat-icon>
+        <p>Sair</p>
+      </a>
+    </li>
   </ul>
 </nav>
