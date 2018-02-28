@@ -1,39 +1,33 @@
 <div class="jumbotron">
   <div class="container">
-    <h1 class="display-3">Moodlelize</h1>
+    <h1 >Moodlelize</h1>
     <p>Plataforma de relatório e monitoramento de moodles</p>
   </div>
 </div>
 <div class="container">
-  <div class="row">
-    <div *ngIf="!user">
-      <p style="font-size:24px; font-weight: bold; color:#333; text-align:center">Para utilizar a plataforma, faça o login ou cadastre-se</p>
-      <flash-messages></flash-messages>
-      <app-login></app-login>
-    </div>
-    <div *ngIf="user" class="col-md-12">
+  <div *ngIf="!user" class="row">
+    <p style="font-size:24px; font-weight: bold; color:#333; text-align:center">Para utilizar a plataforma, faça o login ou cadastre-se</p>
+    <flash-messages></flash-messages>
+    <app-login></app-login>
+  </div>
+  <div *ngIf="user">
+    <div class="row">
       <p class="welcome">Olá, {{user.displayName}}. Bem vindo ao Moodlelize!</p>
-      <p style="font-size:24px; text-align:center; margin-top:30px">O que gostaria de fazer?</p>
-      <div class="itens">
-        <div class="row">
-          <div class="item col-md-2 col-md-offset-2">
-            <h5><strong>Adicionar ou Remover Moodles</strong></h5>
-            <div class="card" id="moodles" (click)="router.navigate(['dashboard'])">
-              <img src="assets/images/moodle-icon.png" alt="">
-            </div>
-          </div>
-          <div class="item col-md-2 col-md-offset-2">
-            <h5><strong>Alterar informações de perfil</strong></h5>
-            <div class="card" id="perfil" (click)="router.navigate(['perfil'])">
-              <img src="assets/images/moodle-logo-unselected.png" alt="">
-            </div>
-          </div>
-          <div class="item col-md-2 col-md-offset-2">
-            <h5><strong>Gerar relatório de curso</strong></h5>
-            <div class="card" id="relatorio" (click)="router.navigate(['relatorio'])">
-              <img src="assets/images/moodle-logo-unselected.png" alt="">
-            </div>
-          </div>
+      <p style="font-size:24px; text-align:center; margin-top:70px">O que gostaria de fazer?</p>
+    </div>
+    <div class="row">
+      <div class="itens col-md-12">
+        <div class="item col-md-4">
+          <p><strong>Adicionar ou Remover Moodles</strong></p>
+          <mat-icon class="icon" id="add-box" (click)="router.navigate(['dashboard'])">add_box</mat-icon>
+        </div>
+        <div class="item col-md-4">
+          <p><strong>Alterar informações de perfil</strong></p>
+          <mat-icon class="icon" id="assignment-ind" (click)="router.navigate(['perfil'])">assignment_ind</mat-icon>
+        </div>
+        <div class="item col-md-4">
+          <p><strong>Gerar relatório de curso</strong></p>
+          <mat-icon class="icon" id="content-paste" (click)="router.navigate(['relatorio'])">content_paste</mat-icon>
         </div>
       </div>
     </div>

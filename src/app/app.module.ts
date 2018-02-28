@@ -41,6 +41,7 @@ import { UsersAddComponent } from './components/users-add/users-add.component';
 import { RemoveMoodleDialogComponent } from './components/remove-moodle-dialog/remove-moodle-dialog.component';
 import { EditMoodleDialogComponent } from './components/edit-moodle-dialog/edit-moodle-dialog.component';
 import { ReportComponent } from './components/report/report.component';
+import { AddMoodleDialogComponent } from './components/add-moodle-dialog/add-moodle-dialog.component';
 
 @NgModule({
   declarations: [
@@ -58,7 +59,8 @@ import { ReportComponent } from './components/report/report.component';
     UsersAddComponent,
     RemoveMoodleDialogComponent,
     EditMoodleDialogComponent,
-    ReportComponent
+    ReportComponent,
+    AddMoodleDialogComponent
 
   ],
   imports: [
