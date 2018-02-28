@@ -4,6 +4,7 @@ import { MoodleService } from '../../services/moodle.service';
 import { MoodleApiService } from '../../services/moodle-api.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
 import Chart from 'chart.js'
+import * as $ from 'jquery';
 @Component({
   selector: 'app-report',
   templateUrl: './report.component.html',
@@ -97,14 +98,14 @@ export class ReportComponent implements OnInit {
     }
   }
   chartInit(){
-    let doughnut: HTMLCanvasElement = document.getElementById("doughnut").getContext('2d');
-    var myChart = new Chart(doughnut, {
+    let doughnut = $("#doughnut")[0].getContext('2d');
+    let doughnutChart = new Chart(doughnut, {
     type: 'doughnut',
     data: {
-        labels: ["Red", "Blue", "Yellow", "Green"],
+        labels: ["nunca", "1-3 dias", "4-6 dias", "mais de 6 dias"],
         datasets: [{
             label: '# of Votes',
-            data: [12, 19, 3, 5],
+            data: [12, 39, 23, 26],
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(54, 162, 235, 0.2)',
@@ -124,14 +125,14 @@ export class ReportComponent implements OnInit {
     }
     });
 
-    let bar: HTMLCanvasElement = document.getElementById("bar").getContext('2d');
-    var myChart = new Chart(bar, {
+    let bar = $("#bar")[0].getContext('2d');
+    let barChart = new Chart(bar, {
     type: 'bar',
     data: {
-        labels: ["Red", "Blue", "Yellow", "Green"],
+        labels: ["nunca", "1-3 dias", "4-6 dias", "mais de 6 dias"],
         datasets: [{
             label: '# of Votes',
-            data: [12, 19, 3, 5],
+            data: [12, 39, 23, 26],
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(54, 162, 235, 0.2)',
@@ -151,11 +152,11 @@ export class ReportComponent implements OnInit {
     }
     });
 
-    let line: HTMLCanvasElement = document.getElementById("line").getContext('2d');
-    var myChart = new Chart(line, {
+    let line  = $("#line")[0].getContext('2d')
+    let lineChart = new Chart(line, {
     type: 'line',
     data: {
-        labels['3', '7', '9', '10', '15'],
+        labels:['3', '7', '9', '10', '15'],
         datasets: [{
             label: '# of Votes',
             data: [

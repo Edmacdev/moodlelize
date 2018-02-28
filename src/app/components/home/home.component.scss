@@ -4,16 +4,20 @@
   font-weight: bold;
 }
 .card{
-  height: 200px;
+  height: 150px;
   width: 150px;
+  border: 0px;
+  text-align: center;
   cursor: pointer;
 }
+.card:hover{
+  border: 3px solid  #F58021;
+}
 .card img{
-  width: 24px;
-  height: 24px;
+  width: 100px;
+  height: 100px;
 }
 #moodles{
-  background: #F58021;
   color: white;
 }
 .itens{
