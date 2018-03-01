@@ -4,6 +4,7 @@ import { MoodleService } from '../../services/moodle.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { AddMoodleDialogComponent } from '../add-moodle-dialog/add-moodle-dialog.component';
 import { EditMoodleDialogComponent } from '../edit-moodle-dialog/edit-moodle-dialog.component';
 import { RemoveMoodleDialogComponent } from '../remove-moodle-dialog/remove-moodle-dialog.component';
 import { Observable } from 'rxjs/Rx';
@@ -11,16 +12,16 @@ import { Moodle } from '../models/Moodle';
 import swal from 'sweetalert';
 
 @Component({
-  selector: 'moodle-reg',
-  templateUrl: './moodle-reg.component.html',
-  styleUrls: ['./moodle-reg.component.scss']
+  selector: 'moodles',
+  templateUrl: './moodles.component.html',
+  styleUrls: ['./moodles.component.scss']
 })
-export class MoodleRegComponent implements OnInit {
+export class MoodlesComponent {
   user: any; //usuário logado e autenticado
   moodles: any; //moodloes do usuário
   step: number = 0; //atributo para lógica do material accordion
 
-//Moodles properties
+  //Moodles properties
   add_moodle_name: string;
   add_moodle_url: string;
   add_moodle_token: string;
@@ -61,17 +62,20 @@ export class MoodleRegComponent implements OnInit {
     )
   }
   addMoodle(){
-    const moodle={
-      name: this.add_moodle_name,
-      url: this.add_moodle_url,
-      token: this.add_moodle_token
-    }
-    this.moodleService.addMoodle(this.user.uid, moodle)
-    .then(
-      swal('Moodle Adicionado', '','success')
+    let dialogRef = this.dialog.open(AddMoodleDialogComponent,{
+      width: '600px'
+
+    });
+    dialogRef.afterClosed().subscribe(
+      result => {
+        if(result.status == "confirm"){
+          this.moodleService.addMoodle(this.user.uid, result.value)
+          .then(
+              swal('', 'Moodle adicionado', 'success')
+          )
+        }
+      }
     );
-    this.fg_add_moodle.reset();
-    // this.moodleService.getMoodles(this.user.uid)
   }
   editMoodle(moodle){
     let dialogRef = this.dialog.open(
@@ -88,6 +92,7 @@ export class MoodleRegComponent implements OnInit {
             swal('Moodle Atualizado', '','success')
           )
         }
+
       }
     )
   }

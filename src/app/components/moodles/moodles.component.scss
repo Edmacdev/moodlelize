@@ -1,8 +1,19 @@
+.block{
+  background: grey;
+  border: 2px solid #333;
+  padding: 15px;
+}
+h1 {
+  border-bottom: 3px solid #a3a3a3;
+}
 h2{
   text-align: center;
 }
 input:-webkit-autofill {
     -webkit-box-shadow: 0 0 0 30px white inset;
+}
+.content{
+  margin-top: 75px;
 }
 .tb_moodleInfo{
   width: 100%;
@@ -15,12 +26,6 @@ input:-webkit-autofill {
   font-size: 18px;
 }
 //accordion
-.acc-add-moodle {
-  background-color: #286090 !important;
-}
-.acc-add-moodle h3{
-  color: white;
-}
 .mat-form-field{
   margin-right: 20px;
   width: 25%;
@@ -50,4 +55,7 @@ input:-webkit-autofill {
 }
 .icon-mode-edit:hover{
   color: blue;
+}
+.bt-add-moodle{
+  margin-top: 40px;
 }

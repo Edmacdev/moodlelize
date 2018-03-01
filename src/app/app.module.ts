@@ -1,3 +1,5 @@
+// MODULOS
+
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
@@ -13,15 +15,26 @@ import { AngularFireAuthModule } from 'angularfire2/auth';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { AngularFireStorageModule } from 'angularfire2/storage';
 
+// COMPONENTES
+
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { HomeComponent } from './components/home/home.component';
 import { MoodleRegComponent } from './components/moodle-reg/moodle-reg.component';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { MoodlesComponent } from './components/moodles/moodles.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { SearchComponent } from './components/search/search.component';
 import { UserComponent } from './components/user/user.component';
+import { DisplayUsersDialogComponent } from './components/display-users-dialog/display-users-dialog.component';
+import { UsersAddComponent } from './components/users-add/users-add.component';
+import { RemoveMoodleDialogComponent } from './components/remove-moodle-dialog/remove-moodle-dialog.component';
+import { EditMoodleDialogComponent } from './components/edit-moodle-dialog/edit-moodle-dialog.component';
+import { ReportComponent } from './components/report/report.component';
+import { AddMoodleDialogComponent } from './components/add-moodle-dialog/add-moodle-dialog.component';
+import { CoursePageComponent } from './components/course-page/course-page.component';
+
+//SERVIÇOS
 
 import { ValidateService } from './services/validate.service';
 import { AuthService } from './services/auth.service';
@@ -29,19 +42,12 @@ import { AuthGuard } from './guards/auth.guard';
 import { MoodleService } from './services/moodle.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
 import { DataShareService } from './services/data-share.service';
-
 import { MoodleApiService } from './services/moodle-api.service';
-import { CoursePageComponent } from './components/course-page/course-page.component';
 
+//OUTROS
 
 import { environment } from '../environments/environment';
 import 'hammerjs';
-import { DisplayUsersDialogComponent } from './components/display-users-dialog/display-users-dialog.component';
-import { UsersAddComponent } from './components/users-add/users-add.component';
-import { RemoveMoodleDialogComponent } from './components/remove-moodle-dialog/remove-moodle-dialog.component';
-import { EditMoodleDialogComponent } from './components/edit-moodle-dialog/edit-moodle-dialog.component';
-import { ReportComponent } from './components/report/report.component';
-import { AddMoodleDialogComponent } from './components/add-moodle-dialog/add-moodle-dialog.component';
 
 @NgModule({
   declarations: [
@@ -49,7 +55,7 @@ import { AddMoodleDialogComponent } from './components/add-moodle-dialog/add-moo
     LoginComponent,
     NavbarComponent,
     HomeComponent,
-    DashboardComponent,
+    MoodlesComponent,
     ProfileComponent,
     MoodleRegComponent,
     CoursePageComponent,
@@ -61,14 +67,13 @@ import { AddMoodleDialogComponent } from './components/add-moodle-dialog/add-moo
     EditMoodleDialogComponent,
     ReportComponent,
     AddMoodleDialogComponent
-
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    FlashMessagesModule.forRoot(),
+    FlashMessagesModule,
     HttpModule,
     BrowserAnimationsModule,
     MatButtonModule,
@@ -95,13 +100,13 @@ import { AddMoodleDialogComponent } from './components/add-moodle-dialog/add-moo
     MoodleApiService,
     FlashMessagesService,
     DataShareService
-
   ],
   bootstrap: [AppComponent],
   entryComponents:[
     DisplayUsersDialogComponent,
     EditMoodleDialogComponent,
-    RemoveMoodleDialogComponent
+    RemoveMoodleDialogComponent,
+    AddMoodleDialogComponent
   ]
 })
 export class AppModule { }

@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-
+import { MoodleService } from '../../services/moodle.service';
 @Component({
   selector: 'app-add-moodle-dialog',
   templateUrl: './add-moodle-dialog.component.html',
@@ -10,12 +10,13 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 export class AddMoodleDialogComponent implements OnInit {
   fg_add_moodle: FormGroup;
 
-  form_name: string;
-  form_url: string;
-  form_token: string;
+  form_name: string = '';
+  form_url: string = '';
+  form_token: string = '';
   constructor(
     private fb: FormBuilder,
-    public dialogRef: MatDialogRef<EditMoodleDialogComponent>,
+    public dialogRef: MatDialogRef<AddMoodleDialogComponent>,
+    private moodleService:MoodleService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.fg_add_moodle = fb.group({
@@ -28,7 +29,6 @@ export class AddMoodleDialogComponent implements OnInit {
   ngOnInit() {
   }
   onCloseConfirm(){
-    this.fg_add_moodle.value.id = this.data.id
     let data ={
       status: 'confirm',
       value: this.fg_add_moodle.value
@@ -37,7 +37,10 @@ export class AddMoodleDialogComponent implements OnInit {
 
   }
   onCloseCancel(){
-    this.dialogRef.close("cancel")
+    let data ={
+      status: 'cancel'
+    }
+    this.dialogRef.close(data)
   }
 
 }
