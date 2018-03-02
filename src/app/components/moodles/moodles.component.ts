@@ -71,7 +71,9 @@ export class MoodlesComponent {
         if(result.status == "confirm"){
           this.moodleService.addMoodle(this.user.uid, result.value)
           .then(
+            () => {
               swal('', 'Moodle adicionado', 'success')
+            }
           )
         }
       }
@@ -89,10 +91,11 @@ export class MoodlesComponent {
         if(result.status == "confirm"){
           this.moodleService.updateMoodle(this.user.uid, result.value.id, result.value)
           .then(
-            swal('Moodle Atualizado', '','success')
+            () => {
+              swal('Moodle Atualizado', '','success')
+            }
           )
         }
-
       }
     )
   }
@@ -108,7 +111,9 @@ export class MoodlesComponent {
         if(result == "confirm"){
           this.moodleService.removeMoodle(this.user.uid, moodle.id)
           .then(
-            swal('Moodle Excluido', '', 'success')
+            () => {
+              swal('Moodle Excluido', '', 'success')
+            }      
           )
         }
       }
