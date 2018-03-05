@@ -4,7 +4,7 @@ import { AuthService } from '../../services/auth.service';
 import { AddMoodleDialogComponent } from '../add-moodle-dialog/add-moodle-dialog.component';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { MoodleService } from '../../services/moodle.service';
-import swal from 'sweetalert';
+import swal from 'sweetalert2';
 
 @Component({
   selector: 'app-home',

@@ -8,7 +8,7 @@ import { EditMoodleDialogComponent } from '../edit-moodle-dialog/edit-moodle-dia
 import { RemoveMoodleDialogComponent } from '../remove-moodle-dialog/remove-moodle-dialog.component';
 import { Observable } from 'rxjs/Rx';
 import { Moodle } from '../models/Moodle';
-import swal from 'sweetalert';
+import swal from 'sweetalert2';
 
 @Component({
   selector: 'moodle-reg',

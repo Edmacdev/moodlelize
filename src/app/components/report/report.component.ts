@@ -3,8 +3,11 @@ import { AuthService } from '../../services/auth.service';
 import { MoodleService } from '../../services/moodle.service';
 import { MoodleApiService } from '../../services/moodle-api.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
+
 import Chart from 'chart.js'
 import * as $ from 'jquery';
+
+declare var Chart: any
 @Component({
   selector: 'app-report',
   templateUrl: './report.component.html',
@@ -67,7 +70,6 @@ export class ReportComponent implements OnInit {
   }
   getCourse(index){
     this.course = this.courses[index];
-    console.log(this.course)
     this.isCourseSelected = true;
     this.getEnrolledUsers(this.course.id);
   }
@@ -87,6 +89,7 @@ export class ReportComponent implements OnInit {
         }
         this.enrolledUsers = data;
         this.usersAccessData = this.getEnrolledUsersAccessData();
+        console.log(this.enrolledUsers)
         this.chartInit();
       }
     )
@@ -96,7 +99,7 @@ export class ReportComponent implements OnInit {
       return 0
     }
       lastaccess = new Date(lastaccess *1000);
-      console.log('lastacces: ' + lastaccess)
+
       let currentdate = new Date();
       let timeDiff = Math.abs(currentdate.getTime() - lastaccess.getTime());
       let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
@@ -109,7 +112,7 @@ export class ReportComponent implements OnInit {
     let group2 = [];
     let group3 = [];
     let group4 = [];
-    console.log(this.enrolledUsers)
+
     for (let i in this.enrolledUsers){
       let days = this.getDaysDiff(this.enrolledUsers[i].lastaccess);
       if(days == 0){
@@ -137,13 +140,11 @@ export class ReportComponent implements OnInit {
     let timeDiff = Math.abs(enddate.getTime() - startdate.getTime());
     let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
-    return ((diffDays <= 1)? 'indeterminado' : diffDays + ' dias')
-    // console.log(this.course)
-    // return 'getduration'
+    return ((diffDays <= 1)? 'indeterminado' : diffDays + ' dias');
   }
   chartInit(){
-    let doughnut = $("#doughnut")[0].getContext('2d');
-    let doughnutChart = new Chart(doughnut, {
+    var doughnut = $("#doughnut")[0].getContext('2d');
+    var doughnutChart = new Chart(doughnut, {
     type: 'doughnut',
     data: {
         labels: ["nunca", "1-2 dias", "3-5 dias", "5-10", "mais de 10 dias"],

@@ -9,7 +9,7 @@ import { EditMoodleDialogComponent } from '../edit-moodle-dialog/edit-moodle-dia
 import { RemoveMoodleDialogComponent } from '../remove-moodle-dialog/remove-moodle-dialog.component';
 import { Observable } from 'rxjs/Rx';
 import { Moodle } from '../models/Moodle';
-import swal from 'sweetalert';
+import swal from 'sweetalert2';
 
 @Component({
   selector: 'moodles',
@@ -71,7 +71,7 @@ export class MoodlesComponent {
         if(result.status == "confirm"){
           this.moodleService.addMoodle(this.user.uid, result.value)
           .then(
-            () => {
+            (res) => {
               swal('', 'Moodle adicionado', 'success')
             }
           )
@@ -113,7 +113,7 @@ export class MoodlesComponent {
           .then(
             () => {
               swal('Moodle Excluido', '', 'success')
-            }      
+            }
           )
         }
       }
