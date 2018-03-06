@@ -73,5 +73,13 @@ wsProtocol: string = 'https://';
     '&courseid=' + params.courseid
     ).map(res => res.json())
   }
+  gradereport_user_get_grade_items (){
+    return this.http.get(this.wsProtocol + host + this.wsURL +
+    '?wstoken=' + params.wstoken +
+    '&wsfunction=gradereport_user_get_grade_items' +
+    '&moodlewsrestformat=json' +
+    '&courseid=' + params.courseid
+    ).map(res => res.json())
+  }
 
 }

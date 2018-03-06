@@ -72,9 +72,7 @@ export class ReportComponent implements OnInit {
     this.course = this.courses[index];
     this.isCourseSelected = true;
     this.getEnrolledUsers(this.course.id);
-  }
-  dateConverter(utc){
-    return utc = new Date(this.course.startdate*1000);
+    this.countdownTimer((this.course.enddate)*1000)
   }
   getEnrolledUsers(courseid){
     const params ={
@@ -87,7 +85,7 @@ export class ReportComponent implements OnInit {
           this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
           return false;
         }
-        this.enrolledUsers = data;
+        this.enrolledUsers = data.sort((a,b) => a.fullname.localeCompare(b.fullname));
         this.usersAccessData = this.getEnrolledUsersAccessData();
         console.log(this.enrolledUsers)
         this.chartInit();
@@ -96,18 +94,19 @@ export class ReportComponent implements OnInit {
   }
   getDaysDiff(lastaccess){
     if(lastaccess == 0){
-      return 0
+      return null
     }
       lastaccess = new Date(lastaccess *1000);
 
       let currentdate = new Date();
       let timeDiff = Math.abs(currentdate.getTime() - lastaccess.getTime());
       let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-      return diffDays;
+      return diffDays - 1;
   }
   getEnrolledUsersAccessData(){
     let accessData = [];
     let never = [];
+    let group0 = [];
     let group1 = [];
     let group2 = [];
     let group3 = [];
@@ -115,8 +114,11 @@ export class ReportComponent implements OnInit {
 
     for (let i in this.enrolledUsers){
       let days = this.getDaysDiff(this.enrolledUsers[i].lastaccess);
-      if(days == 0){
+      if(days == null){
         never.push(this.enrolledUsers[i])
+      }
+      else if (days == 0){
+        group0.push(this.enrolledUsers[i])
       }
       else if(days >= 1 && days <= 2){
         group1.push(this.enrolledUsers[i])
@@ -131,32 +133,57 @@ export class ReportComponent implements OnInit {
         group4.push(this.enrolledUsers[i])
       }
     }
-    accessData.push(never, group1, group2, group3, group4);
+    accessData.push(never, group0, group1, group2, group3, group4);
     return accessData
   }
-  getCourseDuration(){
-    let startdate = new Date(this.course.startdate)
-    let enddate = new Date(this.course.enddate)
-    let timeDiff = Math.abs(enddate.getTime() - startdate.getTime());
-    let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
-    return ((diffDays <= 1)? 'indeterminado' : diffDays + ' dias');
+  countdownTimer(countDownDate){
+        // Update the count down every 1 second
+    var x = setInterval(function() {
+
+      // Get todays date and time
+      var now = new Date().getTime();
+
+      // Find the distance between now an the count down date
+      var distance = countDownDate - now;
+
+      // Time calculations for days, hours, minutes and seconds
+      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      // Display the result in the element with id="demo"
+      // document.getElementById("days").innerHTML = '59';
+      $(".days").html(days);
+      $(".hours").html(hours);
+      $(".minutes").html(minutes);
+      $(".seconds").html(seconds);
+
+      // If the count down is finished, write some text
+      if (distance < 0) {
+        clearInterval(x);
+        $(".countdown").html('<h3>CURSO ENCERRADO</h3>');
+      }
+    }, 1000);
   }
   chartInit(){
     var doughnut = $("#doughnut")[0].getContext('2d');
     var doughnutChart = new Chart(doughnut, {
     type: 'doughnut',
     data: {
-        labels: ["nunca", "1-2 dias", "3-5 dias", "5-10", "mais de 10 dias"],
+        labels: ["nunca", "hoje", "1-2 dias", "3-5 dias", "5-10", "mais de 10 dias"],
         datasets: [{
             label: '# of Votes',
             data: [this.usersAccessData[0].length, this.usersAccessData[1].length,
-            this.usersAccessData[2].length, this.usersAccessData[3].length, this.usersAccessData[4].length],
+            this.usersAccessData[2].length, this.usersAccessData[3].length,
+             this.usersAccessData[4].length, this.usersAccessData[4].length],
             // data: [1, 6, 9, 5]
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(54, 162, 235, 0.2)',
                 'rgba(255, 206, 86, 0.2)',
+                'rgba(218, 135, 76, 0.2)',
                 'rgba(75, 192, 192, 0.2)',
                 'rgba(128, 0, 128, 0.2)'
             ],
@@ -164,6 +191,7 @@ export class ReportComponent implements OnInit {
                 'rgba(255,99,132,1)',
                 'rgba(54, 162, 235, 1)',
                 'rgba(255, 206, 86, 1)',
+                'rgba(218, 135, 76, 1)',
                 'rgba(75, 192, 192, 1)',
                 'rgba(128, 0, 128, 1)'
             ],
@@ -233,4 +261,5 @@ export class ReportComponent implements OnInit {
     // }
     // });
   }
+
 }
