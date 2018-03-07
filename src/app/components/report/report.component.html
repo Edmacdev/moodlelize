@@ -10,7 +10,7 @@
         </mat-form-field>
         <strong>Curso:</strong>
         <mat-form-field class="mat-form">
-          <mat-select [(ngModel)]="form_courseid" name="form_courseid" (change)="getCourse(form_courseid)">
+          <mat-select [(ngModel)]="form_courseid" name="form_courseid" (change)="report(form_courseid)">
             <mat-option  *ngFor="let course of courses let i = index" [value]="i">{{course.fullname}}</mat-option>
           </mat-select>
         </mat-form-field>
@@ -19,11 +19,11 @@
   </div>
 </div>
 
-<div class="container">
+<div class="container" *ngIf="isReady">
   <div class="row">
-    <div class="col-md-12 title" *ngIf="isCourseSelected">
+    <div class="col-md-12 title" >
       <h2>{{course.fullname}}</h2>
-      <p *ngIf="enrolledUsers">Alunos matriculados: {{enrolledUsers.length}}</p>
+      <p >Alunos matriculados: {{enrolledUsers.length}}</p>
     </div>
   </div>
   <div class="row">
@@ -46,140 +46,185 @@
           <p class="seconds_ref">Segundos</p>
         </li>
       </ul>
+      <div class="course-end col-md-6 col-md-offset-3"></div>
     </div>
   </div>
   <flash-messages></flash-messages>
   <div class="row">
-    <div class="chart col-md-12"><canvas id="doughnut"></canvas></div>
-  </div>
-  <div class="row">
-    <div class="tabs col-md-12" *ngIf="usersAccessData">
-      <mat-tab-group>
-        <mat-tab label="Nunca">
-          <div >
-            <table class="tb-users">
-              <tr>
-                <th>Nome</th>
-                <th>email</th>
-                <th>fone</th>
-              </tr>
-              <tr *ngFor="let user of usersAccessData[0]">
-                <td >
-                  <h5>{{user.firstname}} {{user.lastname}}</h5>
-                </td>
-                <td >
-                  <h5>{{user.email}}</h5>
-                </td>
-                <td >
-                  <h5>{{user.phone1}}</h5>
-                </td>
-              </tr>
-            </table>
+    <div class="tabs">
+      <mat-tab-group (selectedTabChange)="chartRender($event.index)">
+        <mat-tab label="Acesso">
+          <div class="container">
+            <div class="row">
+              <div class="chart col-md-12"><canvas id="cht-access"></canvas></div>
+            </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <mat-tab-group>
+                    <mat-tab label="Nunca">
+                      <div >
+                        <table class="tb-users">
+                          <tr>
+                            <th>Nome</th>
+                            <th>email</th>
+                            <th>fone</th>
+                          </tr>
+                          <tr *ngFor="let user of usersAccessData[0]">
+                            <td >
+                              <h5>{{user.firstname}} {{user.lastname}}</h5>
+                            </td>
+                            <td >
+                              <h5>{{user.email}}</h5>
+                            </td>
+                            <td >
+                              <h5>{{user.phone1}}</h5>
+                            </td>
+                          </tr>
+                        </table>
 
+                      </div>
+                    </mat-tab>
+                    <mat-tab label="Hoje">
+                      <div >
+                        <table class="tb-users">
+                          <tr>
+                            <th>Nome</th>
+                            <th>email</th>
+                            <th>fone</th>
+                          </tr>
+                          <tr *ngFor="let user of usersAccessData[1]">
+                            <td >
+                              <h5>{{user.firstname}} {{user.lastname}}</h5>
+                            </td>
+                            <td >
+                              <h5>{{user.email}}</h5>
+                            </td>
+                            <td >
+                              <h5>{{user.phone1}}</h5>
+                            </td>
+                          </tr>
+                        </table>
+
+                      </div>
+                    </mat-tab>
+                    <mat-tab label="1-2 dias">
+                      <table class="tb-users">
+                        <tr>
+                          <th>Nome</th>
+                          <th>email</th>
+                          <th>fone</th>
+                        </tr>
+                        <tr *ngFor="let user of usersAccessData[2]">
+                          <td >
+                            <h5>{{user.firstname}} {{user.lastname}}</h5>
+                          </td>
+                          <td >
+                            <h5>{{user.email}}</h5>
+                          </td>
+                          <td >
+                            <h5>{{user.phone1}}</h5>
+                          </td>
+                        </tr>
+                      </table>
+                    </mat-tab>
+                    <mat-tab label="3-5 dias">
+                      <table class="tb-users">
+                        <tr>
+                          <th>Nome</th>
+                          <th>email</th>
+                          <th>fone</th>
+                        </tr>
+                        <tr *ngFor="let user of usersAccessData[3]">
+                          <td >
+                            <h5>{{user.firstname}} {{user.lastname}}</h5>
+                          </td>
+                          <td >
+                            <h5>{{user.email}}</h5>
+                          </td>
+                          <td >
+                            <h5>{{user.phone1}}</h5>
+                          </td>
+                        </tr>
+                      </table>
+                    </mat-tab>
+                    <mat-tab label="5-10 dias">
+                      <table class="tb-users">
+                        <tr>
+                          <th>Nome</th>
+                          <th>email</th>
+                          <th>fone</th>
+                        </tr>
+                        <tr *ngFor="let user of usersAccessData[4]">
+                          <td >
+                            <h5>{{user.firstname}} {{user.lastname}}</h5>
+                          </td>
+                          <td >
+                            <h5>{{user.email}}</h5>
+                          </td>
+                          <td >
+                            <h5>{{user.phone1}}</h5>
+                          </td>
+                        </tr>
+                      </table>
+                  </mat-tab>
+                    <mat-tab label="10+ dias">
+                      <table class="tb-users">
+                        <tr>
+                          <th>Nome</th>
+                          <th>email</th>
+                          <th>fone</th>
+                        </tr>
+                        <tr *ngFor="let user of usersAccessData[5]">
+                          <td >
+                            <h5>{{user.firstname}} {{user.lastname}}</h5>
+                          </td>
+                          <td >
+                            <h5>{{user.email}}</h5>
+                          </td>
+                          <td >
+                            <h5>{{user.phone1}}</h5>
+                          </td>
+                        </tr>
+                      </table>
+                    </mat-tab>
+                  </mat-tab-group>
+                </div>
+              </div>
           </div>
         </mat-tab>
-        <mat-tab label="Hoje">
-          <div >
-            <table class="tb-users">
-              <tr>
-                <th>Nome</th>
-                <th>email</th>
-                <th>fone</th>
-              </tr>
-              <tr *ngFor="let user of usersAccessData[1]">
-                <td >
-                  <h5>{{user.firstname}} {{user.lastname}}</h5>
-                </td>
-                <td >
-                  <h5>{{user.email}}</h5>
-                </td>
-                <td >
-                  <h5>{{user.phone1}}</h5>
-                </td>
-              </tr>
-            </table>
-
+        <mat-tab label="Progresso">
+          <div class="container">
+            <div class="row">
+              <div class="col-md-12"><canvas id="cht-progress"></canvas></div>
+            </div>
+            <div class="row">
+              <div class="usersTable">
+                <table class="tb-users">
+                  <tr>
+                    <th>Nome</th>
+                    <th>email</th>
+                    <th>fone</th>
+                  </tr>
+                  <tr *ngFor="let user of usersAccessData[0]">
+                    <td >
+                      <h5>{{user.firstname}} {{user.lastname}}</h5>
+                    </td>
+                    <td >
+                      <h5>{{user.email}}</h5>
+                    </td>
+                    <td >
+                      <h5>{{user.phone1}}</h5>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
           </div>
         </mat-tab>
-        <mat-tab label="1-2 dias">
-          <table class="tb-users">
-            <tr>
-              <th>Nome</th>
-              <th>email</th>
-              <th>fone</th>
-            </tr>
-            <tr *ngFor="let user of usersAccessData[2]">
-              <td >
-                <h5>{{user.firstname}} {{user.lastname}}</h5>
-              </td>
-              <td >
-                <h5>{{user.email}}</h5>
-              </td>
-              <td >
-                <h5>{{user.phone1}}</h5>
-              </td>
-            </tr>
-          </table>
+        <mat-tab label="Notas">
+          <div class="chart col-md-12"><canvas id="cht-grades"></canvas></div>
         </mat-tab>
-        <mat-tab label="3-5 dias">
-          <table class="tb-users">
-            <tr>
-              <th>Nome</th>
-              <th>email</th>
-              <th>fone</th>
-            </tr>
-            <tr *ngFor="let user of usersAccessData[3]">
-              <td >
-                <h5>{{user.firstname}} {{user.lastname}}</h5>
-              </td>
-              <td >
-                <h5>{{user.email}}</h5>
-              </td>
-              <td >
-                <h5>{{user.phone1}}</h5>
-              </td>
-            </tr>
-          </table>
-        </mat-tab>
-        <mat-tab label="5-10 dias">
-          <table class="tb-users">
-            <tr>
-              <th>Nome</th>
-              <th>email</th>
-              <th>fone</th>
-            </tr>
-            <tr *ngFor="let user of usersAccessData[4]">
-              <td >
-                <h5>{{user.firstname}} {{user.lastname}}</h5>
-              </td>
-              <td >
-                <h5>{{user.email}}</h5>
-              </td>
-              <td >
-                <h5>{{user.phone1}}</h5>
-              </td>
-            </tr>
-          </table>
-      </mat-tab>
-        <mat-tab label="10+ dias">
-          <table class="tb-users">
-            <tr>
-              <th>Nome</th>
-              <th>email</th>
-              <th>fone</th>
-            </tr>
-            <tr *ngFor="let user of usersAccessData[5]">
-              <td >
-                <h5>{{user.firstname}} {{user.lastname}}</h5>
-              </td>
-              <td >
-                <h5>{{user.email}}</h5>
-              </td>
-              <td >
-                <h5>{{user.phone1}}</h5>
-              </td>
-            </tr>
-          </table>
+        <mat-tab label="Visão">
         </mat-tab>
       </mat-tab-group>
     </div>

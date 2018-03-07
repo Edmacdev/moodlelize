@@ -3,6 +3,8 @@ import { AuthService } from '../../services/auth.service';
 import { MoodleService } from '../../services/moodle.service';
 import { MoodleApiService } from '../../services/moodle-api.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 
 import Chart from 'chart.js'
 import * as $ from 'jquery';
@@ -17,18 +19,22 @@ export class ReportComponent implements OnInit {
   user: any;
   usersAccessData: any[];
   enrolledUsers: any[];
+  usersGrades: any[];
+  usersProgress: any[];
   moodles: any[];
   courses: any[];
   course: any;
-  events = [];
 
   form_moodle: any;
-  form_courseid: string;
+  form_courseid: number;
 
-  courseSelected: number;
   isCourseSelected: boolean = false;
 
-  displayedColumns = ['position', 'name', 'weight', 'symbol'];
+  timer: any;
+
+  status: boolean[];
+  isReady: boolean = false;
+  statusObs: Subject<any>;
 
   constructor(
     private authService: AuthService,
@@ -51,7 +57,6 @@ export class ReportComponent implements OnInit {
         }
       }
     )
-
   }
   getCourses(){
     const params = {
@@ -68,18 +73,17 @@ export class ReportComponent implements OnInit {
       }
     )
   }
-  getCourse(index){
-    this.course = this.courses[index];
+  report(courseIndex){
+    this.status = [false, false, false];
+    this.isReady = false;
+    this.statusObs = new Subject();
+
+    clearInterval(this.timer)
+    this.course = this.courses[courseIndex];
     this.isCourseSelected = true;
-    this.getEnrolledUsers(this.course.id);
-    this.countdownTimer((this.course.enddate)*1000)
-  }
-  getEnrolledUsers(courseid){
-    const params ={
-      wstoken: this.form_moodle.token,
-      courseid: courseid
-    }
-    this.moodleApiService.core_enrol_get_enrolled_users(this.form_moodle.url, params).subscribe(
+
+    this.countdownTimer((this.course.enddate)*1000, this.course)
+    this.getEnrolledUsers(this.course.id).subscribe(
       data => {
         if(data.errorcode){
           this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
@@ -87,12 +91,48 @@ export class ReportComponent implements OnInit {
         }
         this.enrolledUsers = data.sort((a,b) => a.fullname.localeCompare(b.fullname));
         this.usersAccessData = this.getEnrolledUsersAccessData();
-        console.log(this.enrolledUsers)
-        this.chartInit();
+
+      }
+    );
+    this.getUserGrades(this.course.id).subscribe(
+      data => {
+
+        this.usersGrades = this.courseGrades(data.usergrades);
+        this.usersProgress = this.courseProgress(data.usergrades);
+      }
+    )
+    this.statusObs.subscribe(
+      data => {
+        switch (data){
+          case 'access':
+            this.status[0] = true;
+          break
+          case 'grades':
+            this.status[1] = true;
+          break
+          case 'progress':
+            this.status[2] = true;
+          break
+          default:
+           console.error(data)
+          break
+        }
+        if( this.status.every(status => status === true) ){
+          this.isReady = true;
+
+        }
+        else this.isReady = false;
       }
     )
   }
-  getDaysDiff(lastaccess){
+  getEnrolledUsers(courseid){
+    const params ={
+      wstoken: this.form_moodle.token,
+      courseid: courseid
+    }
+    return this.moodleApiService.core_enrol_get_enrolled_users(this.form_moodle.url, params)
+  }
+  getDaysSinceLastAccess(lastaccess){
     if(lastaccess == 0){
       return null
     }
@@ -113,7 +153,7 @@ export class ReportComponent implements OnInit {
     let group4 = [];
 
     for (let i in this.enrolledUsers){
-      let days = this.getDaysDiff(this.enrolledUsers[i].lastaccess);
+      let days = this.getDaysSinceLastAccess(this.enrolledUsers[i].lastaccess);
       if(days == null){
         never.push(this.enrolledUsers[i])
       }
@@ -134,12 +174,19 @@ export class ReportComponent implements OnInit {
       }
     }
     accessData.push(never, group0, group1, group2, group3, group4);
+    this.statusObs.next('access');
     return accessData
   }
-
-  countdownTimer(countDownDate){
+  getUserGrades(courseid){
+    const params ={
+      wstoken: this.form_moodle.token,
+      courseid: courseid
+    }
+    return this.moodleApiService.gradereport_user_get_grade_items(this.form_moodle.url, params)
+  }
+  countdownTimer(countDownDate, course){
         // Update the count down every 1 second
-    var x = setInterval(function() {
+    this.timer = setInterval(function() {
 
       // Get todays date and time
       var now = new Date().getTime();
@@ -147,119 +194,218 @@ export class ReportComponent implements OnInit {
       // Find the distance between now an the count down date
       var distance = countDownDate - now;
 
-      // Time calculations for days, hours, minutes and seconds
-      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      if(distance > 0){
+        $(".course-end").html("");
+        $(".countdown").show()
 
-      // Display the result in the element with id="demo"
-      // document.getElementById("days").innerHTML = '59';
-      $(".days").html(days);
-      $(".hours").html(hours);
-      $(".minutes").html(minutes);
-      $(".seconds").html(seconds);
+        // Time calculations for days, hours, minutes and seconds
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        // Display the result in the element with id="demo"
+        // document.getElementById("days").innerHTML = '59';
+        $(".days").html(days);
+        $(".hours").html(hours);
+        $(".minutes").html(minutes);
+        $(".seconds").html(seconds);
+      }
 
       // If the count down is finished, write some text
       if (distance < 0) {
-        clearInterval(x);
-        $(".countdown").html('<h3>CURSO ENCERRADO</h3>');
+        clearInterval(this.timer);
+        $(".course-end").html("<h3>CURSO ENCERRADO</h3>");
+        $(".countdown").hide();
       }
     }, 1000);
   }
-  chartInit(){
-    var doughnut = $("#doughnut")[0].getContext('2d');
-    var doughnutChart = new Chart(doughnut, {
-    type: 'doughnut',
-    data: {
-        labels: ["nunca", "hoje", "1-2 dias", "3-5 dias", "5-10", "mais de 10 dias"],
-        datasets: [{
-            label: '# of Votes',
-            data: [this.usersAccessData[0].length, this.usersAccessData[1].length,
-            this.usersAccessData[2].length, this.usersAccessData[3].length,
-             this.usersAccessData[4].length, this.usersAccessData[4].length],
-            // data: [1, 6, 9, 5]
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(218, 135, 76, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(128, 0, 128, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255,99,132,1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(218, 135, 76, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(128, 0, 128, 1)'
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
+  chartRender(index){
+    switch (index){
+      case 0:
+        var doughnut = $("#cht-access")[0].getContext('2d');
+        var doughnutChart = new Chart(doughnut, {
+        type: 'doughnut',
+        data: {
+            labels: ["nunca", "hoje", "1-2 dias", "3-5 dias", "5-10", "mais de 10 dias"],
+            datasets: [{
+                label: '# of Votes',
+                data: [this.usersAccessData[0].length, this.usersAccessData[1].length,
+                this.usersAccessData[2].length, this.usersAccessData[3].length,
+                 this.usersAccessData[4].length, this.usersAccessData[5].length],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(218, 135, 76, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(128, 0, 128, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(218, 135, 76, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(128, 0, 128, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+        }
+        })
+      break;
+
+      case 1:
+        let chtProgressCtx = $("#cht-progress")[0].getContext('2d');
+        let chtProgress = new Chart(chtProgressCtx, {
+        type: 'bar',
+        data: {
+            labels: ['sem progresso', '1-20%', '21-40%', '41-60%', '61-80%', '81-100%'],
+            datasets: [{
+                data: [this.usersProgress[0].length,this.usersProgress[1].length,this.usersProgress[2].length,
+                this.usersProgress[3].length,this.usersProgress[4].length,this.usersProgress[5].length],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(218, 135, 76, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(128, 0, 128, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(218, 135, 76, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(128, 0, 128, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {}
+        })
+      break;
+
+      case 2:
+        let chtGradesCtx = $("#cht-grades")[0].getContext('2d');
+        let chtGrades = new Chart(chtGradesCtx, {
+        type: 'pie',
+        data: {
+            labels: ["sem nota","0-20", "21-40","41-60", "61-80", "81-100"],
+            datasets: [{
+                label: '',
+                data: [this.usersGrades[0].length, this.usersGrades[1].length, this.usersGrades[2].length,
+                this.usersGrades[3].length,this.usersGrades[4].length,this.usersGrades[5].length],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(218, 135, 76, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(128, 0, 128, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(218, 135, 76, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(128, 0, 128, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {}
+        })
+      break;
     }
-    });
-
-    // let bar = $("#bar")[0].getContext('2d');
-    // let barChart = new Chart(bar, {
-    // type: 'bar',
-    // data: {
-    //     labels: ["nunca", "1-3 dias", "4-6 dias", "mais de 6 dias"],
-    //     datasets: [{
-    //         label: '# of Votes',
-    //         data: [12, 39, 23, 26],
-    //         backgroundColor: [
-    //             'rgba(255, 99, 132, 0.2)',
-    //             'rgba(54, 162, 235, 0.2)',
-    //             'rgba(255, 206, 86, 0.2)',
-    //             'rgba(75, 192, 192, 0.2)'
-    //         ],
-    //         borderColor: [
-    //             'rgba(255,99,132,1)',
-    //             'rgba(54, 162, 235, 1)',
-    //             'rgba(255, 206, 86, 1)',
-    //             'rgba(75, 192, 192, 1)'
-    //         ],
-    //         borderWidth: 1
-    //     }]
-    // },
-    // options: {
-    // }
-    // });
-    //
-    // let line  = $("#line")[0].getContext('2d')
-    // let lineChart = new Chart(line, {
-    // type: 'line',
-    // data: {
-    //     labels:['3', '7', '9', '10', '15'],
-    //     datasets: [{
-    //         label: '# of Votes',
-    //         data: [
-    //           {x: 3, y: 8},
-    //           {x: 7, y: 11},
-    //           {x: 9, y: 12},
-    //           {x: 10, y: 8},
-    //           {x: 15, y: 14},
-    //           {x: 18, y: 13},
-    //           {x: 25, y: 17}
-    //         ],
-    //         borderColor: [
-    //             'rgba(54, 162, 235, 1)'
-    //         ],
-    //         borderWidth: 1,
-    //         fill: false
-    //     }]
-    // },
-    // options: {
-    //   elements: {
-    //         line: {
-    //             tension: 0, // disables bezier curves
-    //         }
-    //     }
-    // }
-    // });
   }
+  courseProgress(usersGrades){
+    let progressData = [];
+    let none = [];
+    let group0 = [];
+    let group1 = [];
+    let group2 = [];
+    let group3 = [];
+    let group4 = [];
 
+    let activities = usersGrades[0].gradeitems.length-1;
+    var progress = 0;
+
+    for (let i in usersGrades){
+      for(let j = 0; j< activities; j++){
+        let grade = usersGrades[i].gradeitems[j].graderaw;
+        if(grade){
+          progress++
+        }
+      }
+      var percentage = (progress / activities) *100;
+      if(percentage == 0){
+        none.push(usersGrades[i])
+      }
+      else if (percentage >= 1 && percentage <= 20){
+        group0.push(usersGrades[i])
+      }
+      else if(percentage >= 21 && percentage <= 40){
+        group1.push(usersGrades[i])
+      }
+      else if(percentage >= 41 && percentage <= 60){
+        group2.push(usersGrades[i])
+      }
+      else if(percentage >= 61 && percentage <= 80){
+        group3.push(usersGrades[i])
+      }
+      else if(percentage > 80){
+        group4.push(usersGrades[i])
+      }
+    }
+    progressData.push(none, group0, group1, group2, group3, group4);
+    this.statusObs.next('progress');
+    console.log(usersGrades)
+    return progressData
+  }
+  courseGrades(usersGrades){
+    let gradesData = [];
+    let none = [];
+    let group0 = [];
+    let group1 = [];
+    let group2 = [];
+    let group3 = [];
+    let group4 = [];
+
+    for (let i in usersGrades){
+      let grade = usersGrades[i].gradeitems[usersGrades[i].gradeitems.length - 1].graderaw;
+      if(grade == null){
+        none.push(usersGrades[i])
+      }else{
+        grade = grade*10
+        else if (grade >= 0 && grade <= 20){
+          group0.push(usersGrades[i])
+        }
+        else if(grade >= 21 && grade <= 40){
+          group1.push(usersGrades[i])
+        }
+        else if(grade >= 41 && grade <= 60){
+          group2.push(usersGrades[i])
+        }
+        else if(grade >= 61 && grade <= 80){
+          group3.push(usersGrades[i])
+        }
+        else if(grade > 80){
+          group4.push(usersGrades[i])
+        }
+      }
+
+    }
+    gradesData.push(none, group0, group1, group2, group3, group4);
+    this.statusObs.next('grades');
+    console.log(usersGrades)
+    return gradesData
+  }
+  onLinkClick(e){
+    console.log(e)
+  }
 }
