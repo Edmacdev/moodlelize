@@ -550,10 +550,9 @@ export class ReportComponent implements OnInit {
         case 2:
           this.gradesDataSource.paginator = this.paginator3;
         break;
+      }
     },500)
-
   }
-
 }
 export interface Element {
   name: string;
