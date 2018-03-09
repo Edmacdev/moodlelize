@@ -50,144 +50,46 @@
     </div>
   </div>
   <flash-messages></flash-messages>
-  <div class="row">
+  <div class="row wrapper">
     <div class="tabs">
-      <mat-tab-group (selectedTabChange)="chartRender($event.index)">
+      <mat-tab-group (selectedTabChange)="contentLoad($event.index)">
         <mat-tab label="Acesso">
           <div class="container">
             <div class="row">
+
               <div class="chart col-md-12"><canvas id="cht-access"></canvas></div>
             </div>
               <div class="row">
-                <div class="col-md-12">
-                  <mat-tab-group>
-                    <mat-tab label="Nunca">
-                      <div >
-                        <table class="tb-users">
-                          <tr>
-                            <th>Nome</th>
-                            <th>email</th>
-                            <th>fone</th>
-                          </tr>
-                          <tr *ngFor="let user of usersAccessData[0]">
-                            <td >
-                              <h5>{{user.firstname}} {{user.lastname}}</h5>
-                            </td>
-                            <td >
-                              <h5>{{user.email}}</h5>
-                            </td>
-                            <td >
-                              <h5>{{user.phone1}}</h5>
-                            </td>
-                          </tr>
-                        </table>
-
-                      </div>
-                    </mat-tab>
-                    <mat-tab label="Hoje">
-                      <div >
-                        <table class="tb-users">
-                          <tr>
-                            <th>Nome</th>
-                            <th>email</th>
-                            <th>fone</th>
-                          </tr>
-                          <tr *ngFor="let user of usersAccessData[1]">
-                            <td >
-                              <h5>{{user.firstname}} {{user.lastname}}</h5>
-                            </td>
-                            <td >
-                              <h5>{{user.email}}</h5>
-                            </td>
-                            <td >
-                              <h5>{{user.phone1}}</h5>
-                            </td>
-                          </tr>
-                        </table>
-
-                      </div>
-                    </mat-tab>
-                    <mat-tab label="1-2 dias">
-                      <table class="tb-users">
-                        <tr>
-                          <th>Nome</th>
-                          <th>email</th>
-                          <th>fone</th>
-                        </tr>
-                        <tr *ngFor="let user of usersAccessData[2]">
-                          <td >
-                            <h5>{{user.firstname}} {{user.lastname}}</h5>
-                          </td>
-                          <td >
-                            <h5>{{user.email}}</h5>
-                          </td>
-                          <td >
-                            <h5>{{user.phone1}}</h5>
-                          </td>
-                        </tr>
-                      </table>
-                    </mat-tab>
-                    <mat-tab label="3-5 dias">
-                      <table class="tb-users">
-                        <tr>
-                          <th>Nome</th>
-                          <th>email</th>
-                          <th>fone</th>
-                        </tr>
-                        <tr *ngFor="let user of usersAccessData[3]">
-                          <td >
-                            <h5>{{user.firstname}} {{user.lastname}}</h5>
-                          </td>
-                          <td >
-                            <h5>{{user.email}}</h5>
-                          </td>
-                          <td >
-                            <h5>{{user.phone1}}</h5>
-                          </td>
-                        </tr>
-                      </table>
-                    </mat-tab>
-                    <mat-tab label="5-10 dias">
-                      <table class="tb-users">
-                        <tr>
-                          <th>Nome</th>
-                          <th>email</th>
-                          <th>fone</th>
-                        </tr>
-                        <tr *ngFor="let user of usersAccessData[4]">
-                          <td >
-                            <h5>{{user.firstname}} {{user.lastname}}</h5>
-                          </td>
-                          <td >
-                            <h5>{{user.email}}</h5>
-                          </td>
-                          <td >
-                            <h5>{{user.phone1}}</h5>
-                          </td>
-                        </tr>
-                      </table>
-                  </mat-tab>
-                    <mat-tab label="10+ dias">
-                      <table class="tb-users">
-                        <tr>
-                          <th>Nome</th>
-                          <th>email</th>
-                          <th>fone</th>
-                        </tr>
-                        <tr *ngFor="let user of usersAccessData[5]">
-                          <td >
-                            <h5>{{user.firstname}} {{user.lastname}}</h5>
-                          </td>
-                          <td >
-                            <h5>{{user.email}}</h5>
-                          </td>
-                          <td >
-                            <h5>{{user.phone1}}</h5>
-                          </td>
-                        </tr>
-                      </table>
-                    </mat-tab>
-                  </mat-tab-group>
+                <div class="info col-md-12">
+                  <mat-table #table [dataSource]="dataSource" matSort>
+                    <ng-container matColumnDef="position">
+                      <mat-header-cell *matHeaderCellDef mat-sort-header> No. </mat-header-cell>
+                      <mat-cell *matCellDef="let element"> {{element.position}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="name">
+                      <mat-header-cell *matHeaderCellDef mat-sort-header> Nome </mat-header-cell>
+                      <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="email">
+                      <mat-header-cell *matHeaderCellDef> Email </mat-header-cell>
+                      <mat-cell *matCellDef="let element"> {{element.email}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="phone">
+                      <mat-header-cell *matHeaderCellDef> Telefone </mat-header-cell>
+                      <mat-cell *matCellDef="let element"> {{element.phone}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="status">
+                      <mat-header-cell *matHeaderCellDef mat-sort-header> status </mat-header-cell>
+                      <mat-cell *matCellDef="let element"> {{element.status}} </mat-cell>
+                    </ng-container>
+                    <mat-header-row *matHeaderRowDef="col_access"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: col_access"></mat-row>
+                  </mat-table>
+                  <mat-paginator #paginator
+                   [pageSize]="10"
+                   [pageSizeOptions]="[5, 10, 20]"
+                   [showFirstLastButtons]="true">
+                  </mat-paginator>
                 </div>
               </div>
           </div>
@@ -195,38 +97,92 @@
         <mat-tab label="Progresso">
           <div class="container">
             <div class="row">
-              <div class="col-md-12"><canvas id="cht-progress"></canvas></div>
+              <H2>PROGRESSO NAS ATIVIDADES DO CURSO</H2>
+              <div class="chart col-md-12"><canvas id="cht-progress"></canvas></div>
             </div>
             <div class="row">
-              <div class="usersTable">
-                <table class="tb-users">
-                  <tr>
-                    <th>Nome</th>
-                    <th>email</th>
-                    <th>fone</th>
-                  </tr>
-                  <tr *ngFor="let user of usersAccessData[0]">
-                    <td >
-                      <h5>{{user.firstname}} {{user.lastname}}</h5>
-                    </td>
-                    <td >
-                      <h5>{{user.email}}</h5>
-                    </td>
-                    <td >
-                      <h5>{{user.phone1}}</h5>
-                    </td>
-                  </tr>
-                </table>
+              <div class="info col-md-12">
+                <mat-table #table [dataSource]="progressDataSource" matSort>
+                  <ng-container matColumnDef="position">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> No. </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.position}} </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="name">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> Nome </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="email">
+                    <mat-header-cell *matHeaderCellDef> Email </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.email}} </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="phone">
+                    <mat-header-cell *matHeaderCellDef> Telefone </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.phone}} </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="progress">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> Progresso </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.progress}} </mat-cell>
+                  </ng-container>
+                  <mat-header-row *matHeaderRowDef="col_progress"></mat-header-row>
+                  <mat-row *matRowDef="let row; columns: col_progress"></mat-row>
+                </mat-table>
+                <mat-paginator #paginator2
+                 [pageSize]="10"
+                 [pageSizeOptions]="[5, 10, 20]"
+                 [showFirstLastButtons]="true">
+                </mat-paginator>
               </div>
             </div>
           </div>
         </mat-tab>
         <mat-tab label="Notas">
-          <div class="chart col-md-12"><canvas id="cht-grades"></canvas></div>
+          <div class="container">
+            <div class="row">
+
+              <div class="chart col-md-12"><canvas id="cht-grades"></canvas></div>
+            </div>
+            <div class="content">
+              <mat-table #table [dataSource]="gradesDataSource" matSort>
+                <ng-container matColumnDef="position">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header> No. </mat-header-cell>
+                  <mat-cell *matCellDef="let element"> {{element.position}} </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="name">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header> Nome </mat-header-cell>
+                  <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="email">
+                  <mat-header-cell *matHeaderCellDef> Email </mat-header-cell>
+                  <mat-cell *matCellDef="let element"> {{element.email}} </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="phone">
+                  <mat-header-cell *matHeaderCellDef> Telefone </mat-header-cell>
+                  <mat-cell *matCellDef="let element"> {{element.phone}} </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="grade">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header> Notas </mat-header-cell>
+                  <mat-cell *matCellDef="let element"> {{element.grade}} </mat-cell>
+                </ng-container>
+                <mat-header-row *matHeaderRowDef="col_grades"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: col_grades"></mat-row>
+              </mat-table>
+              <mat-paginator #paginator3
+               [pageSize]="10"
+               [pageSizeOptions]="[5, 10, 20]"
+               [showFirstLastButtons]="true">
+              </mat-paginator>
+            </div>
+          </div>
         </mat-tab>
-        <mat-tab label="Visão">
+        <mat-tab label="Visão" class="tb-users">
+          <div class="container">
+          </div>
         </mat-tab>
       </mat-tab-group>
     </div>
   </div>
+</div>
+<div class="container" *ngIf="isLoading">
+  <div class="row" class="col-md-6 col-md-offset-3" style="margin-top:50px; text-align:center"><h1>CARREGANDO...</h1></div>
+
 </div>

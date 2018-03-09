@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { MoodleService } from '../../services/moodle.service';
 import { MoodleApiService } from '../../services/moodle-api.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
+import {MatTableDataSource, MatSort, MatPaginator} from '@angular/material';
 
 import Chart from 'chart.js'
 import * as $ from 'jquery';
@@ -20,21 +21,39 @@ export class ReportComponent implements OnInit {
   usersAccessData: any[];
   enrolledUsers: any[];
   usersGrades: any[];
+  usergrades: any[];
   usersProgress: any[];
   moodles: any[];
   courses: any[];
   course: any;
-
+//FORMS
   form_moodle: any;
   form_courseid: number;
-
-  isCourseSelected: boolean = false;
-
+//TIMER
   timer: any;
-
+//STATUS
   status: boolean[];
   isReady: boolean = false;
+  isLoading: boolean = false;
+  isCourseSelected: boolean = false;
   statusObs: Subject<any>;
+//DATA TABLES
+  displayedColumns = ['position', 'name', 'progress', 'grade'];
+  col_access = ['position', 'name', 'email','phone', 'status'];
+  col_progress =['position', 'name','email','phone', 'progress'];
+  col_grades = ['position', 'name', 'email','phone', 'grade'];
+  col_general = ['position', 'name', 'email','phone', 'progress', 'grade'];
+  dataSource: MatTableDataSource<object>;
+  // accessDataSource: MatTableDataSource[];
+  progressDataSource: MatTableDataSource<object>;
+  gradesDataSource: MatTableDataSource<object>;
+  // generalDataSource: MatTableDataSource[];
+
+  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatSort) sort2: MatSort;
+  @ViewChild('paginator') paginator: MatPaginator;
+  @ViewChild('paginator2') paginator2: MatPaginator;
+  @ViewChild('paginator3') paginator3: MatPaginator;
 
   constructor(
     private authService: AuthService,
@@ -74,8 +93,9 @@ export class ReportComponent implements OnInit {
     )
   }
   report(courseIndex){
-    this.status = [false, false, false];
+    this.status = [false, false, false, false];
     this.isReady = false;
+    this.isLoading = true;
     this.statusObs = new Subject();
 
     clearInterval(this.timer)
@@ -91,14 +111,20 @@ export class ReportComponent implements OnInit {
         }
         this.enrolledUsers = data.sort((a,b) => a.fullname.localeCompare(b.fullname));
         this.usersAccessData = this.getEnrolledUsersAccessData();
-
       }
     );
     this.getUserGrades(this.course.id).subscribe(
       data => {
-
-        this.usersGrades = this.courseGrades(data.usergrades);
-        this.usersProgress = this.courseProgress(data.usergrades);
+        if(data.errorcode){
+          this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
+          return false;
+        }
+        let usersGrades = data.usergrades.sort((a,b) => a.userfullname.localeCompare(b.userfullname));
+        this.usersGrades = this.courseGrades(usersGrades);
+        this.usersProgress = this.courseProgress(usersGrades);
+        this.usergrades = data.usergrades
+        this.statusObs.next('usergrades')
+        // this.reportTable(data.usergrades)
       }
     )
     this.statusObs.subscribe(
@@ -113,15 +139,31 @@ export class ReportComponent implements OnInit {
           case 'progress':
             this.status[2] = true;
           break
+          case 'usergrades':
+            this.status[3] = true;
+          break
           default:
            console.error(data)
           break
         }
         if( this.status.every(status => status === true) ){
+
+          this.dataSource = new MatTableDataSource(this.prepareDataSource(this.enrolledUsers, this.usergrades));
+          this.progressDataSource = new MatTableDataSource(this.prepareDataSource(this.enrolledUsers, this.usergrades));
+          this.gradesDataSource = new MatTableDataSource(this.prepareDataSource(this.enrolledUsers, this.usergrades));
           this.isReady = true;
+          this.isLoading = false;
+          setTimeout(
+            () => {
+              this.contentLoad(0);
+
+            },200
+          )
+        }
+        else {
+          this.isReady = false;
 
         }
-        else this.isReady = false;
       }
     )
   }
@@ -227,7 +269,7 @@ export class ReportComponent implements OnInit {
         var doughnutChart = new Chart(doughnut, {
         type: 'doughnut',
         data: {
-            labels: ["nunca", "hoje", "1-2 dias", "3-5 dias", "5-10", "mais de 10 dias"],
+            labels: ["nunca", "menos de 24h", "1-2 dias", "3-5 dias", "5-10", "mais de 10 dias"],
             datasets: [{
                 label: '# of Votes',
                 data: [this.usersAccessData[0].length, this.usersAccessData[1].length,
@@ -363,8 +405,8 @@ export class ReportComponent implements OnInit {
       }
     }
     progressData.push(none, group0, group1, group2, group3, group4);
+
     this.statusObs.next('progress');
-    console.log(usersGrades)
     return progressData
   }
   courseGrades(usersGrades){
@@ -382,7 +424,7 @@ export class ReportComponent implements OnInit {
         none.push(usersGrades[i])
       }else{
         grade = grade*10
-        else if (grade >= 0 && grade <= 20){
+        if (grade >= 0 && grade <= 20){
           group0.push(usersGrades[i])
         }
         else if(grade >= 21 && grade <= 40){
@@ -398,14 +440,124 @@ export class ReportComponent implements OnInit {
           group4.push(usersGrades[i])
         }
       }
-
     }
     gradesData.push(none, group0, group1, group2, group3, group4);
     this.statusObs.next('grades');
-    console.log(usersGrades)
     return gradesData
   }
-  onLinkClick(e){
-    console.log(e)
+  applyFilter(filterValue: string) {
+    filterValue = filterValue.trim(); // Remove whitespace
+    filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
+    this.dataSource.filter = filterValue;
+    this.dataSource.filter = filterValue;
   }
+  reportTable(usersGrades){
+    let tableData = []
+    for (let i in usersGrades){
+      let name = usersGrades[i].userfullname;
+      let activities = usersGrades[i].gradeitems.length-1;
+      let grade = usersGrades[i].gradeitems[activities].graderaw;
+      grade ? grade *= 10 : grade = 0;
+      let progress = 0;
+      for (let j = 0; j < activities; j++){
+        if(usersGrades[i].gradeitems[j].graderaw)
+          progress++
+      }
+      progress = (progress / activities) *100;
+      let elem ={position: (i), name: name, progress: progress, grade: grade}
+      tableData.push(elem)
+    }
+
+    this.dataSource = new MatTableDataSource(tableData);
+    this.progressDataSource = new MatTableDataSource(tableData);
+    this.statusObs.next('general');
+  }
+  prepareDataSource(enrolledUsers, usersGrades){
+
+      let dataSource:object[] = [];
+
+      for (let i in enrolledUsers){
+        if(enrolledUsers[i].roles[0].roleid == 5){
+          let uid = enrolledUsers[i].id;
+          let position = i;
+          let name = enrolledUsers[i].fullname;
+          let email = enrolledUsers[i].email;
+          let phone = enrolledUsers[i].phone1;
+          let lastaccess = null;
+
+          //last access
+          let days = this.getDaysSinceLastAccess(enrolledUsers[i].lastaccess);
+          if(days == null){
+            lastaccess = 'nunca'
+          }
+          else if (days == 0){
+            lastaccess = 'menos de 24h'
+          }
+          else if(days >= 1 && days <= 2){
+            lastaccess = '1-2 dias'
+          }
+          else if(days >= 3 && days <= 5){
+            lastaccess = '3-5 dias'
+          }
+          else if(days >= 5 && days <= 10){
+            lastaccess = '5-10 dias'
+          }
+          else if(days > 10 ){
+            lastaccess = '10+ dias'
+          }
+
+          let progress = 0;
+          //Progress
+            let activities = usersGrades[0].gradeitems.length-1;
+            let gradeitems =usersGrades.find((element)=>{return element.userid == uid}).gradeitems
+
+            for (let j = 0; j < activities; j++){
+              if(gradeitems[j].graderaw)
+                progress++
+            }
+            progress = (progress / activities) *100;
+
+          //grade
+          let grade = gradeitems[gradeitems.length - 1].graderaw;
+          grade? grade *= 10 : grade = 'sem nota';
+          let elem: object = {
+            position: position,
+            name: name,
+            email: email,
+            phone: phone,
+            status: lastaccess,
+            progress: progress,
+            grade: grade
+          }
+          dataSource.push(elem);
+        }
+      }
+
+      return dataSource
+  }
+  contentLoad(index){
+    this.chartRender(index);
+    setTimeout(()=>{
+      switch (index){
+        case 0:
+          this.dataSource.paginator = this.paginator;
+          this.dataSource.sort = this.sort;
+        break;
+        case 1:
+          this.progressDataSource.paginator = this.paginator2;
+          this.progressDataSource.sort = this.sort2;
+        break;
+        case 2:
+          this.gradesDataSource.paginator = this.paginator3;
+        break;
+    },500)
+
+  }
+
+}
+export interface Element {
+  name: string;
+  position: number;
+  progress: number;
+  grade: number;
 }

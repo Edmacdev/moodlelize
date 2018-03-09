@@ -2,6 +2,10 @@
 mat-sidenav-container{
   float: right;
 }
+h2{
+  text-align: center;
+  width: 100%
+}
 .report{
   text-align: center;
 }
@@ -14,6 +18,7 @@ mat-sidenav-container{
 }
 .chart{
   margin-top: 30px;
+  margin-bottom: 50px;
 }
 .mat-form{
   margin-right: 65px;
@@ -38,12 +43,12 @@ mat-sidenav-container{
   background: rgba(255, 0, 0, 0.5);
 }
 .tabs{
-  min-height: 700px;
+  min-height: 500px;
   width: 100%;
 
 }
 .list{
-  overflow: auto;
+  // overflow: auto;
 }
 .tb-users{
   width: 100%;
@@ -83,3 +88,29 @@ ul.countdown li p {
 }
 
 .last { border-right: 1px solid #C0392B; }
+
+/* Structure */
+.example-container {
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+}
+
+.example-header {
+  min-height: 64px;
+  padding: 8px 24px 0;
+}
+
+.filter {
+  font-size: 14px;
+  width: 100%;
+}
+
+.mat-table {
+  min-height: 550px;
+  // overflow: auto;
+}
+
+.info{
+  margin-bottom: 150px;
+}
