@@ -38,22 +38,12 @@ export class ReportComponent implements OnInit {
   isCourseSelected: boolean = false;
   statusObs: Subject<any>;
 //DATA TABLES
-  displayedColumns = ['position', 'name', 'progress', 'grade'];
-  col_access = ['position', 'name', 'email','phone', 'status'];
-  col_progress =['position', 'name','email','phone', 'progress'];
-  col_grades = ['position', 'name', 'email','phone', 'grade'];
-  col_general = ['position', 'name', 'email','phone', 'progress', 'grade'];
+  displayColumns = ['position', 'name', 'email','phone','access', 'progress', 'grade'];
   dataSource: MatTableDataSource<object>;
-  // accessDataSource: MatTableDataSource[];
-  progressDataSource: MatTableDataSource<object>;
-  gradesDataSource: MatTableDataSource<object>;
-  // generalDataSource: MatTableDataSource[];
+
 
   @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(MatSort) sort2: MatSort;
   @ViewChild('paginator') paginator: MatPaginator;
-  @ViewChild('paginator2') paginator2: MatPaginator;
-  @ViewChild('paginator3') paginator3: MatPaginator;
 
   constructor(
     private authService: AuthService,
@@ -97,12 +87,13 @@ export class ReportComponent implements OnInit {
     this.isReady = false;
     this.isLoading = true;
     this.statusObs = new Subject();
-
-    clearInterval(this.timer)
     this.course = this.courses[courseIndex];
     this.isCourseSelected = true;
 
-    this.countdownTimer((this.course.enddate)*1000, this.course)
+    clearInterval(this.timer)
+    //open countdown timer
+    this.countdownTimer(this.course)
+    //get info about enrolled users
     this.getEnrolledUsers(this.course.id).subscribe(
       data => {
         if(data.errorcode){
@@ -149,13 +140,13 @@ export class ReportComponent implements OnInit {
         if( this.status.every(status => status === true) ){
 
           this.dataSource = new MatTableDataSource(this.prepareDataSource(this.enrolledUsers, this.usergrades));
-          this.progressDataSource = new MatTableDataSource(this.prepareDataSource(this.enrolledUsers, this.usergrades));
-          this.gradesDataSource = new MatTableDataSource(this.prepareDataSource(this.enrolledUsers, this.usergrades));
           this.isReady = true;
           this.isLoading = false;
           setTimeout(
             () => {
-              this.contentLoad(0);
+              this.chartRender(0)
+              this.dataSource.paginator = this.paginator;
+              this.dataSource.sort = this.sort;
 
             },200
           )
@@ -226,7 +217,7 @@ export class ReportComponent implements OnInit {
     }
     return this.moodleApiService.gradereport_user_get_grade_items(this.form_moodle.url, params)
   }
-  countdownTimer(countDownDate, course){
+  countdownTimer(course){
         // Update the count down every 1 second
     this.timer = setInterval(function() {
 
@@ -234,6 +225,7 @@ export class ReportComponent implements OnInit {
       var now = new Date().getTime();
 
       // Find the distance between now an the count down date
+      var countDownDate = course.enddate *1000;
       var distance = countDownDate - now;
 
       if(distance > 0){
@@ -275,6 +267,7 @@ export class ReportComponent implements OnInit {
                 data: [this.usersAccessData[0].length, this.usersAccessData[1].length,
                 this.usersAccessData[2].length, this.usersAccessData[3].length,
                  this.usersAccessData[4].length, this.usersAccessData[5].length],
+                // data: [this.]
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -475,6 +468,7 @@ export class ReportComponent implements OnInit {
   prepareDataSource(enrolledUsers, usersGrades){
 
       let dataSource:object[] = [];
+      let chartData:
 
       for (let i in enrolledUsers){
         if(enrolledUsers[i].roles[0].roleid == 5){
@@ -519,39 +513,22 @@ export class ReportComponent implements OnInit {
 
           //grade
           let grade = gradeitems[gradeitems.length - 1].graderaw;
-          grade? grade *= 10 : grade = 'sem nota';
+          if(!grade) grade = 'sem nota';
           let elem: object = {
             position: position,
             name: name,
             email: email,
             phone: phone,
-            status: lastaccess,
+            lastaccess: lastaccess,
             progress: progress,
             grade: grade
           }
           dataSource.push(elem);
+
         }
       }
 
       return dataSource
-  }
-  contentLoad(index){
-    this.chartRender(index);
-    setTimeout(()=>{
-      switch (index){
-        case 0:
-          this.dataSource.paginator = this.paginator;
-          this.dataSource.sort = this.sort;
-        break;
-        case 1:
-          this.progressDataSource.paginator = this.paginator2;
-          this.progressDataSource.sort = this.sort2;
-        break;
-        case 2:
-          this.gradesDataSource.paginator = this.paginator3;
-        break;
-      }
-    },500)
   }
 }
 export interface Element {
