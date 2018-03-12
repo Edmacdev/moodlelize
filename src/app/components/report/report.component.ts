@@ -255,19 +255,29 @@ export class ReportComponent implements OnInit {
     }, 1000);
   }
   chartRender(index){
+    var data1:number = 0;
+    var data2:number = 0;
+    var data3:number = 0;
+    var data4:number = 0;
+    var data5:number = 0;
+    var data6:number = 0;
     switch (index){
       case 0:
+        data1 = this.dataSource.data.filter(elem => elem.lastaccess == "nunca").length;
+        data2 = this.dataSource.data.filter(elem => elem.lastaccess == "menos de 24h").length;
+        data3 = this.dataSource.data.filter(elem => elem.lastaccess == "1-2 dias").length;
+        data4 = this.dataSource.data.filter(elem => elem.lastaccess == "3-5 dias").length;
+        data5 = this.dataSource.data.filter(elem => elem.lastaccess == "5-10 dias").length;
+        data6 = this.dataSource.data.filter(elem => elem.lastaccess == "mais de 10 dias").length;
+        var filter_access =  elem =>  elem.lastaccess = this;
         var doughnut = $("#cht-access")[0].getContext('2d');
         var doughnutChart = new Chart(doughnut, {
         type: 'doughnut',
         data: {
-            labels: ["nunca", "menos de 24h", "1-2 dias", "3-5 dias", "5-10", "mais de 10 dias"],
+            labels: ["nunca", "menos de 24h", "1-2 dias", "3-5 dias", "5-10 dias", "mais de 10 dias"],
             datasets: [{
                 label: '# of Votes',
-                data: [this.usersAccessData[0].length, this.usersAccessData[1].length,
-                this.usersAccessData[2].length, this.usersAccessData[3].length,
-                 this.usersAccessData[4].length, this.usersAccessData[5].length],
-                // data: [this.]
+                data: [data1, data2, data3, data4, data5, data6]
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -293,14 +303,19 @@ export class ReportComponent implements OnInit {
       break;
 
       case 1:
+        data1 = this.dataSource.data.filter(elem => elem.progress == 0).length;
+        data2 = this.dataSource.data.filter(elem => elem.progress >= 1 && elem.progress <= 20).length;
+        data3 = this.dataSource.data.filter(elem => elem.progress >= 21 && elem.progress <= 40).length;
+        data4 = this.dataSource.data.filter(elem => elem.progress >= 41 && elem.progress <= 60).length;
+        data5 = this.dataSource.data.filter(elem => elem.progress >= 61 && elem.progress <= 80).length;
+        data6 = this.dataSource.data.filter(elem => elem.progress >= 81 && elem.progress <= 100).length;
         let chtProgressCtx = $("#cht-progress")[0].getContext('2d');
         let chtProgress = new Chart(chtProgressCtx, {
         type: 'bar',
         data: {
             labels: ['sem progresso', '1-20%', '21-40%', '41-60%', '61-80%', '81-100%'],
             datasets: [{
-                data: [this.usersProgress[0].length,this.usersProgress[1].length,this.usersProgress[2].length,
-                this.usersProgress[3].length,this.usersProgress[4].length,this.usersProgress[5].length],
+                data: [data1, data2, data3, data4, data5, data6],
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -325,6 +340,12 @@ export class ReportComponent implements OnInit {
       break;
 
       case 2:
+        data1 = this.dataSource.data.filter(elem => elem.grade == -1).length;
+        data2 = this.dataSource.data.filter(elem => elem.grade >= 1 && elem.grade <= 20).length;
+        data3 = this.dataSource.data.filter(elem => elem.grade >= 21 && elem.grade <= 40).length;
+        data4 = this.dataSource.data.filter(elem => elem.grade >= 41 && elem.grade <= 60).length;
+        data5 = this.dataSource.data.filter(elem => elem.grade >= 61 && elem.grade <= 80).length;
+        data6 = this.dataSource.data.filter(elem => elem.grade >= 81 && elem.grade <= 100).length;
         let chtGradesCtx = $("#cht-grades")[0].getContext('2d');
         let chtGrades = new Chart(chtGradesCtx, {
         type: 'pie',
@@ -332,8 +353,7 @@ export class ReportComponent implements OnInit {
             labels: ["sem nota","0-20", "21-40","41-60", "61-80", "81-100"],
             datasets: [{
                 label: '',
-                data: [this.usersGrades[0].length, this.usersGrades[1].length, this.usersGrades[2].length,
-                this.usersGrades[3].length,this.usersGrades[4].length,this.usersGrades[5].length],
+                data: [data1, data2, data3, data4, data5, data6],
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -513,7 +533,7 @@ export class ReportComponent implements OnInit {
 
           //grade
           let grade = gradeitems[gradeitems.length - 1].graderaw;
-          if(!grade) grade = 'sem nota';
+          if(!grade) grade = -1;
           let elem: object = {
             position: position,
             name: name,
