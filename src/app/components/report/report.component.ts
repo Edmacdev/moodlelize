@@ -18,10 +18,8 @@ declare var Chart: any
 })
 export class ReportComponent implements OnInit {
   user: any;
-  usersAccessData: any[];
   enrolledUsers: any[];
   usersGrades: any[];
-  usersProgress: any[];
   moodles: any[];
   courses: any[];
   course: any;
