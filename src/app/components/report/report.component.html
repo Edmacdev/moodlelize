@@ -80,8 +80,8 @@
                     <mat-cell *matCellDef="let element"> {{element.phone}} </mat-cell>
                   </ng-container>
                   <ng-container matColumnDef="lastaccess">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header> Acesso</mat-header-cell>
-                    <mat-cell *matCellDef="let element"> {{element.lastaccess}} </mat-cell>
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> Último Acesso</mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{hoursToDays(element.lastaccess)}}</mat-cell>
                   </ng-container>
                   <ng-container matColumnDef="progress">
                     <mat-header-cell *matHeaderCellDef mat-sort-header> Progresso </mat-header-cell>
@@ -106,6 +106,7 @@
         <mat-tab label="Acesso">
           <div class="container">
             <div class="row">
+              <h2>DIAS DESDE O ÚLTIMO ACESSO</h2>
               <div class="chart col-md-12"><canvas id="cht-access"></canvas></div>
             </div>
           </div>

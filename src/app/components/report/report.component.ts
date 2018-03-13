@@ -121,7 +121,7 @@ export class ReportComponent implements OnInit {
           break;
         }
         if( this.status.every(status => status === true) ){
-
+          console.log(this.usersGrades )
           this.dataSource = new MatTableDataSource(this.prepareDataSource(this.enrolledUsers, this.usersGrades));
           this.isReady = true;
           this.isLoading = false;
@@ -197,8 +197,30 @@ export class ReportComponent implements OnInit {
 
       let currentdate = new Date();
       let timeDiff = Math.abs(currentdate.getTime() - lastaccess.getTime());
-      let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-      return diffDays - 1;
+      let diffDays = Math.floor(timeDiff / (1000 * 3600));
+      return diffDays ;
+  }
+  hoursToDays(hours){
+    if(hours >= 24) {
+      let days = Math.floor(hours/24)
+      if(days == 1){
+        return days + ' dia';
+      }
+      else if(days > 1){
+        return days + ' dias'
+      }
+    }
+    else {
+      if(hours == 1){
+        return hours + ' hora';
+      }
+      else if (hours > 1){
+        return hours + ' horas';
+      }
+      else if (hours < 1){
+        return 'menos de 1 hora'
+      }
+    }
   }
   chartRender(index){
     var data1:number = 0;
@@ -209,12 +231,12 @@ export class ReportComponent implements OnInit {
     var data6:number = 0;
     switch (index){
       case 1:
-        data1 = this.dataSource.data.filter(elem => elem.lastaccess == "nunca").length;
-        data2 = this.dataSource.data.filter(elem => elem.lastaccess == "menos de 24h").length;
-        data3 = this.dataSource.data.filter(elem => elem.lastaccess == "1-2 dias").length;
-        data4 = this.dataSource.data.filter(elem => elem.lastaccess == "3-5 dias").length;
-        data5 = this.dataSource.data.filter(elem => elem.lastaccess == "5-10 dias").length;
-        data6 = this.dataSource.data.filter(elem => elem.lastaccess == "mais de 10 dias").length;
+        data1 = this.dataSource.data.filter(elem => elem.lastaccess == null).length;
+        data2 = this.dataSource.data.filter(elem => elem.lastaccess < 24).length;
+        data3 = this.dataSource.data.filter(elem => elem.lastaccess >= 24 && elem.lastaccess < 48 ).length;
+        data4 = this.dataSource.data.filter(elem => elem.lastaccess >= 48 && elem.lastaccess < 120 ).length;
+        data5 = this.dataSource.data.filter(elem => elem.lastaccess >= 120 && elem.lastaccess < 240 ).length;
+        data6 = this.dataSource.data.filter(elem => elem.lastaccess > 240).length;
         var filter_access =  elem =>  elem.lastaccess = this;
         var doughnut = $("#cht-access")[0].getContext('2d');
         var doughnutChart = new Chart(doughnut, {
@@ -339,28 +361,27 @@ export class ReportComponent implements OnInit {
           let name = enrolledUsers[i].fullname;
           let email = enrolledUsers[i].email;
           let phone = enrolledUsers[i].phone1;
-          let lastaccess:string;
 
           //last access
-          let days = this.getDaysSinceLastAccess(enrolledUsers[i].lastaccess);
-          if(days == null){
-            lastaccess = 'nunca'
-          }
-          else if (days == 0){
-            lastaccess = 'menos de 24h'
-          }
-          else if(days >= 1 && days <= 2){
-            lastaccess = '1-2 dias'
-          }
-          else if(days >= 3 && days <= 5){
-            lastaccess = '3-5 dias'
-          }
-          else if(days >= 5 && days <= 10){
-            lastaccess = '5-10 dias'
-          }
-          else if(days > 10 ){
-            lastaccess = '10+ dias'
-          }
+          let lastaccess = this.getDaysSinceLastAccess(enrolledUsers[i].lastaccess);
+          // if(days == null){
+          //   lastaccess = 'nunca'
+          // }
+          // else if (days == 0){
+          //   lastaccess = 'menos de 24h'
+          // }
+          // else if(days >= 1 && days <= 2){
+          //   lastaccess = '1-2 dias'
+          // }
+          // else if(days >= 3 && days <= 5){
+          //   lastaccess = '3-5 dias'
+          // }
+          // else if(days >= 5 && days <= 10){
+          //   lastaccess = '5-10 dias'
+          // }
+          // else if(days > 10 ){
+          //   lastaccess = '10+ dias'
+          // }
 
           let progress = 0;
           //Progress
@@ -388,6 +409,7 @@ export class ReportComponent implements OnInit {
           dataSource.push(elem);
         }
       }
+      console.log(dataSource)
       return dataSource
   }
 }
