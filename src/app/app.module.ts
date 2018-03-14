@@ -22,10 +22,8 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { HomeComponent } from './components/home/home.component';
-import { MoodleRegComponent } from './components/moodle-reg/moodle-reg.component';
 import { MoodlesComponent } from './components/moodles/moodles.component';
 import { ProfileComponent } from './components/profile/profile.component';
-import { SearchComponent } from './components/search/search.component';
 import { UserComponent } from './components/user/user.component';
 import { DisplayUsersDialogComponent } from './components/display-users-dialog/display-users-dialog.component';
 import { UsersAddComponent } from './components/users-add/users-add.component';
@@ -33,7 +31,6 @@ import { RemoveMoodleDialogComponent } from './components/remove-moodle-dialog/r
 import { EditMoodleDialogComponent } from './components/edit-moodle-dialog/edit-moodle-dialog.component';
 import { ReportComponent } from './components/report/report.component';
 import { AddMoodleDialogComponent } from './components/add-moodle-dialog/add-moodle-dialog.component';
-import { CoursePageComponent } from './components/course-page/course-page.component';
 
 //SERVIÇOS
 
@@ -58,9 +55,6 @@ import 'hammerjs';
     HomeComponent,
     MoodlesComponent,
     ProfileComponent,
-    MoodleRegComponent,
-    CoursePageComponent,
-    SearchComponent,
     UserComponent,
     DisplayUsersDialogComponent,
     UsersAddComponent,

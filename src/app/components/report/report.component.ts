@@ -6,7 +6,7 @@ import { FlashMessagesService } from 'angular2-flash-messages';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import {MatTableDataSource, MatSort, MatPaginator} from '@angular/material';
-
+import swal from 'sweetalert2';
 import Chart from 'chart.js'
 import * as $ from 'jquery';
 
@@ -23,6 +23,8 @@ export class ReportComponent implements OnInit {
   moodles: any[];
   courses: any[];
   course: any;
+  courseTitle: string;
+  user_info: object;
 //FORMS
   form_moodle: any;
   form_courseid: number;
@@ -35,8 +37,11 @@ export class ReportComponent implements OnInit {
   isCourseSelected: boolean = false;
   statusObs: Subject<any>;
 //DATA TABLES
-  displayColumns = ['position', 'name', 'email','phone','lastaccess', 'progress', 'grade'];
+  displayColumns = ['id', 'name', 'email','phone','lastaccess', 'progress', 'grade'];
   dataSource: MatTableDataSource<any>;
+//USER ELEMENT TABLE DATA
+  selectedUserInfo: object;
+  userElemValue: string;
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild('paginator') paginator: MatPaginator;
@@ -121,7 +126,7 @@ export class ReportComponent implements OnInit {
           break;
         }
         if( this.status.every(status => status === true) ){
-          console.log(this.usersGrades )
+
           this.dataSource = new MatTableDataSource(this.prepareDataSource(this.enrolledUsers, this.usersGrades));
           this.isReady = true;
           this.isLoading = false;
@@ -129,9 +134,37 @@ export class ReportComponent implements OnInit {
             () => {
               this.dataSource.paginator = this.paginator;
               this.dataSource.sort = this.sort;
-            },400
-          )
-        }
+
+              $(".input-title").focusout(
+                (event) =>{
+
+                  this.changeTitleHandler()
+                }
+              )
+              $(".input-title").keyup(
+                (event) =>{
+                  if(event.which == 13){
+                    this.changeTitleHandler()
+                  }
+                }
+              )
+
+              $(".user-info").focusout(
+                (event) => {
+
+                  this.changeUserInfoHandler(this.selectedUserInfo, event)
+                }
+              )
+              $(".user-info").keyup(
+                (event) =>{
+                  if(event.which == 13){
+                    this.changeUserInfoHandler(this.selectedUserInfo, event)
+                  }
+                }
+              )
+          },400
+        )
+      }
         else {
           this.isReady = false;
         }
@@ -357,8 +390,9 @@ export class ReportComponent implements OnInit {
       for (let i in enrolledUsers){
         if(enrolledUsers[i].roles[0].roleid == 5){
           let uid = enrolledUsers[i].id;
-          let position = i;
           let name = enrolledUsers[i].fullname;
+          let firstname = enrolledUsers[i].firstname;
+          let lastname = enrolledUsers[i].lastname;
           let email = enrolledUsers[i].email;
           let phone = enrolledUsers[i].phone1;
 
@@ -398,8 +432,10 @@ export class ReportComponent implements OnInit {
           let grade = gradeitems[gradeitems.length - 1].graderaw;
           if(!grade) grade = -1;
           let elem: object = {
-            position: position,
+            id: uid,
             name: name,
+            firstname: firstname,
+            lastname: lastname,
             email: email,
             phone: phone,
             lastaccess: lastaccess,
@@ -409,15 +445,130 @@ export class ReportComponent implements OnInit {
           dataSource.push(elem);
         }
       }
-      console.log(dataSource)
       return dataSource
+  }
+  changeTitle(title){
+    const params ={
+      wstoken: this.form_moodle.token,
+      courseid: this.course.id,
+      fullname: title
+    }
+    return this.moodleApiService.core_course_update_courses(this.form_moodle.url, params);
+  }
+  changeUserInfo(user, value){
+
+    const params ={
+      wstoken: this.form_moodle.token,
+      userid: user.id,
+      userinfo: "&users[0][" + user.type + "]=" + value
+    }
+    return this.moodleApiService.core_user_update_users(this.form_moodle.url, params);
+  }
+  changeTitleHandler(){
+      if($(".input-title").val() != this.course.fullname){
+        swal({
+          title: 'Mudar Título',
+          text: 'Tem certeza de que quer alterar o título?',
+          type: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Sim',
+          cancelButtonText: 'Não'
+        }).then((result) => {
+          if (result.value) {
+            this.changeTitle($(".input-title").val()).subscribe(
+              (data) => {
+                if(data.exception){
+                  $(".input-title").val(this.course.fullname);
+                  swal(
+                    '',
+                    'Erro ao atualizar o título',
+                    'error'
+                  )
+                }
+                else{
+                  this.course.fullname = $(".input-title").val()
+                  swal(
+                    '',
+                    'Título Atualizado!',
+                    'success'
+                  )
+                }
+              }
+            );
+          } else if (result.dismiss === swal.DismissReason.cancel) {
+            $(".input-title").val(this.course.fullname);
+            swal(
+              '',
+              'O título não foi alterado',
+              'error'
+            )
+          }
+        })
+      }
+  }
+  changeUserInfoHandler(user, event){
+    var dataSourceUser = this.dataSource.data.find(element => element.id == user.id)
+
+    if(event.target.value !=  dataSourceUser.firstname &&
+       event.target.value !=  dataSourceUser.lastname &&
+       event.target.value !=  dataSourceUser.email ){
+      swal({
+        title: 'Alterar Usuário',
+        text: 'Tem certeza de que quer alterar esta informação?',
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sim',
+        cancelButtonText: 'Não'
+      }).then((result) => {
+        if (result.value) {
+          this.changeUserInfo(user, event.target.value).subscribe(
+            data => {
+              if(data != null){
+                swal(
+                  '',
+                  'Erro ao atualizar usuário',
+                  'error'
+                )
+                if(user.type == 'firstname') $("#firstname"+user.id).val(this.dataSource.data.find((element)=> element.id == user.id).firstname);
+                else if(user.type == 'lastname') $("#lastname"+user.id).val(this.dataSource.data.find((element)=> element.id == user.id).lastname);
+                else if(user.type == 'email') $("#email"+user.id).val(this.dataSource.data.find((element)=> element.id == user.id).email);
+              }
+              else{
+                swal(
+                  '',
+                  'Usuário Atualizado!',
+                  'success'
+                )
+              }
+            }
+          );
+        } else if (result.dismiss === swal.DismissReason.cancel) {
+          swal(
+            '',
+            'O usuário não foi atualizado',
+            'error'
+          )
+          if(user.type == 'firstname') $("#firstname"+user.id).val(this.dataSource.data.find((element)=> element.id == user.id).firstname);
+          else if(user.type == 'lastname') $("#lastname"+user.id).val(this.dataSource.data.find((element)=> element.id == user.id).lastname);
+          else if(user.type == 'email') $("#email"+user.id).val(this.dataSource.data.find((element)=> element.id == user.id).email);
+
+        }
+      })
+    }
+  }
+  setCurrentUserInfo(id, type){
+    const userInfo = {
+      id: id,
+      type: type
+    }
+    this.selectedUserInfo = userInfo;
   }
 }
 export interface Element {
   name: string;
   email: string;
   phone: string;
-  position: number;
+  id: number;
   access: string;
   progress: number;
   grade: number;

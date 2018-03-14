@@ -22,16 +22,6 @@ wsProtocol: string = 'https://';
     ).map(res => res.json())
   }
 
-  // core_course_get_courses_by_field(host, params){
-  //   return this.http.get(this.wsProtocol + host + this.wsURL +
-  //   '?wstoken=' + params.wstoken +
-  //   '&wsfunction=core_course_get_courses_by_field' +
-  //   '&moodlewsrestformat=json' +
-  //   '&field=' + params.field +
-  //   '&value=' + params.value
-  // ).map(res => res.json())
-  // }
-
   core_user_get_users(host, params){
 
     return this.http.get(this.wsProtocol + host + this.wsURL +
@@ -79,6 +69,24 @@ wsProtocol: string = 'https://';
     '&wsfunction=gradereport_user_get_grade_items' +
     '&moodlewsrestformat=json' +
     '&courseid=' + params.courseid
+    ).map(res => res.json())
+  }
+  core_course_update_courses(host, params){
+    return this.http.get(this.wsProtocol + host + this.wsURL +
+    '?wstoken=' + params.wstoken +
+    '&wsfunction=core_course_update_courses' +
+    '&moodlewsrestformat=json' +
+    '&courses[0][id]=' + params.courseid +
+    '&courses[0][fullname]=' + params.fullname
+    ).map(res => res.json())
+  }
+  core_user_update_users(host, params){
+    return this.http.get(this.wsProtocol + host + this.wsURL +
+    '?wstoken=' + params.wstoken +
+    '&wsfunction=core_user_update_users' +
+    '&moodlewsrestformat=json' +
+    '&users[0][id]=' + params.userid +
+    params.userinfo
     ).map(res => res.json())
   }
 

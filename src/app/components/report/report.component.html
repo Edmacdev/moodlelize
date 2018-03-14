@@ -1,7 +1,7 @@
 <div class="topbar">
   <div class="container">
     <div class="row">
-      <form class="col-md-12 select" action="index.html" method="post">
+      <form class="col-md-12 select" action="index.html">
         <strong>Moodle:</strong>
         <mat-form-field class="mat-form" >
           <mat-select [(ngModel)]="form_moodle" name="form_moodle" (change)="getCourses()">
@@ -22,7 +22,9 @@
 <div class="container" *ngIf="isReady">
   <div class="row">
     <div class="col-md-12 title" >
-      <h2>{{course.fullname}}</h2>
+      <form action="">
+        <h2><input  class="editable input-title"value="{{course.fullname}}"></h2>
+      </form>
       <p >Alunos matriculados: {{enrolledUsers.length}}</p>
     </div>
   </div>
@@ -63,21 +65,35 @@
                    </mat-form-field>
                  </div>
                 <mat-table #table [dataSource]="dataSource" matSort>
-                  <ng-container matColumnDef="position">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header> No. </mat-header-cell>
-                    <mat-cell *matCellDef="let element"> {{element.position}} </mat-cell>
+                  <ng-container matColumnDef="id">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> ID </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.id}} </mat-cell>
                   </ng-container>
-                  <ng-container matColumnDef="name">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header> Nome </mat-header-cell>
-                    <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+                  <ng-container matColumnDef="name" >
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>  Nome </mat-header-cell>
+                    <mat-cell *matCellDef="let element" >
+                      <div class="name" style="display:block">
+                        <div class="firstname">
+                          <input id="firstname{{element.id}}"(click)="setCurrentUserInfo(element.id, 'firstname')"type="text" class="editable user-info" value="{{element.firstname}}">
+                        </div>
+                        <div class="lastname">
+                          <input id="lastname{{element.id}}"(click)="setCurrentUserInfo(element.id, 'lastname')"type="text" class="editable user-info" value="{{element.lastname}}">
+                        </div>
+                      </div>
+
+                    </mat-cell>
                   </ng-container>
-                  <ng-container matColumnDef="email">
+                  <ng-container matColumnDef="email" >
                     <mat-header-cell *matHeaderCellDef mat-sort-header> Email </mat-header-cell>
-                    <mat-cell *matCellDef="let element"> {{element.email}} </mat-cell>
+                    <mat-cell *matCellDef="let element">
+                      <input id="email{{element.id}}"(click)="setCurrentUserInfo(element.id, 'email')"type="text" class="editable user-info" value="{{element.email}}">
+                    </mat-cell>
                   </ng-container>
-                  <ng-container matColumnDef="phone">
-                    <mat-header-cell *matHeaderCellDef> Telefone </mat-header-cell>
-                    <mat-cell *matCellDef="let element"> {{element.phone}} </mat-cell>
+                  <ng-container matColumnDef="phone" class="user-info">
+                    <mat-header-cell *matHeaderCellDef > Telefone </mat-header-cell>
+                    <mat-cell *matCellDef="let element" (click)="setUserInfo(element.id, element.name, element.email, element.phone)">
+                       <input (click)="setCurrentUserInfo(element.id, 'phone1')"type="text" class="editable user-info" value="{{element.phone}}">
+                     </mat-cell>
                   </ng-container>
                   <ng-container matColumnDef="lastaccess">
                     <mat-header-cell *matHeaderCellDef mat-sort-header> Último Acesso</mat-header-cell>
