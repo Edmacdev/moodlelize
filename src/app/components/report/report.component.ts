@@ -3,7 +3,9 @@ import { AuthService } from '../../services/auth.service';
 import { MoodleService } from '../../services/moodle.service';
 import { MoodleApiService } from '../../services/moodle-api.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
-import { Observable } from 'rxjs/Observable';
+import {Observable} from 'rxjs/Rx'
+import 'rxjs/add/operator/merge';
+import { forkJoin } from 'rxjs/observable/forkJoin';
 import { Subject } from 'rxjs/Subject';
 import {MatTableDataSource, MatSort, MatPaginator} from '@angular/material';
 import swal from 'sweetalert2';
@@ -30,22 +32,24 @@ export class ReportComponent implements OnInit {
   form_courseid: number;
 //TIMER
   timer: any;
+  courseTimeProgress: number;
 //STATUS
   status: boolean[];
   isReady: boolean = false;
   isLoading: boolean = false;
   isCourseSelected: boolean = false;
   statusObs: Subject<any>;
+  usersStatuses: any[] = [];
 //DATA TABLES
-  displayColumns = ['id', 'name', 'email','phone','lastaccess', 'progress', 'grade'];
+  displayColumns = ['status', 'name', 'email','phone','lastaccess', 'progress', 'grade'];
   dataSource: MatTableDataSource<any>;
 //USER ELEMENT TABLE DATA
   selectedUserInfo: object;
   userElemValue: string;
-
+//OBSERVABLES
+  observableArray: any[] = []
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild('paginator') paginator: MatPaginator;
-
   constructor(
     private authService: AuthService,
     private moodleService: MoodleService,
@@ -101,7 +105,8 @@ export class ReportComponent implements OnInit {
           this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
           return false;
         }
-        this.enrolledUsers = data.sort((a,b) => a.fullname.localeCompare(b.fullname));
+        let filter = data.filter(element =>  element.roles[0].roleid == 5);
+        this.enrolledUsers = filter.sort((a,b) => a.fullname.localeCompare(b.fullname));
         this.statusObs.next('enrolledUsers');
       }
     );
@@ -112,7 +117,17 @@ export class ReportComponent implements OnInit {
           return false;
         }
         this.usersGrades = data.usergrades.sort((a,b) => a.userfullname.localeCompare(b.userfullname));
-        this.statusObs.next('usersGrades');
+        var observableArray: any[] = [];
+        for(let i in this.usersGrades){
+          observableArray.push(this.getUserActivitiesStatus(this.course.id, this.usersGrades[i].userid))
+        }
+        forkJoin(observableArray).subscribe(
+          result => {
+            this.usersStatuses = result;
+            this.statusObs.next('usersGrades');
+          }
+        )
+
       }
     )
     this.statusObs.subscribe(
@@ -127,9 +142,10 @@ export class ReportComponent implements OnInit {
         }
         if( this.status.every(status => status === true) ){
 
-          this.dataSource = new MatTableDataSource(this.prepareDataSource(this.enrolledUsers, this.usersGrades));
+          this.dataSource = new MatTableDataSource(this.prepareDataSource(this.enrolledUsers, this.usersGrades, this.usersStatuses));
           this.isReady = true;
           this.isLoading = false;
+
           setTimeout(
             () => {
               this.dataSource.paginator = this.paginator;
@@ -200,6 +216,7 @@ export class ReportComponent implements OnInit {
         $(".seconds").html(seconds);
       }
 
+
       // If the count down is finished, write some text
       if (distance < 0) {
         clearInterval(this.timer);
@@ -207,6 +224,16 @@ export class ReportComponent implements OnInit {
         $(".countdown").hide();
       }
     }, 1000);
+  }
+  courseTimeProgress(course){
+    let now = new Date().getTime();
+    let enddate = course.enddate *1000;
+    let startdate = course.startdate *1000;
+    let distance = now - startdate;
+    let duration = enddate - startdate;
+    let progress = (distance *100) / duration
+    return Math.floor(progress)
+
   }
   getEnrolledUsers(courseid){
     const params ={
@@ -221,6 +248,14 @@ export class ReportComponent implements OnInit {
       courseid: courseid
     }
     return this.moodleApiService.gradereport_user_get_grade_items(this.form_moodle.url, params)
+  }
+  getUserActivitiesStatus(courseid, userid){
+    const params ={
+      wstoken: this.form_moodle.token,
+      courseid: courseid,
+      userid: userid
+    }
+    return this.moodleApiService.core_completion_get_activities_completion_status(this.form_moodle.url, params)
   }
   getDaysSinceLastAccess(lastaccess){
     if(lastaccess == 0){
@@ -244,15 +279,16 @@ export class ReportComponent implements OnInit {
       }
     }
     else {
-      if(hours == 1){
-        return hours + ' hora';
-      }
-      else if (hours > 1){
-        return hours + ' horas';
-      }
-      else if (hours < 1){
-        return 'menos de 1 hora'
-      }
+      return 'menos de 1 dia'
+      // if(hours == 1){
+      //   return hours + ' hora';
+      // }
+      // else if (hours > 1){
+      //   return hours + ' horas';
+      // }
+      // else if (hours < 1){
+      //   return 'menos de 1 hora'
+      // }
     }
   }
   chartRender(index){
@@ -271,13 +307,13 @@ export class ReportComponent implements OnInit {
         data5 = this.dataSource.data.filter(elem => elem.lastaccess >= 120 && elem.lastaccess < 240 ).length;
         data6 = this.dataSource.data.filter(elem => elem.lastaccess > 240).length;
         var filter_access =  elem =>  elem.lastaccess = this;
-        var doughnut = $("#cht-access")[0].getContext('2d');
-        var doughnutChart = new Chart(doughnut, {
-        type: 'doughnut',
+        var chtAccessCtx = $("#cht-access")[0].getContext('2d');
+        var chtAccess = new Chart(chtAccessCtx, {
+        type: 'bar',
         data: {
             labels: ["nunca", "menos de 24h", "1-2 dias", "3-5 dias", "5-10 dias", "mais de 10 dias"],
             datasets: [{
-                label: '# of Votes',
+                label: '',
                 data: [data1, data2, data3, data4, data5, data6],
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
@@ -349,7 +385,7 @@ export class ReportComponent implements OnInit {
         data6 = this.dataSource.data.filter(elem => elem.grade >= 81 && elem.grade <= 100).length;
         let chtGradesCtx = $("#cht-grades")[0].getContext('2d');
         let chtGrades = new Chart(chtGradesCtx, {
-        type: 'pie',
+        type: 'bar',
         data: {
             labels: ["sem nota","0-20", "21-40","41-60", "61-80", "81-100"],
             datasets: [{
@@ -384,66 +420,75 @@ export class ReportComponent implements OnInit {
     filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
     this.dataSource.filter = filterValue;
   }
-  prepareDataSource(enrolledUsers, usersGrades){
+  prepareDataSource(enrolledUsers, usersGrades, usersStatuses){
       let dataSource:any[] = [];
 
       for (let i in enrolledUsers){
-        if(enrolledUsers[i].roles[0].roleid == 5){
-          let uid = enrolledUsers[i].id;
-          let name = enrolledUsers[i].fullname;
-          let firstname = enrolledUsers[i].firstname;
-          let lastname = enrolledUsers[i].lastname;
-          let email = enrolledUsers[i].email;
-          let phone = enrolledUsers[i].phone1;
+        let uid = enrolledUsers[i].id;
+        let name = enrolledUsers[i].fullname;
+        let firstname = enrolledUsers[i].firstname;
+        let lastname = enrolledUsers[i].lastname;
+        let email = enrolledUsers[i].email;
+        let phone = enrolledUsers[i].phone1;
 
-          //last access
-          let lastaccess = this.getDaysSinceLastAccess(enrolledUsers[i].lastaccess);
-          // if(days == null){
-          //   lastaccess = 'nunca'
-          // }
-          // else if (days == 0){
-          //   lastaccess = 'menos de 24h'
-          // }
-          // else if(days >= 1 && days <= 2){
-          //   lastaccess = '1-2 dias'
-          // }
-          // else if(days >= 3 && days <= 5){
-          //   lastaccess = '3-5 dias'
-          // }
-          // else if(days >= 5 && days <= 10){
-          //   lastaccess = '5-10 dias'
-          // }
-          // else if(days > 10 ){
-          //   lastaccess = '10+ dias'
-          // }
+        //last access
+        let lastaccess = this.getDaysSinceLastAccess(enrolledUsers[i].lastaccess);
+        // if(days == null){
+        //   lastaccess = 'nunca'
+        // }
+        // else if (days == 0){
+        //   lastaccess = 'menos de 24h'
+        // }
+        // else if(days >= 1 && days <= 2){
+        //   lastaccess = '1-2 dias'
+        // }
+        // else if(days >= 3 && days <= 5){
+        //   lastaccess = '3-5 dias'
+        // }
+        // else if(days >= 5 && days <= 10){
+        //   lastaccess = '5-10 dias'
+        // }
+        // else if(days > 10 ){
+        //   lastaccess = '10+ dias'
+        // }
 
-          let progress = 0;
-          //Progress
-            let activities = usersGrades[0].gradeitems.length-1;
-            let gradeitems =usersGrades.find((element)=>{return element.userid == uid}).gradeitems
 
-            for (let j = 0; j < activities; j++){
-              if(gradeitems[j].graderaw)
-                progress++
-            }
-            progress = (progress / activities) *100;
-
-          //grade
-          let grade = gradeitems[gradeitems.length - 1].graderaw;
-          if(!grade) grade = -1;
-          let elem: object = {
-            id: uid,
-            name: name,
-            firstname: firstname,
-            lastname: lastname,
-            email: email,
-            phone: phone,
-            lastaccess: lastaccess,
-            progress: progress,
-            grade: grade
+        //Progress
+          let activities = usersStatuses[i].statuses.length;
+          let activitiesCompleted = 0;
+          for(let j in usersStatuses[i].statuses){
+            if(usersStatuses[i].statuses[j].state != 0) activitiesCompleted++
           }
-          dataSource.push(elem);
+          let gradeitems =usersGrades.find((element)=>{return element.userid == uid}).gradeitems
+          let progress = Math.floor((activitiesCompleted *100)/ activities);
+
+        //grade
+        let grade = gradeitems[gradeitems.length - 1].graderaw;
+        if(!grade) grade = -1;
+        //status
+        let status: string = '';
+        let courseTime = this.courseTimeProgress(this.course);
+        console.log(courseTime + ' progress= '+ progress)
+        if( progress >= courseTime ) status = 'azul'
+        else{
+          if(lastaccess <= 48 ) status = 'amarelo';
+          else status = 'vermelho'
         }
+
+        let elem: object = {
+          id: uid,
+          name: name,
+          firstname: firstname,
+          lastname: lastname,
+          email: email,
+          phone: phone,
+          lastaccess: lastaccess,
+          progress: progress,
+          grade: grade,
+          status: status
+        }
+        dataSource.push(elem);
+
       }
       return dataSource
   }
@@ -562,6 +607,21 @@ export class ReportComponent implements OnInit {
       type: type
     }
     this.selectedUserInfo = userInfo;
+  }
+  getRowColor(color){
+    switch(color){
+      case 'azul':
+        return 'rgba(54, 162, 235, 0.2)';
+      break
+      case 'amarelo':
+        return 'rgba(255, 206, 86, 0.2)';
+      break
+      case 'vermelho':
+        return 'rgba(255, 0, 0, 0.2)'
+      break
+      default:
+        return 'rgba(0,0,0,0)'
+    }
   }
 }
 export interface Element {

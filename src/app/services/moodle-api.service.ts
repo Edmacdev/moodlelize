@@ -89,5 +89,14 @@ wsProtocol: string = 'https://';
     params.userinfo
     ).map(res => res.json())
   }
+  core_completion_get_activities_completion_status(host, params){
+    return this.http.get(this.wsProtocol + host + this.wsURL +
+    '?wstoken=' + params.wstoken +
+    '&wsfunction=core_completion_get_activities_completion_status' +
+    '&moodlewsrestformat=json' +
+    '&courseid=' + params.courseid +
+    '&userid=' + params.userid 
+    ).map(res => res.json())
+  }
 
 }
