@@ -224,14 +224,18 @@ export class ReportComponent implements OnInit {
       }
     }, 1000);
   }
-  courseTimeProgress(course){
+  courseTime(course){
     let now = new Date().getTime();
     let enddate = course.enddate *1000;
     let startdate = course.startdate *1000;
     let distance = now - startdate;
     let duration = enddate - startdate;
-    let progress = (distance *100) / duration
-    return Math.floor(progress)
+    let progress = Math.floor((distance *100) / duration)
+    let courseTime = {
+      duration: duration,
+      progress: progress
+    }
+    return courseTime
 
   }
   getEnrolledUsers(courseid){
@@ -299,18 +303,28 @@ export class ReportComponent implements OnInit {
     var data6:number = 0;
     switch (index){
       case 1:
-        data1 = this.dataSource.data.filter(elem => elem.lastaccess == null).length;
-        data2 = this.dataSource.data.filter(elem => elem.lastaccess < 24).length;
-        data3 = this.dataSource.data.filter(elem => elem.lastaccess >= 24 && elem.lastaccess < 48 ).length;
-        data4 = this.dataSource.data.filter(elem => elem.lastaccess >= 48 && elem.lastaccess < 120 ).length;
-        data5 = this.dataSource.data.filter(elem => elem.lastaccess >= 120 && elem.lastaccess < 240 ).length;
-        data6 = this.dataSource.data.filter(elem => elem.lastaccess > 240).length;
+        var days = percentage => {
+          let courseDuration = Math.floor(this.courseTime(this.course).duration/(1000 * 60 * 60 * 24));
+          return Math.floor((percentage*courseDuration)/100);
+        }
+        data1 = this.dataSource.data.filter(elem => elem.lastaccess/24 == null).length;
+        data2 = this.dataSource.data.filter(elem => elem.lastaccess/24 < days(5)).length;
+        data3 = this.dataSource.data.filter(elem => elem.lastaccess/24 >= days(5) && elem.lastaccess/24 < days(10) ).length;
+        data4 = this.dataSource.data.filter(elem => elem.lastaccess/24 >= days(10) && elem.lastaccess/24 < days(25) ).length;
+        data5 = this.dataSource.data.filter(elem => elem.lastaccess/24 >= days(25) && elem.lastaccess/24 < days(50) ).length;
+        data6 = this.dataSource.data.filter(elem => elem.lastaccess/24 > days(50)).length;
         var filter_access =  elem =>  elem.lastaccess = this;
         var chtAccessCtx = $("#cht-access")[0].getContext('2d');
         var chtAccess = new Chart(chtAccessCtx, {
         type: 'bar',
         data: {
-            labels: ["nunca", "menos de 24h", "1-2 dias", "3-5 dias", "5-10 dias", "mais de 10 dias"],
+            labels: [
+              "nunca",
+              "menos de " + days(5) + " dias",
+              days(5) + "-" + days(10) + " dias",
+              days(10) + "-" + days(25) + " dias",
+              days(25) + "-" + days(50) + " dias",
+              "mais de " + days(50) + " dias"],
             datasets: [{
                 label: '',
                 data: [data1, data2, data3, data4, data5, data6],
@@ -466,8 +480,8 @@ export class ReportComponent implements OnInit {
         if(!grade) grade = -1;
         //status
         let risk: string = '';
-        let courseTime = this.courseTimeProgress(this.course);
-        if( progress >= courseTime ) risk = 'baixo'
+        let courseTime = this.courseTime(this.course);
+        if( progress >= courseTime.progress ) risk = 'baixo'
         else{
           if(lastaccess <= 48 ) risk = 'médio';
           else risk = 'alto'
