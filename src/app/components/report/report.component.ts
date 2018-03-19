@@ -32,7 +32,6 @@ export class ReportComponent implements OnInit {
   form_courseid: number;
 //TIMER
   timer: any;
-  courseTimeProgress: number;
 //STATUS
   status: boolean[];
   isReady: boolean = false;
@@ -41,7 +40,7 @@ export class ReportComponent implements OnInit {
   statusObs: Subject<any>;
   usersStatuses: any[] = [];
 //DATA TABLES
-  displayColumns = ['status', 'name', 'email','phone','lastaccess', 'progress', 'grade'];
+  displayColumns = ['risk', 'name', 'email','phone','lastaccess', 'progress', 'grade'];
   dataSource: MatTableDataSource<any>;
 //USER ELEMENT TABLE DATA
   selectedUserInfo: object;
@@ -466,13 +465,12 @@ export class ReportComponent implements OnInit {
         let grade = gradeitems[gradeitems.length - 1].graderaw;
         if(!grade) grade = -1;
         //status
-        let status: string = '';
+        let risk: string = '';
         let courseTime = this.courseTimeProgress(this.course);
-        console.log(courseTime + ' progress= '+ progress)
-        if( progress >= courseTime ) status = 'azul'
+        if( progress >= courseTime ) risk = 'baixo'
         else{
-          if(lastaccess <= 48 ) status = 'amarelo';
-          else status = 'vermelho'
+          if(lastaccess <= 48 ) risk = 'médio';
+          else risk = 'alto'
         }
 
         let elem: object = {
@@ -485,7 +483,7 @@ export class ReportComponent implements OnInit {
           lastaccess: lastaccess,
           progress: progress,
           grade: grade,
-          status: status
+          risk: risk
         }
         dataSource.push(elem);
 
@@ -552,7 +550,12 @@ export class ReportComponent implements OnInit {
       }
   }
   changeUserInfoHandler(user, event){
-    var dataSourceUser = this.dataSource.data.find(element => element.id == user.id)
+    var i;
+    var dataSourceUser = this.dataSource.data
+      .find((element, index) => {
+        i = index;
+        return element.id == user.id;
+      })
 
     if(event.target.value !=  dataSourceUser.firstname &&
        event.target.value !=  dataSourceUser.lastname &&
@@ -574,11 +577,14 @@ export class ReportComponent implements OnInit {
                   'Erro ao atualizar usuário',
                   'error'
                 )
-                if(user.type == 'firstname') $("#firstname"+user.id).val(this.dataSource.data.find((element)=> element.id == user.id).firstname);
-                else if(user.type == 'lastname') $("#lastname"+user.id).val(this.dataSource.data.find((element)=> element.id == user.id).lastname);
-                else if(user.type == 'email') $("#email"+user.id).val(this.dataSource.data.find((element)=> element.id == user.id).email);
+                if(user.type == 'firstname') $("#firstname"+user.id).val(dataSourceUser.firstname);
+                else if(user.type == 'lastname') $("#lastname"+user.id).val(dataSourceUser.lastname);
+                else if(user.type == 'email') $("#email"+user.id).val(dataSourceUser.email);
               }
               else{
+                if(user.type == 'firstname') this.dataSource.data[i].firstname = $("#firstname"+user.id).val();
+                else if(user.type == 'lastname') this.dataSource.data[i].lastname = $("#lastname"+user.id).val();
+                else if(user.type == 'email') this.dataSource.data[i].email = $("#email"+user.id).val();
                 swal(
                   '',
                   'Usuário Atualizado!',
@@ -593,9 +599,9 @@ export class ReportComponent implements OnInit {
             'O usuário não foi atualizado',
             'error'
           )
-          if(user.type == 'firstname') $("#firstname"+user.id).val(this.dataSource.data.find((element)=> element.id == user.id).firstname);
-          else if(user.type == 'lastname') $("#lastname"+user.id).val(this.dataSource.data.find((element)=> element.id == user.id).lastname);
-          else if(user.type == 'email') $("#email"+user.id).val(this.dataSource.data.find((element)=> element.id == user.id).email);
+          if(user.type == 'firstname') $("#firstname"+user.id).val(dataSourceUser.firstname);
+          else if(user.type == 'lastname') $("#lastname"+user.id).val(dataSourceUser.lastname);
+          else if(user.type == 'email') $("#email"+user.id).val(dataSourceUser.email);
 
         }
       })
@@ -607,21 +613,28 @@ export class ReportComponent implements OnInit {
       type: type
     }
     this.selectedUserInfo = userInfo;
+    console.log(this.selectedUserInfo)
   }
-  getRowColor(color){
-    switch(color){
-      case 'azul':
-        return 'rgba(54, 162, 235, 0.2)';
-      break
-      case 'amarelo':
-        return 'rgba(255, 206, 86, 0.2)';
-      break
-      case 'vermelho':
-        return 'rgba(255, 0, 0, 0.2)'
-      break
-      default:
-        return 'rgba(0,0,0,0)'
-    }
+  getRowColor(risk){
+    // var clr:string = '';
+    // switch(color){
+    //   case 'baixo':
+    //   clr = 'rgba(54, 162, 235, 0.1)';
+    //     return clr
+    //   break
+    //   case 'médio':
+    //     return 'rgba(255, 206, 86, 0.1)'
+    //   break
+    //   case 'alto':
+    //     return 'rgba(255, 0, 0, 0.1)'
+    //   break
+    //   default:
+    //     return 'rgba(0,0,0,0)'
+    // }
+    if(risk == 'baixo') return 'rgba(54, 162, 235, 0.1)';
+    else if(risk == 'médio') return 'rgba(255, 206, 86, 0.1)';
+    else if(risk == 'alto') return 'rgba(255, 0, 0, 0.1)';
+
   }
 }
 export interface Element {

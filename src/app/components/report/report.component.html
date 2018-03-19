@@ -65,9 +65,9 @@
                    </mat-form-field>
                  </div>
                 <mat-table #table [dataSource]="dataSource" matSort>
-                  <ng-container matColumnDef="status">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header> Status </mat-header-cell>
-                    <mat-cell *matCellDef="let element" > {{element.status}} </mat-cell>
+                  <ng-container matColumnDef="risk">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> Risco </mat-header-cell>
+                    <mat-cell *matCellDef="let element" > {{element.risk}} </mat-cell>
                   </ng-container>
                   <ng-container matColumnDef="name" >
                     <mat-header-cell *matHeaderCellDef mat-sort-header>  Nome </mat-header-cell>
@@ -91,7 +91,7 @@
                   </ng-container>
                   <ng-container matColumnDef="phone" class="user-info">
                     <mat-header-cell *matHeaderCellDef > Telefone </mat-header-cell>
-                    <mat-cell *matCellDef="let element" (click)="setUserInfo(element.id, element.name, element.email, element.phone)">
+                    <mat-cell *matCellDef="let element" >
                        <input (click)="setCurrentUserInfo(element.id, 'phone1')"type="text" class="editable user-info" value="{{element.phone}}">
                      </mat-cell>
                   </ng-container>
@@ -108,7 +108,7 @@
                     <mat-cell *matCellDef="let element"> {{element.grade}} </mat-cell>
                   </ng-container>
                   <mat-header-row *matHeaderRowDef="displayColumns"></mat-header-row>
-                  <mat-row *matRowDef="let row; columns: displayColumns" [style.background-color]="getRowColor(row.status)"></mat-row>
+                  <mat-row *matRowDef="let row; columns: displayColumns"  [style.background-color]="getRowColor(row.risk)"></mat-row>
                 </mat-table>
                 <mat-paginator #paginator
                  [pageSize]="25"
