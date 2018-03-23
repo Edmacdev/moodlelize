@@ -47,7 +47,7 @@ h2{
 .list{
   // overflow: auto;
 }
-.tb-users{
+#tb-users{
   width: 100%;
 }
 //COUNTDOWN
@@ -131,4 +131,7 @@ ul.countdown li p {
   padding: 3px 0px 3px 3px;
   margin: 5px 1px 3px 0px;
   border: 1px solid rgba(81, 203, 238, 1);
+}
+.name input{
+  display: inline-block;
 }

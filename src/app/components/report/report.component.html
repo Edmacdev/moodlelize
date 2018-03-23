@@ -25,7 +25,6 @@
       <form action="">
         <h2><input  class="editable input-title"value="{{course.fullname}}"></h2>
       </form>
-      <p >Alunos matriculados: {{enrolledUsers.length}}</p>
     </div>
   </div>
   <div class="row">
@@ -50,12 +49,16 @@
       </ul>
       <div class="course-end col-md-6 col-md-offset-3"></div>
     </div>
+    <div class="course-info">
+      <p>Alunos matriculados: {{enrolledUsers.length}}</p>
+      <p>Data de início: {{formatDate(course.startdate).getDate()}}-{{formatDate(course.startdate).getMonth()}}-{{formatDate(course.startdate).getFullYear()}}</p>
+      <p>Data de Término: {{formatDate(course.enddate).getDate()}}-{{formatDate(course.enddate).getMonth()}}-{{formatDate(course.enddate).getFullYear()}}</p>
+    </div>
   </div>
-  <flash-messages></flash-messages>
-  <div class="row wrapper">
-    <div class="tabs">
+  <div class="row wrapper" >
+    <div class="tabs"*ngIf="!isEnded">
       <mat-tab-group (selectedTabChange)="chartRender($event.index);">
-        <mat-tab label="Quadro Geral" class="tb-users">
+        <mat-tab label="Quadro Geral" id="tb-users">
           <div class="container">
             <div class="row">
               <div class="info col-md-12">
@@ -109,6 +112,94 @@
                   </ng-container>
                   <mat-header-row *matHeaderRowDef="displayColumns"></mat-header-row>
                   <mat-row *matRowDef="let row; columns: displayColumns"  [style.background-color]="getRowColor(row.risk)"></mat-row>
+                </mat-table>
+                <mat-paginator #paginator
+                 [pageSize]="25"
+                 [pageSizeOptions]="[5, 10, 25, 50, 100]"
+                 [showFirstLastButtons]="true">
+                </mat-paginator>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Acesso">
+          <div class="container">
+            <div class="row">
+              <h2>DIAS DESDE O ÚLTIMO ACESSO</h2>
+              <div class="chart col-md-12"><canvas id="cht-access"></canvas></div>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Progresso">
+          <div class="container">
+            <div class="row">
+              <h2>PROGRESSO NAS ATIVIDADES DO CURSO</h2>
+              <div class="chart col-md-12"><canvas id="cht-progress"></canvas></div>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Notas">
+          <div class="container">
+            <div class="row">
+              <div class="chart col-md-12"><canvas id="cht-grades"></canvas></div>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+    <div class="tabs" *ngIf="isEnded">
+
+      <mat-tab-group (selectedTabChange)="chartRender($event.index);">
+        <mat-tab label="Quadro Geral" id="tb-users">
+          <div class="container">
+            <div class="row">
+              <h2>RELATÓRIO FINAL</h2>
+              <div class="info col-md-12">
+                <div class="example-header">
+                   <mat-form-field class="filter">
+                     <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filtro">
+                   </mat-form-field>
+                 </div>
+                <mat-table #table [dataSource]="dataSource" matSort>
+                  <ng-container matColumnDef="risk">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> Risco </mat-header-cell>
+                    <mat-cell *matCellDef="let element" > {{element.risk}} </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="name" >
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>  Nome </mat-header-cell>
+                    <mat-cell *matCellDef="let element" >
+                      <div class="name">
+                        <div >
+                          <input id="firstname{{element.id}}"class="firstname"(click)="setCurrentUserInfo(element.id, 'firstname')"type="text" class="editable user-info" value="{{element.firstname}}">
+                        </div>
+                        <div>
+                          <input id="lastname{{element.id}}"class="lastname"(click)="setCurrentUserInfo(element.id, 'lastname')"type="text" class="editable user-info" value="{{element.lastname}}">
+                        </div>
+                      </div>
+                    </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="email" >
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> Email </mat-header-cell>
+                    <mat-cell *matCellDef="let element">
+                      <input id="email{{element.id}}"(click)="setCurrentUserInfo(element.id, 'email')"type="text" class="editable user-info" value="{{element.email}}">
+                    </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="phone" class="user-info">
+                    <mat-header-cell *matHeaderCellDef > Telefone </mat-header-cell>
+                    <mat-cell *matCellDef="let element" >
+                       <input (click)="setCurrentUserInfo(element.id, 'phone1')"type="text" class="editable user-info" value="{{element.phone}}">
+                     </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="result">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> Resultado </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.result}} </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="grade">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Nota </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.grade}} </mat-cell>
+                  </ng-container>
+                  <mat-header-row *matHeaderRowDef="displayColumnsResult"></mat-header-row>
+                  <mat-row *matRowDef="let row; columns: displayColumnsResult"  [style.background-color]="getRowColor(row.result)"></mat-row>
                 </mat-table>
                 <mat-paginator #paginator
                  [pageSize]="25"
