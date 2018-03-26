@@ -20,8 +20,9 @@ declare var Chart: any
 })
 export class ReportComponent implements OnInit {
   user: any;
-  enrolledTeachers: any[];
-  enrolledStudents: any[];
+  enrolledUsers: any[] = [];
+  enrolledTeachers: any[] = [];
+  enrolledStudents: any[] = [];
   usersGrades: any[];
   moodles: any[];
   courses: any[];
@@ -84,10 +85,29 @@ export class ReportComponent implements OnInit {
     this.moodleApiService.core_course_get_courses(this.form_moodle.url, params).subscribe(
       data => {
         if(data.errorcode){
-          this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
+          console.log(data)
+          let errortext: string;
+          switch(data.errorcode){
+            case 'invalidtoken':
+              errortext = 'O token registrado é inválido.';
+            break
+            default: errortext = 'Ocorreu um erro desconhecido'
+          }
+          swal({
+            type: 'error',
+            text: errortext
+          })
           return false;
         }
         this.courses = data.sort((a,b) => a.fullname.localeCompare(b.fullname))
+      },
+      err => {
+        if(err.status == 0){
+          swal({
+            type: 'error',
+            text: 'O URL registrado não é válido.'
+          })
+        }
       }
     )
   }
@@ -103,86 +123,28 @@ export class ReportComponent implements OnInit {
     var wstoken: string = this.form_moodle.token;
     var url: string = this.form_moodle.url;
     var courseid: string = this.course.id
-    var status: boolean[] = [false, false] ;
-
-    var statusSubject: Subject<string> = new Subject();
-
-
-    //BUSCAR USUÁRIOS MATRICULADOS
-    let enrolledUsers;
-    this.moodleApiService.core_enrol_get_enrolled_users(url,{wstoken: wstoken,courseid: courseid})
-    .subscribe(
-      data => {
-        if(data.errorcode){
-          this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
-          return false;
-        }
-        this.enrolledTeachers = data.filter(element =>  element.roles[0].roleid == 3);
-        this.enrolledStudents = data.filter(element =>  element.roles[0].roleid == 5);
-        this.enrolledStudents = this.enrolledStudents.sort((a,b) => a.fullname.localeCompare(b.fullname));
-        statusSubject.next('enrolledUsers');
-      }
-    )
-    //BUSCAR NOTAS DOS ALUNOS
-    let usersGrades;
+    var usersGrades;
     var activitiesStatusArray: any[] = []
     var courseStatusArray: any[] = []
+    var status: boolean[] = [false, false] ;
+    var statusSubject: Subject<string> = new Subject();
 
-    this.moodleApiService.gradereport_user_get_grade_items(url,{wstoken: wstoken,courseid: courseid})
-    .subscribe(
-      data => {
-
-        if(data.errorcode){
-          this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
-          return false;
-        }
-        usersGrades= data.usergrades.sort((a,b) => a.userfullname.localeCompare(b.userfullname));
-
-        if(!this.isEnded){
-          //BUSCAR ATIVIDADES FEITAS POR ALUNOS
-          let activitiesStatusRequestArray: any[] =[]
-          for(let i in usersGrades){
-            let userid = usersGrades[i].userid
-            let request = this.moodleApiService.core_completion_get_activities_completion_status(url,{wstoken: wstoken,courseid: courseid, userid: userid});
-            activitiesStatusArray.push(request);
-          }
-          forkJoin(activitiesStatusArray).subscribe(
-            result => {
-              activitiesStatusArray = result;
-              statusSubject.next('usersActivitiesCompletion');
-            }
-          )
-        }
-        else{
-          //VERIFICAR SE USUÁRIO CONCLUIU O CURSO
-          let courseStatusRequestArray: any[] =[]
-          for(let i in usersGrades){
-            let userid = usersGrades[i].userid
-            let request = this.moodleApiService.core_completion_get_course_completion_status(url,{wstoken: wstoken,courseid: courseid, userid: userid})
-            courseStatusArray.push(request)
-          }
-          forkJoin(courseStatusArray).subscribe(
-            result => {
-              courseStatusArray = result;
-              statusSubject.next('usersCourseCompletion');
-
-            }
-          )
-        }
-      }
-    )
     statusSubject.subscribe(
       data => {
         switch(data){
           case 'enrolledUsers':
             status[0] = true;
+            console.log(status)
           break
           case 'usersActivitiesCompletion':
             status[1] = true;
+            console.log(status)
           break
           case 'usersCourseCompletion':
             status[1] = true;
+            console.log(status)
           break
+          default: console.log('default: ' + data)
         }
         if(status.every(st => st === true)){
           this.dataSource = new MatTableDataSource(this.prepareDataSource(this.enrolledStudents, usersGrades, activitiesStatusArray, courseStatusArray));
@@ -220,6 +182,76 @@ export class ReportComponent implements OnInit {
         else this.isReady = false;
       }
     )
+
+    //BUSCAR USUÁRIOS MATRICULADOS
+    let enrolledUsers;
+    this.moodleApiService.core_enrol_get_enrolled_users(url,{wstoken: wstoken,courseid: courseid})
+    .subscribe(
+      data => {
+        if(data.errorcode){
+          this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
+          return false;
+        }
+        if(data.length > 0){
+
+          this.enrolledUsers = data;
+          this.enrolledTeachers = data.filter(element =>  element.roles[0].roleid == 3);
+          this.enrolledStudents = data.filter(element =>  element.roles[0].roleid == 5);
+          this.enrolledStudents = this.enrolledStudents.sort((a,b) => a.fullname.localeCompare(b.fullname));
+          statusSubject.next('enrolledUsers');
+          console.log(data)
+          //BUSCAR NOTAS DOS ALUNOS
+
+
+
+
+          this.moodleApiService.gradereport_user_get_grade_items(url,{wstoken: wstoken,courseid: courseid})
+          .subscribe(
+            data => {
+              if(data.errorcode){
+                console.log(data)
+                return false;
+              }
+              usersGrades= data.usergrades.sort((a,b) => a.userfullname.localeCompare(b.userfullname));
+
+              if(!this.isEnded){
+                //BUSCAR ATIVIDADES FEITAS POR ALUNOS
+                let activitiesStatusRequestArray: any[] =[]
+                for(let i in usersGrades){
+                  let userid = usersGrades[i].userid
+                  let request = this.moodleApiService.core_completion_get_activities_completion_status(url,{wstoken: wstoken,courseid: courseid, userid: userid});
+                  activitiesStatusArray.push(request);
+                }
+                forkJoin(activitiesStatusArray).subscribe(
+                  result => {
+                    activitiesStatusArray = result;
+                    statusSubject.next('usersActivitiesCompletion');
+                  }
+                )
+              }
+              else{
+                //VERIFICAR SE USUÁRIO CONCLUIU O CURSO
+                let courseStatusRequestArray: any[] =[]
+                for(let i in usersGrades){
+                  let userid = usersGrades[i].userid
+                  let request = this.moodleApiService.core_completion_get_course_completion_status(url,{wstoken: wstoken,courseid: courseid, userid: userid})
+                  courseStatusArray.push(request)
+                }
+                forkJoin(courseStatusArray).subscribe(
+                  result => {
+                    courseStatusArray = result;
+                    statusSubject.next('usersCourseCompletion');
+
+                  }
+                )
+              }
+            }
+          )
+
+        }
+        else this.isReady = true;
+
+    })
   }
   countdownTimer(course){
     // Get todays date and time
@@ -475,10 +507,10 @@ export class ReportComponent implements OnInit {
             //status
             let risk: string = '';
             let courseTime = this.courseTime(this.course);
-            if( progress >= courseTime.progress ) risk = '0 - baixo'
+            if( progress >= courseTime.progress ) risk = '1 - baixo'
             else{
-              if(lastaccess <= 48 ) risk = '1 - médio';
-              else risk = '2 - alto'
+              if(lastaccess <= 48 ) risk = '2 - médio';
+              else risk = '3 - alto'
             }
             let elem = {
               id: uid,
@@ -526,13 +558,12 @@ export class ReportComponent implements OnInit {
           dataSource.push(elem);
         }
       }
-      // if(this.isEnded) return dataSource;
-      // else {
-      //   dataSource.sort((a,b) => a.risk.localeCompare(b.risk));
-      //   return dataSource.reverse();
-      // }
-      dataSource.sort((a,b) => a.risk.localeCompare(b.risk));
-      return dataSource.reverse();
+      if(this.isEnded) return dataSource;
+      else {
+        dataSource.sort((a,b) => a.risk.localeCompare(b.risk));
+        return dataSource.reverse();
+      }
+
   }
   changeTitle(title){
     const params ={
@@ -660,9 +691,9 @@ export class ReportComponent implements OnInit {
   }
   getRowColor(condition){
 
-    if(condition == '0 - baixo') return 'rgba(54, 162, 235, 0.1)';
-    else if(condition == '1 - médio') return 'rgba(255, 206, 86, 0.1)';
-    else if(condition == '2 - alto') return 'rgba(255, 0, 0, 0.1)';
+    if(condition == '1 - baixo') return 'rgba(54, 162, 235, 0.1)';
+    else if(condition == '2 - médio') return 'rgba(255, 206, 86, 0.1)';
+    else if(condition == '3 - alto') return 'rgba(255, 0, 0, 0.1)';
     else if(condition == 'Aprovado') return 'rgba(54, 162, 235, 0.1)';
     else if(condition == 'Reprovado') return 'rgba(255, 0, 0, 0.1)';
     else if(condition == 'Sem Critério') return 'rgba(255, 206, 86, 0.1)';

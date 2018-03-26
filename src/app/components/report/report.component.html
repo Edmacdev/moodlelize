@@ -21,6 +21,7 @@
 
 <div class="container" *ngIf="isReady">
   <div class="row">
+    <flash-messages></flash-messages>
     <div class="col-md-12 title" >
       <form action="">
         <h2><input  class="editable input-title"value="{{course.fullname}}"></h2>
@@ -57,8 +58,7 @@
     </div>
   </div>
   <div class="row wrapper" >
-    <!-- <div class="tabs"*ngIf="!isEnded"> -->
-    <div class="tabs"*ngIf="true">
+    <div class="tabs"*ngIf="!isEnded">
       <mat-tab-group (selectedTabChange)="chartRender($event.index);">
         <mat-tab label="Quadro Geral" id="tb-users">
           <div class="container">
@@ -149,9 +149,7 @@
         </mat-tab>
       </mat-tab-group>
     </div>
-    <!-- <div class="tabs" *ngIf="isEnded"> -->
-    <div class="tabs" *ngIf="false">
-
+    <div class="tabs" *ngIf="isEnded">
       <mat-tab-group (selectedTabChange)="chartRender($event.index);">
         <mat-tab label="Quadro Geral" id="tb-users">
           <div class="container">
