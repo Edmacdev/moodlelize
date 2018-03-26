@@ -72,9 +72,10 @@ ul.countdown li span {
 }
 
 ul.countdown li p {
-  color: #a7abb1;
+  color: #333;
   font-size: 14px;
   text-transform: uppercase;
+  margin-top: 10px;
 }
 
 .days {
@@ -86,11 +87,7 @@ ul.countdown li p {
 .last { border-right: 1px solid #C0392B; }
 
 /* Structure */
-.example-container {
-  display: flex;
-  flex-direction: column;
-  min-width: 300px;
-}
+
 
 .example-header {
   min-height: 64px;
@@ -134,4 +131,7 @@ ul.countdown li p {
 }
 .name input{
   display: inline-block;
+}
+.course-info{
+  text-align: center;
 }

@@ -29,6 +29,12 @@
   </div>
   <div class="row">
     <div *ngIf="course"class="countdown-wrapper col-md-6 col-md-offset-3">
+      <div class="course-info">
+        <p>Alunos matriculados: {{enrolledStudents.length}}</p>
+        <p>Data de início: {{formatDate(course.startdate).getDate()}}-{{formatDate(course.startdate).getMonth()}}-{{formatDate(course.startdate).getFullYear()}}</p>
+        <p>Data de Término: {{formatDate(course.enddate).getDate()}}-{{formatDate(course.enddate).getMonth()}}-{{formatDate(course.enddate).getFullYear()}}</p>
+        <p *ngFor="let teacher of enrolledTeachers">Proferssor: {{teacher.fullname}}</p>
+      </div>
       <ul class="countdown">
         <li>
           <span class="days">00</span>
@@ -49,14 +55,10 @@
       </ul>
       <div class="course-end col-md-6 col-md-offset-3"></div>
     </div>
-    <div class="course-info">
-      <p>Alunos matriculados: {{enrolledUsers.length}}</p>
-      <p>Data de início: {{formatDate(course.startdate).getDate()}}-{{formatDate(course.startdate).getMonth()}}-{{formatDate(course.startdate).getFullYear()}}</p>
-      <p>Data de Término: {{formatDate(course.enddate).getDate()}}-{{formatDate(course.enddate).getMonth()}}-{{formatDate(course.enddate).getFullYear()}}</p>
-    </div>
   </div>
   <div class="row wrapper" >
-    <div class="tabs"*ngIf="!isEnded">
+    <!-- <div class="tabs"*ngIf="!isEnded"> -->
+    <div class="tabs"*ngIf="true">
       <mat-tab-group (selectedTabChange)="chartRender($event.index);">
         <mat-tab label="Quadro Geral" id="tb-users">
           <div class="container">
@@ -99,7 +101,7 @@
                      </mat-cell>
                   </ng-container>
                   <ng-container matColumnDef="lastaccess">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header> Último Acesso</mat-header-cell>
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> Ausência</mat-header-cell>
                     <mat-cell *matCellDef="let element"> {{hoursToDays(element.lastaccess)}}</mat-cell>
                   </ng-container>
                   <ng-container matColumnDef="progress">
@@ -147,7 +149,8 @@
         </mat-tab>
       </mat-tab-group>
     </div>
-    <div class="tabs" *ngIf="isEnded">
+    <!-- <div class="tabs" *ngIf="isEnded"> -->
+    <div class="tabs" *ngIf="false">
 
       <mat-tab-group (selectedTabChange)="chartRender($event.index);">
         <mat-tab label="Quadro Geral" id="tb-users">

@@ -20,7 +20,8 @@ declare var Chart: any
 })
 export class ReportComponent implements OnInit {
   user: any;
-  enrolledUsers: any[];
+  enrolledTeachers: any[];
+  enrolledStudents: any[];
   usersGrades: any[];
   moodles: any[];
   courses: any[];
@@ -38,7 +39,6 @@ export class ReportComponent implements OnInit {
   isLoading: boolean = false;
   isEnded: boolean = false;
   isCourseSelected: boolean = false;
-  statusObs: Subject<any>;
   usersCourseStatus: any[] = [];
 //DATA TABLES
   displayColumns = ['risk', 'name', 'email','phone','lastaccess', 'progress', 'grade'];
@@ -99,96 +99,7 @@ export class ReportComponent implements OnInit {
     clearInterval(this.timer)
     // open countdown timer
     this.countdownTimer(this.course)
-    // //get info about enrolled users
-    // this.getEnrolledUsers(this.course.id).subscribe(
-    //   data => {
-    //     if(data.errorcode){
-    //       this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
-    //       return false;
-    //     }
-    //     let filter = data.filter(element =>  element.roles[0].roleid == 5);
-    //     this.enrolledUsers = filter.sort((a,b) => a.fullname.localeCompare(b.fullname));
-    //     this.statusObs.next('enrolledUsers');
-    //   }
-    // );
-    // this.getUsersGrades(this.course.id).subscribe(
-    //   data => {
-    //     if(data.errorcode){
-    //       this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
-    //       return false;
-    //     }
-    //     this.usersGrades = data.usergrades.sort((a,b) => a.userfullname.localeCompare(b.userfullname));
-    //     var activitiesStatusArray: any[] = [];
-    //     for(let i in this.usersGrades){
-    //       observableArray.push(this.getUserActivitiesStatus(this.course.id, this.usersGrades[i].userid))
-    //     }
-    //     forkJoin(activitiesStatusArray).subscribe(
-    //       result => {
-    //         this.usersActivitiesStatus = result;
-    //         this.statusObs.next('usersGrades');
-    //       }
-    //     )
-    //     for(let i in this.usersGrades){
-    //       observableArray.push(this.getUserActivitiesStatus(this.course.id, this.usersGrades[i].userid))
-    //     }
-    //   }
-    // )
-    // this.statusObs.subscribe(
-    //   data => {
-    //     switch(data){
-    //       case 'enrolledUsers':
-    //         this.status[0] = true;
-    //       break;
-    //       case 'usersGrades':
-    //         this.status[1] = true;
-    //       break;
-    //     }
-    //     if( this.status.every(status => status === true) ){
-    //
-    //       this.dataSource = new MatTableDataSource(this.prepareDataSource(this.enrolledUsers, this.usersGrades, this.usersActivitiesStatus));
-    //       this.isReady = true;
-    //       this.isLoading = false;
-    //
-    //       setTimeout(
-    //         () => {
-    //           this.dataSource.paginator = this.paginator;
-    //           this.dataSource.sort = this.sort;
-    //
-    //           $(".input-title").focusout(
-    //             (event) =>{
-    //
-    //               this.changeTitleHandler()
-    //             }
-    //           )
-    //           $(".input-title").keyup(
-    //             (event) =>{
-    //               if(event.which == 13){
-    //                 this.changeTitleHandler()
-    //               }
-    //             }
-    //           )
-    //
-    //           $(".user-info").focusout(
-    //             (event) => {
-    //
-    //               this.changeUserInfoHandler(this.selectedUserInfo, event)
-    //             }
-    //           )
-    //           $(".user-info").keyup(
-    //             (event) =>{
-    //               if(event.which == 13){
-    //                 this.changeUserInfoHandler(this.selectedUserInfo, event)
-    //               }
-    //             }
-    //           )
-    //       },400
-    //     )
-    //   }
-    //     else {
-    //       this.isReady = false;
-    //     }
-    //   }
-    // );
+
     var wstoken: string = this.form_moodle.token;
     var url: string = this.form_moodle.url;
     var courseid: string = this.course.id
@@ -206,8 +117,9 @@ export class ReportComponent implements OnInit {
           this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
           return false;
         }
-        this.enrolledUsers = data.filter(element =>  element.roles[0].roleid == 5);
-        this.enrolledUsers = this.enrolledUsers.sort((a,b) => a.fullname.localeCompare(b.fullname));
+        this.enrolledTeachers = data.filter(element =>  element.roles[0].roleid == 3);
+        this.enrolledStudents = data.filter(element =>  element.roles[0].roleid == 5);
+        this.enrolledStudents = this.enrolledStudents.sort((a,b) => a.fullname.localeCompare(b.fullname));
         statusSubject.next('enrolledUsers');
       }
     )
@@ -225,7 +137,7 @@ export class ReportComponent implements OnInit {
           return false;
         }
         usersGrades= data.usergrades.sort((a,b) => a.userfullname.localeCompare(b.userfullname));
-        console.log(this.isEnded)
+
         if(!this.isEnded){
           //BUSCAR ATIVIDADES FEITAS POR ALUNOS
           let activitiesStatusRequestArray: any[] =[]
@@ -273,7 +185,7 @@ export class ReportComponent implements OnInit {
           break
         }
         if(status.every(st => st === true)){
-          this.dataSource = new MatTableDataSource(this.prepareDataSource(this.enrolledUsers, usersGrades, activitiesStatusArray, courseStatusArray));
+          this.dataSource = new MatTableDataSource(this.prepareDataSource(this.enrolledStudents, usersGrades, activitiesStatusArray, courseStatusArray));
           this.isReady = true;
           this.isLoading = false;
 
@@ -310,16 +222,16 @@ export class ReportComponent implements OnInit {
     )
   }
   countdownTimer(course){
+    // Get todays date and time
+
     let now = new Date().getTime();
-    if((course.enddate*1000 - now)<0) this.isEnded = true;
-        // Update the count down every 1 second
+    var countDownDate = (course.enddate *1000)+86400000;
+    if((countDownDate - now)<0) this.isEnded = true;
+    // Update the count down every 1 second
+
     this.timer = setInterval(() =>{
-
-      // Get todays date and time
-      var now = new Date().getTime();
-
       // Find the distance between now an the count down date
-      var countDownDate = course.enddate *1000;
+
       var distance = countDownDate - now;
 
       if(distance > 0){
@@ -367,36 +279,6 @@ export class ReportComponent implements OnInit {
     return courseTime
 
   }
-  getEnrolledUsers(token, courseid){
-    const params ={
-      wstoken: token,
-      courseid: courseid
-    }
-    return this.moodleApiService.core_enrol_get_enrolled_users(this.form_moodle.url, params)
-  }
-  getUsersGrades(courseid){
-    const params ={
-      wstoken: this.form_moodle.token,
-      courseid: courseid
-    }
-    return this.moodleApiService.gradereport_user_get_grade_items(this.form_moodle.url, params)
-  }
-  getUserActivitiesStatus(courseid, userid){
-    const params ={
-      wstoken: this.form_moodle.token,
-      courseid: courseid,
-      userid: userid
-    }
-    return this.moodleApiService.core_completion_get_activities_completion_status(this.form_moodle.url, params)
-  }
-  getUsersCourseStatus(courseid, userid){
-    const params ={
-      wstoken: this.form_moodle.token,
-      courseid: courseid,
-      userid: userid
-    }
-    return this.moodleApiService.core_completion_get_course_completion_status(this.form_moodle.url, params)
-  }
   getDaysSinceLastAccess(lastaccess){
     if(lastaccess == 0){
       return null
@@ -420,15 +302,6 @@ export class ReportComponent implements OnInit {
     }
     else {
       return 'menos de 1 dia'
-      // if(hours == 1){
-      //   return hours + ' hora';
-      // }
-      // else if (hours > 1){
-      //   return hours + ' horas';
-      // }
-      // else if (hours < 1){
-      //   return 'menos de 1 hora'
-      // }
     }
   }
   chartRender(index){
@@ -571,21 +444,20 @@ export class ReportComponent implements OnInit {
     filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
     this.dataSource.filter = filterValue;
   }
-  prepareDataSource(enrolledUsers, usersGrades, ActivitiesCompletion, courseCompletion){
-    console.log(ActivitiesCompletion)
-    console.log(courseCompletion)
+  prepareDataSource(enrolledStudents, usersGrades, ActivitiesCompletion, courseCompletion){
+
       let dataSource:any[] = [];
 
-      for (let i in enrolledUsers){
-        let uid = enrolledUsers[i].id;
-        let name = enrolledUsers[i].fullname;
-        let firstname = enrolledUsers[i].firstname;
-        let lastname = enrolledUsers[i].lastname;
-        let email = enrolledUsers[i].email;
-        let phone = enrolledUsers[i].phone1;
+      for (let i in enrolledStudents){
+        let uid = enrolledStudents[i].id;
+        let name = enrolledStudents[i].fullname;
+        let firstname = enrolledStudents[i].firstname;
+        let lastname = enrolledStudents[i].lastname;
+        let email = enrolledStudents[i].email;
+        let phone = enrolledStudents[i].phone1;
 
         //last access
-        let lastaccess = this.getDaysSinceLastAccess(enrolledUsers[i].lastaccess);
+        let lastaccess = this.getDaysSinceLastAccess(enrolledStudents[i].lastaccess);
 
         //grade
         let gradeitems =usersGrades.find((element)=>{return element.userid == uid}).gradeitems
@@ -603,10 +475,10 @@ export class ReportComponent implements OnInit {
             //status
             let risk: string = '';
             let courseTime = this.courseTime(this.course);
-            if( progress >= courseTime.progress ) risk = 'baixo'
+            if( progress >= courseTime.progress ) risk = '0 - baixo'
             else{
-              if(lastaccess <= 48 ) risk = 'médio';
-              else risk = 'alto'
+              if(lastaccess <= 48 ) risk = '1 - médio';
+              else risk = '2 - alto'
             }
             let elem = {
               id: uid,
@@ -654,7 +526,13 @@ export class ReportComponent implements OnInit {
           dataSource.push(elem);
         }
       }
-      return dataSource
+      // if(this.isEnded) return dataSource;
+      // else {
+      //   dataSource.sort((a,b) => a.risk.localeCompare(b.risk));
+      //   return dataSource.reverse();
+      // }
+      dataSource.sort((a,b) => a.risk.localeCompare(b.risk));
+      return dataSource.reverse();
   }
   changeTitle(title){
     const params ={
@@ -782,9 +660,9 @@ export class ReportComponent implements OnInit {
   }
   getRowColor(condition){
 
-    if(condition == 'baixo') return 'rgba(54, 162, 235, 0.1)';
-    else if(condition == 'médio') return 'rgba(255, 206, 86, 0.1)';
-    else if(condition == 'alto') return 'rgba(255, 0, 0, 0.1)';
+    if(condition == '0 - baixo') return 'rgba(54, 162, 235, 0.1)';
+    else if(condition == '1 - médio') return 'rgba(255, 206, 86, 0.1)';
+    else if(condition == '2 - alto') return 'rgba(255, 0, 0, 0.1)';
     else if(condition == 'Aprovado') return 'rgba(54, 162, 235, 0.1)';
     else if(condition == 'Reprovado') return 'rgba(255, 0, 0, 0.1)';
     else if(condition == 'Sem Critério') return 'rgba(255, 206, 86, 0.1)';
@@ -794,119 +672,7 @@ export class ReportComponent implements OnInit {
     let dateFormat = new Date(date*1000)
     return dateFormat
   }
-  // getUsersInfo(){
-  //   var wstoken: string = this.form_moodle.token;
-  //   var url: string = this.form_moodle.url;
-  //   var courseid: string = this.course.id
-  //   var status: boolean[] = [false, false, false] ;
-  //   var statusSubject: Subject<string> = new Subject();
-  //
-  //
-  //   //BUSCAR USUÁRIOS MATRICULADOS
-  //   let enrolledUsers;
-  //   this.moodleApiService.core_enrol_get_enrolled_users(url,{wstoken: token,courseid: courseid})
-  //   .subscribe(
-  //     data => {
-  //       if(data.errorcode){
-  //         this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
-  //         return false;
-  //       }
-  //       this.enrolledUsers = data.filter(element =>  element.roles[0].roleid == 5);
-  //       this.statusObs.next('enrolledUsers');
-  //     }
-  //   )
-  //   //BUSCAR NOTAS DOS ALUNOS
-  //   let usersGrades
-  //   var activitiesStatusArray: object[] = []
-  //   var courseStatusArray: object[] = []
-  //
-  //   this.moodleApiService.gradereport_user_get_grade_items(url,{wstoken: token,courseid: courseid})
-  //   .subscribe(
-  //     data => {
-  //       if(data.errorcode){
-  //         this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
-  //         return false;
-  //       }
-  //       usersGrades = data.usergrades
-  //       //BUSCAR ATIVIDADES FEITAS POR ALUNOS
-  //       let activitiesStatusRequestArray: object[] =[]
-  //       for(let i in usersGrades){
-  //         let userid = usersGrades[i].userid
-  //         let request = this.moodleApiService.core_completion_get_activities_completion_status(url,{wstoken: token,courseid: courseid, userid: userid});
-  //         activitiesStatusArray.push(request);
-  //       }
-  //       forkJoin(activitiesRequestStatusArray).subscribe(
-  //         result => {
-  //           activitiesStatusArray = result;
-  //           this.statusObs.next('usersActivitiesCompletion');
-  //         }
-  //       )
-  //       //VERIFICAR SE USUÁRIO CONCLUIU O CURSO
-  //       let courseStatusRequestArray: object[] =[]
-  //       for(let i in usersGrades){
-  //         let userid = usersGrades[i].userid
-  //         let request = this.moodleApiService.core_completion_get_course_completion_status(url,{wstoken: token,courseid: courseid, userid: userid})
-  //         courseStatusArray.psuh(request)
-  //       }
-  //       forkJoin(courseStatusRequestArray).subscribe(
-  //         result => {
-  //           courseStatusArray = result;
-  //           this.statusObs.next('usersCourseCompletion');
-  //         }
-  //       )
-  //     }
-  //   )
-  //   statusSubject.subscribe(
-  //     data => {
-  //       switch(data){
-  //         case 'enrolledUsers':
-  //           status[0] = true;
-  //         break
-  //         case 'usersActivitiesCompletion':
-  //           status[1] = true;
-  //         break
-  //         case 'usersCourseCompletion':
-  //           status[2] = true;
-  //         break
-  //       }
-  //       if(status.every(st => st === true)){
-  //         this.dataSource = new MatTableDataSource(this.prepareDataSource(this.enrolledUsers, usersGrades, usersActivitiesStatus));
-  //         this.isReady = true;
-  //         this.isLoading = false;
-  //
-  //         setTimeout(
-  //           () => {
-  //             this.dataSource.paginator = this.paginator;
-  //             this.dataSource.sort = this.sort;
-  //
-  //             $(".input-title").focusout(event => this.changeTitleHandler());
-  //             $(".input-title").keyup(
-  //               (event) =>{
-  //                 if(event.which == 13){
-  //                   this.changeTitleHandler()
-  //                 }
-  //               }
-  //             )
-  //             $(".user-info").focusout(
-  //               (event) => {
-  //                 this.changeUserInfoHandler(this.selectedUserInfo, event)
-  //               }
-  //             )
-  //             $(".user-info").keyup(
-  //               (event) =>{
-  //                 if(event.which == 13){
-  //                   this.changeUserInfoHandler(this.selectedUserInfo, event)
-  //                 }
-  //               }
-  //             )
-  //           },400
-  //         )
-  //       }
-  //       else this.isReady = false;
-  //     }
-  //   )
-  // }
-  }
+}
 export interface Element {
   name: string;
   email: string;
