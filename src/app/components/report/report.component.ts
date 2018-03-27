@@ -75,7 +75,6 @@ export class ReportComponent implements OnInit {
         }
       }
     )
-
   }
   getCourses(){
     const params = {
@@ -257,7 +256,7 @@ export class ReportComponent implements OnInit {
     // Get todays date and time
 
     let now = new Date().getTime();
-    var countDownDate = (course.enddate *1000)+86400000;
+    var countDownDate = (course.enddate *1000)+86400000*2;
     if((countDownDate - now)<0) this.isEnded = true;
     // Update the count down every 1 second
 
@@ -336,15 +335,14 @@ export class ReportComponent implements OnInit {
       return 'menos de 1 dia'
     }
   }
-  chartRender(index){
+  chartRender(){
     var data1:number = 0;
     var data2:number = 0;
     var data3:number = 0;
     var data4:number = 0;
     var data5:number = 0;
     var data6:number = 0;
-    switch (index){
-      case 1:
+
         var days = percentage => {
           let courseDuration = Math.floor(this.courseTime(this.course).duration/(1000 * 60 * 60 * 24));
           return Math.floor((percentage*courseDuration)/100);
@@ -392,9 +390,7 @@ export class ReportComponent implements OnInit {
         options: {
         }
         })
-      break;
 
-      case 2:
         data1 = this.dataSource.data.filter(elem => elem.progress == 0).length;
         data2 = this.dataSource.data.filter(elem => elem.progress >= 1 && elem.progress <= 20).length;
         data3 = this.dataSource.data.filter(elem => elem.progress >= 21 && elem.progress <= 40).length;
@@ -430,9 +426,7 @@ export class ReportComponent implements OnInit {
         },
         options: {}
         })
-      break;
 
-      case 3:
         data1 = this.dataSource.data.filter(elem => elem.grade == -1).length;
         data2 = this.dataSource.data.filter(elem => elem.grade >= 1 && elem.grade <= 20).length;
         data3 = this.dataSource.data.filter(elem => elem.grade >= 21 && elem.grade <= 40).length;
@@ -468,8 +462,6 @@ export class ReportComponent implements OnInit {
         },
         options: {}
         })
-      break;
-    }
   }
   applyFilter(filterValue: string) {
     filterValue = filterValue.trim(); // Remove whitespace
@@ -702,6 +694,10 @@ export class ReportComponent implements OnInit {
   formatDate(date){
     let dateFormat = new Date(date*1000)
     return dateFormat
+  }
+  print(){
+    // $('#tb-users').printThis();
+    window.print();
   }
 }
 export interface Element {

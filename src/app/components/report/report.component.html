@@ -57,9 +57,10 @@
       <div class="course-end col-md-6 col-md-offset-3"></div>
     </div>
   </div>
+  <div class="icon-print" (click)="print()"><i class="material-icons">print</i></div>
   <div class="row wrapper" >
     <div class="tabs"*ngIf="!isEnded">
-      <mat-tab-group (selectedTabChange)="chartRender($event.index);">
+      <mat-tab-group (selectedTabChange)="chartRender();">
         <mat-tab label="Quadro Geral" id="tb-users">
           <div class="container">
             <div class="row">
@@ -113,8 +114,8 @@
                     <mat-cell *matCellDef="let element"> {{element.grade}} </mat-cell>
                   </ng-container>
                   <mat-header-row *matHeaderRowDef="displayColumns"></mat-header-row>
-                  <mat-row *matRowDef="let row; columns: displayColumns"  [style.background-color]="getRowColor(row.risk)"></mat-row>
-                </mat-table>
+                  <mat-row *matRowDef="let row; columns: displayColumns"  [style.background-color]="getRowColor(row.risk)"><i class="material-icons">remove_circle</i></mat-row>
+            </mat-table>
                 <mat-paginator #paginator
                  [pageSize]="25"
                  [pageSizeOptions]="[5, 10, 25, 50, 100]"
@@ -124,33 +125,28 @@
             </div>
           </div>
         </mat-tab>
-        <mat-tab label="Acesso">
+        <mat-tab label="Gráficos">
           <div class="container">
             <div class="row">
-              <h2>DIAS DESDE O ÚLTIMO ACESSO</h2>
-              <div class="chart col-md-12"><canvas id="cht-access"></canvas></div>
-            </div>
-          </div>
-        </mat-tab>
-        <mat-tab label="Progresso">
-          <div class="container">
-            <div class="row">
-              <h2>PROGRESSO NAS ATIVIDADES DO CURSO</h2>
-              <div class="chart col-md-12"><canvas id="cht-progress"></canvas></div>
-            </div>
-          </div>
-        </mat-tab>
-        <mat-tab label="Notas">
-          <div class="container">
-            <div class="row">
-              <div class="chart col-md-12"><canvas id="cht-grades"></canvas></div>
+              <div class="cht-access-wrapper col-md-6">
+                <h3>DIAS DESDE O ÚLTIMO ACESSO</h3>
+                <div class="chart"><canvas id="cht-access"></canvas></div>
+              </div>
+              <div class="cht-progress-wrapper col-md-6">
+                <h3>PROGRESSO NAS ATIVIDADES</h3>
+                <div class="chart"><canvas id="cht-progress"></canvas></div>
+              </div>
+              <div class="cht-grades-wrapper col-md-6">
+                <h3>NOTAS</h3>
+                <div class="chart"><canvas id="cht-grades"></canvas></div>
+              </div>
             </div>
           </div>
         </mat-tab>
       </mat-tab-group>
     </div>
     <div class="tabs" *ngIf="isEnded">
-      <mat-tab-group (selectedTabChange)="chartRender($event.index);">
+      <mat-tab-group>
         <mat-tab label="Quadro Geral" id="tb-users">
           <div class="container">
             <div class="row">
@@ -208,29 +204,6 @@
                  [showFirstLastButtons]="true">
                 </mat-paginator>
               </div>
-            </div>
-          </div>
-        </mat-tab>
-        <mat-tab label="Acesso">
-          <div class="container">
-            <div class="row">
-              <h2>DIAS DESDE O ÚLTIMO ACESSO</h2>
-              <div class="chart col-md-12"><canvas id="cht-access"></canvas></div>
-            </div>
-          </div>
-        </mat-tab>
-        <mat-tab label="Progresso">
-          <div class="container">
-            <div class="row">
-              <h2>PROGRESSO NAS ATIVIDADES DO CURSO</h2>
-              <div class="chart col-md-12"><canvas id="cht-progress"></canvas></div>
-            </div>
-          </div>
-        </mat-tab>
-        <mat-tab label="Notas">
-          <div class="container">
-            <div class="row">
-              <div class="chart col-md-12"><canvas id="cht-grades"></canvas></div>
             </div>
           </div>
         </mat-tab>

@@ -24,7 +24,8 @@
         "../node_modules/font-awesome/css/font-awesome.css"
       ],
       "scripts": [
-        "../node_modules/chart.js/dist/Chart.min.js"
+        "../node_modules/chart.js/dist/Chart.min.js",
+        "../node_modules/print-this/printThis.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {
