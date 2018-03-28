@@ -72,14 +72,14 @@
                  </div>
                 <mat-table #table [dataSource]="dataSource" matSort>
                   <ng-container matColumnDef="risk">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header> Risco </mat-header-cell>
-                    <mat-cell *matCellDef="let element" > {{element.risk}} </mat-cell>
+                    <mat-header-cell *matHeaderCellDef mat-sort-header class="col-risk"> Risco </mat-header-cell>
+                    <mat-cell *matCellDef="let element"class="col-risk" > {{element.risk}} </mat-cell>
                   </ng-container>
                   <ng-container matColumnDef="name" >
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>  Nome </mat-header-cell>
-                    <mat-cell *matCellDef="let element" >
-                      <div class="name" style="display:block">
-                        <div class="firstname">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header class="col-name">  Nome </mat-header-cell>
+                    <mat-cell *matCellDef="let element" class="col-name">
+                      <div class="name" style="display:flex">
+                        <div class="firstname ">
                           <input id="firstname{{element.id}}"(click)="setCurrentUserInfo(element.id, 'firstname')"type="text" class="editable user-info" value="{{element.firstname}}">
                         </div>
                         <div class="lastname">
@@ -90,29 +90,31 @@
                     </mat-cell>
                   </ng-container>
                   <ng-container matColumnDef="email" >
-                    <mat-header-cell *matHeaderCellDef mat-sort-header> Email </mat-header-cell>
-                    <mat-cell *matCellDef="let element">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header class="col-email"> Email </mat-header-cell>
+                    <mat-cell *matCellDef="let element" class="col-email">
                       <input id="email{{element.id}}"(click)="setCurrentUserInfo(element.id, 'email')"type="text" class="editable user-info" value="{{element.email}}">
                     </mat-cell>
                   </ng-container>
                   <ng-container matColumnDef="phone" class="user-info">
-                    <mat-header-cell *matHeaderCellDef > Telefone </mat-header-cell>
-                    <mat-cell *matCellDef="let element" >
-                       <input (click)="setCurrentUserInfo(element.id, 'phone1')"type="text" class="editable user-info" value="{{element.phone}}">
+                    <mat-header-cell *matHeaderCellDef class="col-phone"> Telefone </mat-header-cell>
+                    <mat-cell *matCellDef="let element" class="col-phone">
+                      {{element.phone}}
+                       <!-- <input (click)="setCurrentUserInfo(element.id, 'phone1')"type="text" class="editable user-info" value="{{element.phone}}"> -->
                      </mat-cell>
                   </ng-container>
                   <ng-container matColumnDef="lastaccess">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header> Ausência</mat-header-cell>
-                    <mat-cell *matCellDef="let element"> {{hoursToDays(element.lastaccess)}}</mat-cell>
+                    <mat-header-cell *matHeaderCellDef mat-sort-header class="col-lastaccess"> Ausência</mat-header-cell>
+                    <mat-cell *matCellDef="let element"class="col-lastaccess"> {{hoursToDays(element.lastaccess)}}</mat-cell>
                   </ng-container>
                   <ng-container matColumnDef="progress">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header> Progresso </mat-header-cell>
-                    <mat-cell *matCellDef="let element"> {{element.progress}}% </mat-cell>
+                    <mat-header-cell *matHeaderCellDef mat-sort-header class="col-progress"> Progresso </mat-header-cell>
+                    <mat-cell *matCellDef="let element" class="col-progress"> {{element.progress}}% </mat-cell>
                   </ng-container>
-                  <ng-container matColumnDef="grade">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>Nota </mat-header-cell>
-                    <mat-cell *matCellDef="let element"> {{element.grade}} </mat-cell>
+                  <ng-container matColumnDef="grade" >
+                    <mat-header-cell *matHeaderCellDef mat-sort-header class="col-grade">Nota </mat-header-cell>
+                    <mat-cell *matCellDef="let element" class="col-grade"> {{element.grade}} </mat-cell>
                   </ng-container>
+
                   <mat-header-row *matHeaderRowDef="displayColumns"></mat-header-row>
                   <mat-row *matRowDef="let row; columns: displayColumns"  [style.background-color]="getRowColor(row.risk)"><i class="material-icons">remove_circle</i></mat-row>
             </mat-table>
@@ -184,7 +186,8 @@
                   <ng-container matColumnDef="phone" class="user-info">
                     <mat-header-cell *matHeaderCellDef > Telefone </mat-header-cell>
                     <mat-cell *matCellDef="let element" >
-                       <input (click)="setCurrentUserInfo(element.id, 'phone1')"type="text" class="editable user-info" value="{{element.phone}}">
+                      {{element.phone}}
+                       <!-- <input (click)="setCurrentUserInfo(element.id, 'phone1')"type="text" class="editable user-info" value="{{element.phone}}"> -->
                      </mat-cell>
                   </ng-container>
                   <ng-container matColumnDef="result">

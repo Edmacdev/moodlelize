@@ -117,6 +117,9 @@ export class ReportComponent implements OnInit {
     this.isCourseSelected = true;
     clearInterval(this.timer)
     // open countdown timer
+    let now = new Date();
+    let countdown = (this.course.enddate *1000)+86400000*3;
+    if(countdown - now < 0) this.isEnded = true;
     this.countdownTimer(this.course)
 
     var wstoken: string = this.form_moodle.token;
@@ -253,17 +256,16 @@ export class ReportComponent implements OnInit {
     })
   }
   countdownTimer(course){
-    // Get todays date and time
 
-    let now = new Date().getTime();
-    var countDownDate = (course.enddate *1000)+86400000*2;
-    if((countDownDate - now)<0) this.isEnded = true;
     // Update the count down every 1 second
 
     this.timer = setInterval(() =>{
+      // Get todays date and time
+      var now = new Date().getTime();
+      var countDownDate = (course.enddate *1000)+86400000*3;
+      var distance = countDownDate - now;
       // Find the distance between now an the count down date
 
-      var distance = countDownDate - now;
 
       if(distance > 0){
         $(".course-end").html("");
@@ -514,7 +516,8 @@ export class ReportComponent implements OnInit {
               lastaccess: lastaccess,
               progress: progress,
               grade: grade,
-              risk: risk
+              risk: risk,
+              icon:''
             }
             dataSource.push(elem);
         }

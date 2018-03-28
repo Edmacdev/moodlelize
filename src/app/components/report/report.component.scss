@@ -32,13 +32,6 @@ h2{
   right: 0;
 }
 
-.users-sidenav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 200px;
-  background: rgba(255, 0, 0, 0.5);
-}
 .tabs{
   min-height: 500px;
   width: 100%;
@@ -139,4 +132,37 @@ ul.countdown li p {
   float: right;
   font-size: 24px;
   cursor: pointer;
+}
+.col-grade{
+  width: 10%;
+}
+.name input{
+  width: auto;
+}
+// .mat-cell, .mat-header-cell{
+//   flex:0;
+// }
+.col-risk{
+  flex:1;
+}
+.col-name{
+  flex: 1;
+}
+.col-email{
+  flex: 1;
+}
+.col-lastaccess{
+  flex:1;
+}
+.col-progress{
+  flex:1;
+}
+.col-grade{
+  flex:1;
+}
+.firstname{
+  flex:0;
+}
+.lastname{
+  flex:0;
 }
