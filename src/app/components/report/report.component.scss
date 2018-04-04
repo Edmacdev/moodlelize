@@ -107,7 +107,7 @@ ul.countdown li p {
   outline: none;
   -webkit-appearance: none;
   border: 0px;
-  width: 100%;
+
 }
 .input-title{
   text-align: center;
@@ -122,9 +122,6 @@ ul.countdown li p {
   margin: 5px 1px 3px 0px;
   border: 1px solid rgba(81, 203, 238, 1);
 }
-.name input{
-  display: inline-block;
-}
 .course-info{
   text-align: center;
 }
@@ -133,36 +130,46 @@ ul.countdown li p {
   font-size: 24px;
   cursor: pointer;
 }
-.col-grade{
-  width: 10%;
-}
-.name input{
-  width: auto;
-}
-// .mat-cell, .mat-header-cell{
-//   flex:0;
-// }
-.col-risk{
+.mat-cell, .mat-header-cell{
   flex:1;
+}
+.col-risk{
+  flex:0.5 !important;
 }
 .col-name{
-  flex: 1;
+  flex: 1.5 !important;
+}
+.mat-cell input{
+  width: 100%;
 }
 .col-email{
-  flex: 1;
+  flex: 1.5 !important;
 }
 .col-lastaccess{
-  flex:1;
+  flex:0.5 !important;
 }
 .col-progress{
-  flex:1;
+  flex:0.5 !important;
 }
 .col-grade{
-  flex:1;
+  flex:0.5 !important;
 }
-.firstname{
-  flex:0;
+.col-options{
+  flex:0.5 !important;
 }
-.lastname{
-  flex:0;
+// .firstname{
+//   flex:0.5 !important;
+// }
+// .lastname{
+//   flex:0.5 !important;
+// }
+.icon-remove-circle{
+  margin-left: 10px;
+  font-size: 24px;
+}
+.icon-remove-circle:hover{
+  color: red;
+}
+.icon{
+  cursor: pointer;
 }

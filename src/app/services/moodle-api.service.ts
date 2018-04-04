@@ -29,8 +29,7 @@ wsProtocol: string = 'https://';
     '&wsfunction=core_user_get_users' +
     '&moodlewsrestformat=json' +
     '&criteria[0][key]=' + params.criteriakey +
-    '&criteria[0][value]=' + params.criteriavalue +
-    params.extra
+    '&criteria[0][value]=' + params.criteriavalue
     ).map(res => res.json())
   }
   core_user_create_users(host, params){
@@ -112,9 +111,15 @@ wsProtocol: string = 'https://';
     '?wstoken=' + params.wstoken +
     '&wsfunction=enrol_manual_unenrol_users' +
     '&moodlewsrestformat=json' +
-    '&enrolments[0][courseid]=' + params.courseid +
-    '&enrolments[0][userid]=' + params.userid
+    params.enrolments
     ).map(res => res.json())
   }
-
+  enrol_manual_enrol_users(host, params){
+    return this.http.get(this.wsProtocol + host + this.wsURL +
+    '?wstoken=' + params.wstoken +
+    '&wsfunction=enrol_manual_enrol_users' +
+    '&moodlewsrestformat=json' +
+    params.enrolments
+    ).map(res => res.json())
+  }
 }

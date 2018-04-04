@@ -32,8 +32,8 @@
     <div *ngIf="course"class="countdown-wrapper col-md-6 col-md-offset-3">
       <div class="course-info">
         <p>Alunos matriculados: {{enrolledStudents.length}}</p>
-        <p>Data de início: {{formatDate(course.startdate).getDate()}}-{{formatDate(course.startdate).getMonth()}}-{{formatDate(course.startdate).getFullYear()}}</p>
-        <p>Data de Término: {{formatDate(course.enddate).getDate()}}-{{formatDate(course.enddate).getMonth()}}-{{formatDate(course.enddate).getFullYear()}}</p>
+        <p>Data de início: {{formatDate(course.startdate).getDate()}}-{{formatDate(course.startdate).getMonth()+1}}-{{formatDate(course.startdate).getFullYear()}}</p>
+        <p>Data de Término: {{formatDate(course.enddate).getDate()}}-{{formatDate(course.enddate).getMonth()+1}}-{{formatDate(course.enddate).getFullYear()}}</p>
         <p *ngFor="let teacher of enrolledTeachers">Proferssor: {{teacher.fullname}}</p>
       </div>
       <ul class="countdown">
@@ -60,7 +60,7 @@
   <div class="icon-print" (click)="print()"><i class="material-icons">print</i></div>
   <div class="row wrapper" >
     <div class="tabs"*ngIf="!isEnded">
-      <mat-tab-group (selectedTabChange)="chartRender();">
+      <mat-tab-group (selectedTabChange)="tabChange($event)">
         <mat-tab label="Quadro Geral" id="tb-users">
           <div class="container">
             <div class="row">
@@ -78,13 +78,12 @@
                   <ng-container matColumnDef="name" >
                     <mat-header-cell *matHeaderCellDef mat-sort-header class="col-name">  Nome </mat-header-cell>
                     <mat-cell *matCellDef="let element" class="col-name">
-                      <div class="name" style="display:flex">
-                        <div class="firstname ">
+                      <div >
+                        <div class="name">
                           <input id="firstname{{element.id}}"(click)="setCurrentUserInfo(element.id, 'firstname')"type="text" class="editable user-info" value="{{element.firstname}}">
-                        </div>
-                        <div class="lastname">
                           <input id="lastname{{element.id}}"(click)="setCurrentUserInfo(element.id, 'lastname')"type="text" class="editable user-info" value="{{element.lastname}}">
                         </div>
+
                       </div>
 
                     </mat-cell>
@@ -113,6 +112,13 @@
                   <ng-container matColumnDef="grade" >
                     <mat-header-cell *matHeaderCellDef mat-sort-header class="col-grade">Nota </mat-header-cell>
                     <mat-cell *matCellDef="let element" class="col-grade"> {{element.grade}} </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="options" >
+                    <mat-header-cell *matHeaderCellDef class="col-options"><i class="material-icons">more_horiz</i></mat-header-cell>
+                    <mat-cell *matCellDef="let element" class="col-options">
+                      <i class="material-icons icon" (click)="userReport(element)">content_paste</i>
+                      <i class="material-icons icon icon-remove-circle" (click)="unenrolUser(element)">remove_circle</i>
+                    </mat-cell>
                   </ng-container>
 
                   <mat-header-row *matHeaderRowDef="displayColumns"></mat-header-row>
@@ -145,10 +151,36 @@
             </div>
           </div>
         </mat-tab>
+        <mat-tab label="Matrícula">
+          <form [formGroup]="fg_search_users">
+            Procurar usuários em que
+            <mat-form-field class="mat-form" >
+              <mat-select [(ngModel)]="form_opt" name="form_opt" [formControl]="form_ctrl">
+                <mat-option *ngFor="let option of options let i = index" [value]="i"><h3>{{option}}</h3></mat-option>
+              </mat-select>
+            </mat-form-field>
+          igual a:
+            <mat-form-field class="mat-form" >
+              <input formControlName="qry" [(ngModel)]="form_query" matInput type="text" class="addText" placeholder="" value="">
+            </mat-form-field>
+            <div class="btn btn-primary" (click)="getUsers(form_query,form_opt)">Buscar</div>
+          </form>
+          <div class="usersList">
+            <mat-list role="list">
+              <mat-list-item *ngFor="let moodleUser of usersList" role="listitem">
+                <mat-checkbox (change)="checkUser($event, moodleUser)"></mat-checkbox>
+                <img [src]=moodleUser.profileimageurlsmall alt="">
+                <h3>{{moodleUser.fullname}} </h3> <p>{{moodleUser.email}}</p>
+                <mat-divider></mat-divider>
+              </mat-list-item>
+            </mat-list>
+            <div class="btn btn-primary"(click)="enrolUsers()">Matricular</div>
+          </div>
+        </mat-tab>
       </mat-tab-group>
     </div>
     <div class="tabs" *ngIf="isEnded">
-      <mat-tab-group>
+      <mat-tab-group (selectedTabChange)="tabChange($event)">
         <mat-tab label="Quadro Geral" id="tb-users">
           <div class="container">
             <div class="row">
@@ -160,43 +192,46 @@
                    </mat-form-field>
                  </div>
                 <mat-table #table [dataSource]="dataSource" matSort>
-                  <ng-container matColumnDef="risk">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header> Risco </mat-header-cell>
-                    <mat-cell *matCellDef="let element" > {{element.risk}} </mat-cell>
-                  </ng-container>
                   <ng-container matColumnDef="name" >
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>  Nome </mat-header-cell>
-                    <mat-cell *matCellDef="let element" >
-                      <div class="name">
-                        <div >
-                          <input id="firstname{{element.id}}"class="firstname"(click)="setCurrentUserInfo(element.id, 'firstname')"type="text" class="editable user-info" value="{{element.firstname}}">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header class="col-name">  Nome </mat-header-cell>
+                    <mat-cell *matCellDef="let element" class="col-name" >
+                      <div >
+                        <div class="name">
+                          <input id="firstname{{element.id}}"(click)="setCurrentUserInfo(element.id, 'firstname')"type="text" class="editable user-info" value="{{element.firstname}}">
                         </div>
-                        <div>
-                          <input id="lastname{{element.id}}"class="lastname"(click)="setCurrentUserInfo(element.id, 'lastname')"type="text" class="editable user-info" value="{{element.lastname}}">
+                        <div class="name">
+                          <input id="lastname{{element.id}}"(click)="setCurrentUserInfo(element.id, 'lastname')"type="text" class="editable user-info" value="{{element.lastname}}">
                         </div>
                       </div>
                     </mat-cell>
                   </ng-container>
                   <ng-container matColumnDef="email" >
-                    <mat-header-cell *matHeaderCellDef mat-sort-header> Email </mat-header-cell>
-                    <mat-cell *matCellDef="let element">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header class="col-email"> Email </mat-header-cell>
+                    <mat-cell *matCellDef="let element" class="col-email">
                       <input id="email{{element.id}}"(click)="setCurrentUserInfo(element.id, 'email')"type="text" class="editable user-info" value="{{element.email}}">
                     </mat-cell>
                   </ng-container>
-                  <ng-container matColumnDef="phone" class="user-info">
-                    <mat-header-cell *matHeaderCellDef > Telefone </mat-header-cell>
+                  <ng-container matColumnDef="phone" class="col-phone">
+                    <mat-header-cell *matHeaderCellDef class="col-phone"> Telefone </mat-header-cell>
                     <mat-cell *matCellDef="let element" >
                       {{element.phone}}
                        <!-- <input (click)="setCurrentUserInfo(element.id, 'phone1')"type="text" class="editable user-info" value="{{element.phone}}"> -->
                      </mat-cell>
                   </ng-container>
                   <ng-container matColumnDef="result">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header> Resultado </mat-header-cell>
-                    <mat-cell *matCellDef="let element"> {{element.result}} </mat-cell>
+                    <mat-header-cell *matHeaderCellDef mat-sort-header class="col-result"> Resultado </mat-header-cell>
+                    <mat-cell *matCellDef="let element" class="col-result"> {{element.result}} </mat-cell>
                   </ng-container>
                   <ng-container matColumnDef="grade">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>Nota </mat-header-cell>
-                    <mat-cell *matCellDef="let element"> {{element.grade}} </mat-cell>
+                    <mat-header-cell *matHeaderCellDef mat-sort-header class="col-grade">Nota </mat-header-cell>
+                    <mat-cell *matCellDef="let element" class="col-grade"> {{element.grade}} </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="options" >
+                    <mat-header-cell *matHeaderCellDef class="col-options"><i class="material-icons">more_horiz</i></mat-header-cell>
+                    <mat-cell *matCellDef="let element" class="col-options">
+                      <i class="material-icons icon" (click)="userReport(element)">content_paste</i>
+                      <i class="material-icons icon icon-remove-circle" (click)="unenrolUser(element)">remove_circle</i>
+                    </mat-cell>
                   </ng-container>
                   <mat-header-row *matHeaderRowDef="displayColumnsResult"></mat-header-row>
                   <mat-row *matRowDef="let row; columns: displayColumnsResult"  [style.background-color]="getRowColor(row.result)"></mat-row>
@@ -208,6 +243,42 @@
                 </mat-paginator>
               </div>
             </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Gráficos">
+          <div class="container">
+            <div class="row">
+              <div class="cht-grades-wrapper col-md-6">
+                <h3>NOTAS</h3>
+                <div class="chart"><canvas id="cht-grades"></canvas></div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Matrícula">
+          <form [formGroup]="fg_search_users">
+            Procurar usuários em que
+            <mat-form-field class="mat-form" >
+              <mat-select [(ngModel)]="form_opt" name="form_opt" [formControl]="form_ctrl">
+                <mat-option *ngFor="let option of options let i = index" [value]="i"><h3>{{option}}</h3></mat-option>
+              </mat-select>
+            </mat-form-field>
+          igual a:
+            <mat-form-field class="mat-form" >
+              <input formControlName="qry" [(ngModel)]="form_query" matInput type="text" class="addText" placeholder="" value="">
+            </mat-form-field>
+            <div class="btn btn-primary" (click)="getUsers(form_query,form_opt)">Buscar</div>
+          </form>
+          <div class="usersList">
+            <mat-list role="list">
+              <mat-list-item *ngFor="let moodleUser of usersList" role="listitem">
+                <mat-checkbox (change)="checkUser($event, moodleUser)"></mat-checkbox>
+                <img [src]=moodleUser.profileimageurlsmall alt="">
+                <h3>{{moodleUser.fullname}} </h3> <p>{{moodleUser.email}}</p>
+                <mat-divider></mat-divider>
+              </mat-list-item>
+            </mat-list>
+            <button class="btn btn-primary" (click)="enrolUsers()"[disabled]="selectedUsersForEnrol.length == 0">Matricular</button>
           </div>
         </mat-tab>
       </mat-tab-group>

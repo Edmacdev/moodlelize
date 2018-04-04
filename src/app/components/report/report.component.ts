@@ -2,7 +2,10 @@ import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { MoodleService } from '../../services/moodle.service';
 import { MoodleApiService } from '../../services/moodle-api.service';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FlashMessagesService } from 'angular2-flash-messages';
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+import { DisplayUsersDialogComponent } from '../display-users-dialog/display-users-dialog.component';
 import {Observable} from 'rxjs/Rx'
 import 'rxjs/add/operator/merge';
 import { forkJoin } from 'rxjs/observable/forkJoin';
@@ -23,6 +26,8 @@ export class ReportComponent implements OnInit {
   enrolledUsers: any[] = [];
   enrolledTeachers: any[] = [];
   enrolledStudents: any[] = [];
+  activitiesStatusArray: any[] = []
+  courseStatusArray: any[] = []
   usersGrades: any[];
   moodles: any[];
   courses: any[];
@@ -42,9 +47,10 @@ export class ReportComponent implements OnInit {
   isCourseSelected: boolean = false;
   usersCourseStatus: any[] = [];
 //DATA TABLES
-  displayColumns = ['risk', 'name', 'email','phone','lastaccess', 'progress', 'grade'];
-  displayColumnsResult = ['name', 'email','phone','result', 'grade'];
+  displayColumns = ['risk', 'name', 'email','phone','lastaccess', 'progress', 'grade','options'];
+  displayColumnsResult = ['name', 'email','phone','result', 'grade','options'];
   dataSource: MatTableDataSource<any>;
+  dataSourcePrepared: MatTableDataSource<any>;
 //USER ELEMENT TABLE DATA
   selectedUserInfo: object;
   userElemValue: string;
@@ -52,12 +58,29 @@ export class ReportComponent implements OnInit {
   observableArray: any[] = []
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild('paginator') paginator: MatPaginator;
+//ENROLL USER TAB
+  form_ctrl = new FormControl();
+  fg_search_users: FormGroup;
+  form_opt: number;
+  form_query: string;
+  options: string[] = ['id', 'nome', 'sobrenome', 'usuário', 'email'];
+  usersList: any[] =[];
+  selectedUsersForEnrol: any[] = [];
+  selectedUsersForUnenrol: any[] = [];
+
+
   constructor(
     private authService: AuthService,
     private moodleService: MoodleService,
     private moodleApiService: MoodleApiService,
-    private flashMessage: FlashMessagesService
-  ) { }
+    private flashMessage: FlashMessagesService,
+    public dialog: MatDialog,
+    private fb: FormBuilder
+  ) {
+    this.fg_search_users = fb.group({
+      'qry':[null, Validators.compose([Validators.required, Validators.minLength(2), Validators.maxLength(30)])],
+      'opt': [null, Validators.compose([Validators.required])]
+  }) }
 
   ngOnInit() {
     this.authService.getUser().subscribe(
@@ -117,17 +140,16 @@ export class ReportComponent implements OnInit {
     this.isCourseSelected = true;
     clearInterval(this.timer)
     // open countdown timer
-    let now = new Date();
-    let countdown = (this.course.enddate *1000)+86400000*3;
+    let now = new Date().getTime();
+    let countdown = (this.course.enddate *1000)+86400000*1;
     if(countdown - now < 0) this.isEnded = true;
     this.countdownTimer(this.course)
 
     var wstoken: string = this.form_moodle.token;
     var url: string = this.form_moodle.url;
     var courseid: string = this.course.id
-    var usersGrades;
-    var activitiesStatusArray: any[] = []
-    var courseStatusArray: any[] = []
+    // var activitiesStatusArray: any[] = []
+    // var courseStatusArray: any[] = []
     var status: boolean[] = [false, false] ;
     var statusSubject: Subject<string> = new Subject();
 
@@ -136,20 +158,20 @@ export class ReportComponent implements OnInit {
         switch(data){
           case 'enrolledUsers':
             status[0] = true;
-            console.log(status)
           break
           case 'usersActivitiesCompletion':
             status[1] = true;
-            console.log(status)
+
           break
           case 'usersCourseCompletion':
             status[1] = true;
-            console.log(status)
+
           break
           default: console.log('default: ' + data)
         }
         if(status.every(st => st === true)){
-          this.dataSource = new MatTableDataSource(this.prepareDataSource(this.enrolledStudents, usersGrades, activitiesStatusArray, courseStatusArray));
+          this.dataSourcePrepared = new MatTableDataSource(this.prepareDataSource(this.enrolledStudents, this.usersGrades, this.activitiesStatusArray, this.courseStatusArray));
+          this.dataSource = new MatTableDataSource(this.prepareDataSource(this.enrolledStudents, this.usersGrades, this.activitiesStatusArray, this.courseStatusArray));
           this.isReady = true;
           this.isLoading = false;
 
@@ -201,7 +223,7 @@ export class ReportComponent implements OnInit {
           this.enrolledStudents = data.filter(element =>  element.roles[0].roleid == 5);
           this.enrolledStudents = this.enrolledStudents.sort((a,b) => a.fullname.localeCompare(b.fullname));
           statusSubject.next('enrolledUsers');
-          console.log(data)
+
           //BUSCAR NOTAS DOS ALUNOS
 
 
@@ -214,19 +236,19 @@ export class ReportComponent implements OnInit {
                 console.log(data)
                 return false;
               }
-              usersGrades= data.usergrades.sort((a,b) => a.userfullname.localeCompare(b.userfullname));
+              this.usersGrades= data.usergrades.sort((a,b) => a.userfullname.localeCompare(b.userfullname));
 
               if(!this.isEnded){
                 //BUSCAR ATIVIDADES FEITAS POR ALUNOS
                 let activitiesStatusRequestArray: any[] =[]
-                for(let i in usersGrades){
-                  let userid = usersGrades[i].userid
+                for(let i in this.usersGrades){
+                  let userid = this.usersGrades[i].userid
                   let request = this.moodleApiService.core_completion_get_activities_completion_status(url,{wstoken: wstoken,courseid: courseid, userid: userid});
-                  activitiesStatusArray.push(request);
+                  this.activitiesStatusArray.push(request);
                 }
-                forkJoin(activitiesStatusArray).subscribe(
+                forkJoin(this.activitiesStatusArray).subscribe(
                   result => {
-                    activitiesStatusArray = result;
+                    this.activitiesStatusArray = result;
                     statusSubject.next('usersActivitiesCompletion');
                   }
                 )
@@ -234,14 +256,14 @@ export class ReportComponent implements OnInit {
               else{
                 //VERIFICAR SE USUÁRIO CONCLUIU O CURSO
                 let courseStatusRequestArray: any[] =[]
-                for(let i in usersGrades){
-                  let userid = usersGrades[i].userid
+                for(let i in this.usersGrades){
+                  let userid = this.usersGrades[i].userid
                   let request = this.moodleApiService.core_completion_get_course_completion_status(url,{wstoken: wstoken,courseid: courseid, userid: userid})
-                  courseStatusArray.push(request)
+                  this.courseStatusArray.push(request)
                 }
-                forkJoin(courseStatusArray).subscribe(
+                forkJoin(this.courseStatusArray).subscribe(
                   result => {
-                    courseStatusArray = result;
+                    this.courseStatusArray = result;
                     statusSubject.next('usersCourseCompletion');
 
                   }
@@ -262,7 +284,7 @@ export class ReportComponent implements OnInit {
     this.timer = setInterval(() =>{
       // Get todays date and time
       var now = new Date().getTime();
-      var countDownDate = (course.enddate *1000)+86400000*3;
+      var countDownDate = (course.enddate *1000)+86400000*1;
       var distance = countDownDate - now;
       // Find the distance between now an the count down date
 
@@ -337,61 +359,66 @@ export class ReportComponent implements OnInit {
       return 'menos de 1 dia'
     }
   }
-  chartRender(){
-    var data1:number = 0;
-    var data2:number = 0;
-    var data3:number = 0;
-    var data4:number = 0;
-    var data5:number = 0;
-    var data6:number = 0;
+  chartRender(chart){
+    switch(chart){
+      case 'access':
+      var data1:number = 0;
+      var data2:number = 0;
+      var data3:number = 0;
+      var data4:number = 0;
+      var data5:number = 0;
+      var data6:number = 0;
 
-        var days = percentage => {
-          let courseDuration = Math.floor(this.courseTime(this.course).duration/(1000 * 60 * 60 * 24));
-          return Math.floor((percentage*courseDuration)/100);
-        }
-        data1 = this.dataSource.data.filter(elem => elem.lastaccess/24 == null).length;
-        data2 = this.dataSource.data.filter(elem => elem.lastaccess/24 < days(5)).length;
-        data3 = this.dataSource.data.filter(elem => elem.lastaccess/24 >= days(5) && elem.lastaccess/24 < days(10) ).length;
-        data4 = this.dataSource.data.filter(elem => elem.lastaccess/24 >= days(10) && elem.lastaccess/24 < days(25) ).length;
-        data5 = this.dataSource.data.filter(elem => elem.lastaccess/24 >= days(25) && elem.lastaccess/24 < days(50) ).length;
-        data6 = this.dataSource.data.filter(elem => elem.lastaccess/24 > days(50)).length;
-        var filter_access =  elem =>  elem.lastaccess = this;
-        var chtAccessCtx = $("#cht-access")[0].getContext('2d');
-        var chtAccess = new Chart(chtAccessCtx, {
-        type: 'bar',
-        data: {
-            labels: [
-              "nunca",
-              "menos de " + days(5) + " dias",
-              days(5) + "-" + days(10) + " dias",
-              days(10) + "-" + days(25) + " dias",
-              days(25) + "-" + days(50) + " dias",
-              "mais de " + days(50) + " dias"],
-            datasets: [{
-                label: '',
-                data: [data1, data2, data3, data4, data5, data6],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(218, 135, 76, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(128, 0, 128, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255,99,132,1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(218, 135, 76, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(128, 0, 128, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-        }
-        })
+          var days = percentage => {
+            let courseDuration = Math.floor(this.courseTime(this.course).duration/(1000 * 60 * 60 * 24));
+            return Math.floor((percentage*courseDuration)/100);
+          }
+          data1 = this.dataSource.data.filter(elem => elem.lastaccess/24 == null).length;
+          data2 = this.dataSource.data.filter(elem => elem.lastaccess/24 < days(5)).length;
+          data3 = this.dataSource.data.filter(elem => elem.lastaccess/24 >= days(5) && elem.lastaccess/24 < days(10) ).length;
+          data4 = this.dataSource.data.filter(elem => elem.lastaccess/24 >= days(10) && elem.lastaccess/24 < days(25) ).length;
+          data5 = this.dataSource.data.filter(elem => elem.lastaccess/24 >= days(25) && elem.lastaccess/24 < days(50) ).length;
+          data6 = this.dataSource.data.filter(elem => elem.lastaccess/24 > days(50)).length;
+          var filter_access =  elem =>  elem.lastaccess = this;
+          var chtAccessCtx = $("#cht-access")[0].getContext('2d');
+          var chtAccess = new Chart(chtAccessCtx, {
+          type: 'bar',
+          data: {
+              labels: [
+                "nunca",
+                "menos de " + days(5) + " dias",
+                days(5) + "-" + days(10) + " dias",
+                days(10) + "-" + days(25) + " dias",
+                days(25) + "-" + days(50) + " dias",
+                "mais de " + days(50) + " dias"],
+              datasets: [{
+                  label: '',
+                  data: [data1, data2, data3, data4, data5, data6],
+                  backgroundColor: [
+                      'rgba(255, 99, 132, 0.2)',
+                      'rgba(54, 162, 235, 0.2)',
+                      'rgba(255, 206, 86, 0.2)',
+                      'rgba(218, 135, 76, 0.2)',
+                      'rgba(75, 192, 192, 0.2)',
+                      'rgba(128, 0, 128, 0.2)'
+                  ],
+                  borderColor: [
+                      'rgba(255,99,132,1)',
+                      'rgba(54, 162, 235, 1)',
+                      'rgba(255, 206, 86, 1)',
+                      'rgba(218, 135, 76, 1)',
+                      'rgba(75, 192, 192, 1)',
+                      'rgba(128, 0, 128, 1)'
+                  ],
+                  borderWidth: 1
+              }]
+          },
+          options: {
+          }
+          })
+
+    break
+    case 'progress':
 
         data1 = this.dataSource.data.filter(elem => elem.progress == 0).length;
         data2 = this.dataSource.data.filter(elem => elem.progress >= 1 && elem.progress <= 20).length;
@@ -428,7 +455,8 @@ export class ReportComponent implements OnInit {
         },
         options: {}
         })
-
+        break
+        case 'grades':
         data1 = this.dataSource.data.filter(elem => elem.grade == -1).length;
         data2 = this.dataSource.data.filter(elem => elem.grade >= 1 && elem.grade <= 20).length;
         data3 = this.dataSource.data.filter(elem => elem.grade >= 21 && elem.grade <= 40).length;
@@ -464,13 +492,15 @@ export class ReportComponent implements OnInit {
         },
         options: {}
         })
+      break
+    }
   }
   applyFilter(filterValue: string) {
     filterValue = filterValue.trim(); // Remove whitespace
     filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
     this.dataSource.filter = filterValue;
   }
-  prepareDataSource(enrolledStudents, usersGrades, ActivitiesCompletion, courseCompletion){
+  prepareDataSource(enrolledStudents, usersGrades, activitiesCompletion, courseCompletion){
 
       let dataSource:any[] = [];
 
@@ -491,10 +521,11 @@ export class ReportComponent implements OnInit {
         if(!grade) grade = -1;
         if(!this.isEnded){
           //Progress
-            let activities = ActivitiesCompletion[i].statuses.length;
+
+            let activities = activitiesCompletion[i].statuses.length;
             let activitiesCompleted = 0;
-            for(let j in ActivitiesCompletion[i].statuses){
-              if(ActivitiesCompletion[i].statuses[j].state != 0) activitiesCompleted++
+            for(let j in activitiesCompletion[i].statuses){
+              if(activitiesCompletion[i].statuses[j].state != 0) activitiesCompleted++
             }
 
             let progress = Math.floor((activitiesCompleted *100)/ activities);
@@ -701,6 +732,190 @@ export class ReportComponent implements OnInit {
   print(){
     // $('#tb-users').printThis();
     window.print();
+  }
+  getUsers(query, fieldIndex){
+    var options: string[] = ['id', 'firstname', 'lastname', 'username', 'email'];
+
+
+    this.moodleApiService.core_user_get_users(this.form_moodle.url, {wstoken: this.form_moodle.token,criteriakey:options[fieldIndex],criteriavalue:query})
+      .subscribe(
+        data => {
+          this.usersList = data.users.sort((a,b) => a.fullname.localeCompare(b.fullname));
+        },
+        err => console.log(err)
+      )
+  }
+  tabChange(event){
+    if(event.index == 1){
+      if(this.isEnded){
+        this.chartRender('grades')
+      }
+      else{
+        this.chartRender('access')
+        this.chartRender('progress')
+        this.chartRender('grades')
+      }
+    }
+  }
+  checkUser(event, user){
+    if(event.checked){
+      this.selectedUsersForEnrol.push(user);
+    }
+    else{
+      var i;
+      this.selectedUsersForEnrol.find(
+        (element, index)=>{
+          i = index;
+          return element.id == user.id
+        })
+      this.selectedUsersForEnrol.splice(i,1);
+    }
+  }
+  enrolUsers(){
+    let enrolments: string ='';
+    for(let i in this.selectedUsersForEnrol){
+      let enrolment =
+      '&enrolments['+i+'][roleid]=5'+
+      '&enrolments['+i+'][userid]='+this.selectedUsersForEnrol[i].id +
+      '&enrolments['+i+'][courseid]='+this.course.id;
+      enrolments += enrolment
+    }
+
+    const params ={
+      wstoken: this.form_moodle.token,
+      enrolments: enrolments
+    }
+    this.moodleApiService.enrol_manual_enrol_users(this.form_moodle.url, params).subscribe(
+      data => {
+        if(data == null){
+          this.dataSource = new MatTableDataSource(
+            this.prepareDataSource(
+              this.enrolledStudents,
+              this.usersGrades,
+              this.activitiesStatusArray,
+              this.courseStatusArray
+            )
+          )
+          swal(
+            '',
+            'Usuário matriculado',
+            'success'
+          )
+        }
+      },
+      err => console.error(err)
+    );
+  }
+  unenrolUser(user){
+    swal({
+      title: 'Desmatricular usuário',
+      text: 'Tem certeza que deseja desmatricular o usuário ' + user.name+ '?',
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sim',
+      cancelButtonText: 'Não'
+    }).then((result) => {
+
+      if (result.value) {
+        let enrolments =
+          '&enrolments[0][roleid]=5'+
+          '&enrolments[0][userid]='+user.id +
+          '&enrolments[0][courseid]='+this.course.id
+
+        const params ={
+          wstoken: this.form_moodle.token,
+          enrolments: enrolments
+        }
+        this.moodleApiService.enrol_manual_unenrol_users(this.form_moodle.url, params).subscribe(
+          data => {
+            if(data == null){
+              var i;
+              this.dataSource.data.find(
+                (element, index)=>{
+                  i = index;
+                  return element.id == user.id
+                }
+              )
+              this.dataSourcePrepared.data.splice(i,1);
+              this.dataSource = this.dataSourcePrepared
+              swal(
+                '',
+                'Usuário desmatriculado',
+                'success'
+              )
+            }
+            else{
+              swal(
+                '',
+                'Erro ao desmatricular usuário',
+                'error'
+              )
+            }
+          },
+          err => console.error(err)
+        );
+      }
+    })
+  }
+  userReport(user){
+    var resultG: any[] = [];
+    var resultC: any[] = [];
+    let params = {
+      wstoken: this.form_moodle.token,
+      userid: user.id
+    }
+
+    this.moodleApiService.gradereport_overview_get_course_grades(this.form_moodle.url, params).subscribe(
+      data => { resultG = data.grades;},
+      err => {console.log(err); return false},
+      () => {
+        if (resultG.length !== 0){
+          var courseids = function() {
+            let courseidsString = '';
+            for (let i in resultG){
+              courseidsString += '&options[ids][' + [i] + ']=' + resultG[i].courseid ;
+            }
+            return courseidsString
+          }
+
+          let params = {
+            wstoken: this.form_moodle.token,
+            coursesid: courseids()
+          }
+
+          this.moodleApiService.core_course_get_courses(this.form_moodle.url, params).subscribe(
+            data => { resultC = data; },
+            err => {},
+            () => {
+              let dialogRef = this.dialog.open(DisplayUsersDialogComponent, {
+                width: '1500px',
+                height: '800px',
+                data: {
+                  name: user.name,
+                  grades: resultG,
+                  courses: resultC
+                }
+              })
+
+              dialogRef.afterClosed().subscribe(result => {
+
+              })
+            }
+          )
+        }
+        else {
+          let dialogRef = this.dialog.open(DisplayUsersDialogComponent,{
+            width: '1500px',
+            height: '800px',
+            data: {
+              name: name,
+              grades: resultG,
+              courses: resultC
+            }
+          });
+        };
+      }
+    )
   }
 }
 export interface Element {
