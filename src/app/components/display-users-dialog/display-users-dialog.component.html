@@ -7,15 +7,15 @@
     <div>
       <p><strong>Relatório: </strong></p>
       <ul>
-        <li *ngFor="let grade of data.grades; let i = index">
+        <li *ngFor="let course of data.courses; let i = index">
 
-          <p><strong>Curso:</strong> {{getCourse(grade.courseid).fullname}}</p>
-          <p><strong>Nota:</strong> {{grade.grade}}</p>
+          <p><strong>Curso:</strong> {{course.fullname}}</p>
+          <p><strong>Nota:</strong> {{getCourseGrade(course.id)}}</p>
           <br>
         </li>
       </ul>
     </div>
-    <div *ngIf="data.grades.length == 0">
+    <div *ngIf="data.courses == 0">
       <p>Usuário não está matriculado em nenhum curso</p>
     </div>
 

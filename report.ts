@@ -1,10 +1,13 @@
-import { Component, OnInit, ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { MoodleService } from '../../services/moodle.service';
 import { MoodleApiService } from '../../services/moodle-api.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { FlashMessagesService } from 'angular2-flash-messages';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { DisplayUsersDialogComponent } from '../display-users-dialog/display-users-dialog.component';
+import {Observable} from 'rxjs/Rx'
+import 'rxjs/add/operator/merge';
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { Subject } from 'rxjs/Subject';
 import {MatTableDataSource, MatSort, MatPaginator} from '@angular/material';
@@ -19,63 +22,64 @@ declare var Chart: any
   styleUrls: ['./report.component.scss']
 })
 export class ReportComponent implements OnInit {
-//USUÁRIO DO SISTEMA
   user: any;
-//MOODLES REGISTRADOS NO SISTEMA
+  enrolledUsers: any[] = [];
+  enrolledTeachers: any[] = [];
+  enrolledStudents: any[] = [];
+  activitiesStatusArray: any[] = []
+  courseStatusArray: any[] = []
+  usersGrades: any[];
   moodles: any[];
-//CURSOS REGISTRADOS NO MOODLE
   courses: any[];
-  //CURSO SELECIONADO PARA RELATORIO
   course: any;
+  courseTitle: string;
   user_info: object;
-//USUÁRIOS MATRICULADOS NO CURSO
-  enrolled_users: any[] = [];
-  enrolled_teachers: any[] = [];
-  enrolled_students: any[] = [];
-//ATIVIDADES CONCLUIDAS E NOTAS DOS ALUNOS
-  activities_status: any[] = []
-  course_status_array: any[] = []
-  user_grades: any[];
 //FORMS
   form_moodle: any;
   form_courseid: number;
 //TIMER
   timer: any;
 //STATUS
-  is_ready: boolean = false;
-  is_loading: boolean = false;
-  is_course_finished: boolean = false;
-  is_course_selected: boolean = false;
-//DATA TABLE
-  display_columns: string[] = ['risk', 'name', 'email','phone','lastaccess', 'progress', 'grade','options'];
-  display_columns_result: string[] = ['name', 'email','phone','result', 'grade','options'];
-  display_columns_users_result: string[] = ['name', 'email','chekbox']
-  data_source: MatTableDataSource<any>;
-  data_source_users_result: MatTableDataSource<any>;
-  selected_user_info: object;
+  status: boolean[];
+  isReady: boolean = false;
+  isLoading: boolean = false;
+  isEnded: boolean = false;
+  isCourseSelected: boolean = false;
+  usersCourseStatus: any[] = [];
+//DATA TABLES
+  displayColumns = ['risk', 'name', 'email','phone','lastaccess', 'progress', 'grade','options'];
+  displayColumnsResult = ['name', 'email','phone','result', 'grade','options'];
+  dataSource: MatTableDataSource<any>;
+  dataSourcePrepared: MatTableDataSource<any>;
+//USER ELEMENT TABLE DATA
+  selectedUserInfo: object;
+  userElemValue: string;
+//OBSERVABLES
+  observableArray: any[] = []
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild('paginator') paginator: MatPaginator;
-//ENROL USER TAB
+//ENROLL USER TAB
   form_ctrl = new FormControl();
   fg_search_users: FormGroup;
   form_opt: number;
-  form_opt_query: number;
   form_query: string;
   options: string[] = ['id', 'nome', 'sobrenome', 'usuário', 'email'];
-  options_query: string[] = ['igual a', 'contém', 'contém antes', 'contém depois'];
-  users_list: any[] =[];
-  selected_users_for_enrollment: any[] = [];
+  usersList: any[] =[];
+  selectedUsersForEnrol: any[] = [];
+  selectedUsersForUnenrol: any[] = [];
+
 
   constructor(
     private authService: AuthService,
     private moodleService: MoodleService,
     private moodleApiService: MoodleApiService,
+    private flashMessage: FlashMessagesService,
     public dialog: MatDialog,
     private fb: FormBuilder
   ) {
-    //CONTROLE DE FORMULÁRIO
     this.fg_search_users = fb.group({
-      'qry':[null, Validators.compose([Validators.required, Validators.minLength(2), Validators.maxLength(30)])]
+      'qry':[null, Validators.compose([Validators.required, Validators.minLength(2), Validators.maxLength(30)])],
+      'opt': [null, Validators.compose([Validators.required])]
   }) }
 
   ngOnInit() {
@@ -87,6 +91,7 @@ export class ReportComponent implements OnInit {
             moodles => {
               if(moodles.length > 0){
                 this.moodles = moodles;
+                this.form_moodle = this.moodles[0].id
               }
             }
           )
@@ -94,9 +99,8 @@ export class ReportComponent implements OnInit {
       }
     )
   }
-  //função que busca os cursos de um determinado Moodle
-  getCourses():void{
-    const params:object = {
+  getCourses(){
+    const params = {
       wstoken: this.form_moodle.token,
       coursesid: ''
     }
@@ -128,32 +132,30 @@ export class ReportComponent implements OnInit {
       }
     )
   }
-  //função que acessa o webservice para buscar e armazenar as informações dos usuários matriculados
-  report():void{
-    this.is_ready = false;
-    this.is_loading = true;
-    this.course = this.courses[this.form_courseid];
-    this.is_course_selected = true;
-    this.activities_status = [];
-    this.course_status_array = [];
+  report(courseIndex){
+    this.isReady = false;
+    this.isLoading = true;
+    this.course = this.courses[courseIndex];
+    this.isCourseSelected = true;
     clearInterval(this.timer)
-    //inicia o timer
+    // open countdown timer
     let now = new Date().getTime();
     let countdown = (this.course.enddate *1000)+86400000*1;
-    if(countdown - now < 0) this.is_course_finished = true;
+    if(countdown - now < 0) this.isEnded = true;
     this.countdownTimer(this.course)
-    //variaveis para uso do webservice
+
     var wstoken: string = this.form_moodle.token;
     var url: string = this.form_moodle.url;
     var courseid: string = this.course.id
-    //status do carregamento da pagina
+    // var activitiesStatusArray: any[] = []
+    // var courseStatusArray: any[] = []
     var status: boolean[] = [false, false] ;
-    var status_subject: Subject<string> = new Subject();
-    //Inscrição que observa a mudança de status
-    status_subject.subscribe(
+    var statusSubject: Subject<string> = new Subject();
+
+    statusSubject.subscribe(
       data => {
         switch(data){
-          case 'enrolled_users':
+          case 'enrolledUsers':
             status[0] = true;
           break
           case 'usersActivitiesCompletion':
@@ -167,20 +169,15 @@ export class ReportComponent implements OnInit {
           default: console.log('default: ' + data)
         }
         if(status.every(st => st === true)){
-          this.data_source = new MatTableDataSource(
-            this.prepareDataSource(
-              this.enrolled_students,
-              this.user_grades,
-              this.activities_status,
-              this.course_status_array
-            ))
-          this.is_ready = true;
-          this.is_loading = false;
+          this.dataSourcePrepared = new MatTableDataSource(this.prepareDataSource(this.enrolledStudents, this.usersGrades, this.activitiesStatusArray, this.courseStatusArray));
+          this.dataSource = new MatTableDataSource(this.prepareDataSource(this.enrolledStudents, this.usersGrades, this.activitiesStatusArray, this.courseStatusArray));
+          this.isReady = true;
+          this.isLoading = false;
 
           setTimeout(
             () => {
-              this.data_source.paginator = this.paginator;
-              this.data_source.sort = this.sort;
+              this.dataSource.paginator = this.paginator;
+              this.dataSource.sort = this.sort;
 
               $(".input-title").focusout(event => this.changeTitleHandler());
               $(".input-title").keyup(
@@ -192,39 +189,44 @@ export class ReportComponent implements OnInit {
               )
               $(".user-info").focusout(
                 (event) => {
-                  this.changeUserInfoHandler(this.selected_user_info, event)
+                  this.changeUserInfoHandler(this.selectedUserInfo, event)
                 }
               )
               $(".user-info").keyup(
                 (event) =>{
                   if(event.which == 13){
-                    this.changeUserInfoHandler(this.selected_user_info, event)
+                    this.changeUserInfoHandler(this.selectedUserInfo, event)
                   }
                 }
               )
             },400
           )
         }
-        else this.is_ready = false;
+        else this.isReady = false;
       }
     )
+
     //BUSCAR USUÁRIOS MATRICULADOS
-    let enrolled_users;
+    let enrolledUsers;
     this.moodleApiService.core_enrol_get_enrolled_users(url,{wstoken: wstoken,courseid: courseid})
     .subscribe(
       data => {
         if(data.errorcode){
+          this.flashMessage.show(data.message,{cssClass: 'alert-danger', timeout:3000})
           return false;
         }
         if(data.length > 0){
 
-          this.enrolled_users = data;
-          this.enrolled_teachers = data.filter(element =>  element.roles[0].roleid == 3);
-          this.enrolled_students = data.filter(element =>  element.roles[0].roleid == 5);
-          this.enrolled_students = this.enrolled_students.sort((a,b) => a.fullname.localeCompare(b.fullname));
-          status_subject.next('enrolled_users');
+          this.enrolledUsers = data;
+          this.enrolledTeachers = data.filter(element =>  element.roles[0].roleid == 3);
+          this.enrolledStudents = data.filter(element =>  element.roles[0].roleid == 5);
+          this.enrolledStudents = this.enrolledStudents.sort((a,b) => a.fullname.localeCompare(b.fullname));
+          statusSubject.next('enrolledUsers');
 
           //BUSCAR NOTAS DOS ALUNOS
+
+
+
 
           this.moodleApiService.gradereport_user_get_grade_items(url,{wstoken: wstoken,courseid: courseid})
           .subscribe(
@@ -232,35 +234,35 @@ export class ReportComponent implements OnInit {
               if(data.errorcode){
                 return false;
               }
-              this.user_grades= data.usergrades.sort((a,b) => a.userfullname.localeCompare(b.userfullname));
+              this.usersGrades= data.usergrades.sort((a,b) => a.userfullname.localeCompare(b.userfullname));
 
-              if(!this.is_course_finished){
+              if(!this.isEnded){
                 //BUSCAR ATIVIDADES FEITAS POR ALUNOS
                 let activitiesStatusRequestArray: any[] =[]
-                for(let i in this.user_grades){
-                  let userid = this.user_grades[i].userid
+                for(let i in this.usersGrades){
+                  let userid = this.usersGrades[i].userid
                   let request = this.moodleApiService.core_completion_get_activities_completion_status(url,{wstoken: wstoken,courseid: courseid, userid: userid});
-                  this.activities_status.push(request);
+                  this.activitiesStatusArray.push(request);
                 }
-                forkJoin(this.activities_status).subscribe(
+                forkJoin(this.activitiesStatusArray).subscribe(
                   result => {
-                    this.activities_status = result;
-                    status_subject.next('usersActivitiesCompletion');
+                    this.activitiesStatusArray = result;
+                    statusSubject.next('usersActivitiesCompletion');
                   }
                 )
               }
               else{
                 //VERIFICAR SE USUÁRIO CONCLUIU O CURSO
                 let courseStatusRequestArray: any[] =[]
-                for(let i in this.user_grades){
-                  let userid = this.user_grades[i].userid
+                for(let i in this.usersGrades){
+                  let userid = this.usersGrades[i].userid
                   let request = this.moodleApiService.core_completion_get_course_completion_status(url,{wstoken: wstoken,courseid: courseid, userid: userid})
-                  this.course_status_array.push(request)
+                  this.courseStatusArray.push(request)
                 }
-                forkJoin(this.course_status_array).subscribe(
+                forkJoin(this.courseStatusArray).subscribe(
                   result => {
-                    this.course_status_array = result;
-                    status_subject.next('usersCourseCompletion');
+                    this.courseStatusArray = result;
+                    statusSubject.next('usersCourseCompletion');
 
                   }
                 )
@@ -269,77 +271,79 @@ export class ReportComponent implements OnInit {
           )
 
         }
-        else this.is_ready = true;
+        else this.isReady = true;
 
     })
   }
-  //Cria um timer de contagem regressiva
-  countdownTimer(course:any):void{
+  countdownTimer(course){
 
-    // Atualiza a contagem a cada 1 segundo
+    // Update the count down every 1 second
 
     this.timer = setInterval(() =>{
-      // data e hora
+      // Get todays date and time
       var now = new Date().getTime();
       var countDownDate = (course.enddate *1000)+86400000*1;
-      // Calcula diferença entre agora e data final
       var distance = countDownDate - now;
+      // Find the distance between now an the count down date
+
 
       if(distance > 0){
         $(".course-end").html("");
         $(".countdown").show()
 
-        // Calculo para dias, horas, minutos e segundos
+        // Time calculations for days, hours, minutes and seconds
         var days = Math.floor(distance / (1000 * 60 * 60 * 24));
         var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        // Mostra o resultado na view
+        // Display the result in the element with id="demo"
+        // document.getElementById("days").innerHTML = '59';
         $(".days").html(days);
         $(".hours").html(hours);
         $(".minutes").html(minutes);
         $(".seconds").html(seconds);
       }
 
-      //Ações para quando o timer chegar ao fim
+
+      // If the count down is finished, write some text
       if (distance < 0) {
         clearInterval(this.timer);
         $(".course-end").html("<h3>CURSO ENCERRADO</h3>");
         $(".countdown").hide();
-        this.is_course_finished = true;
+        this.isEnded = true;
+
       }
-      else     this.is_course_finished = false;
+      else     this.isEnded = false;
     }, 1000);
+
   }
-  //Função que retorna o tempo de duração do curso
-  courseTime(course:any):any{
-    let now:number = new Date().getTime();
-    let enddate:number = course.enddate *1000;
-    let startdate:number = course.startdate *1000;
-    let distance:number = now - startdate;
-    let duration:number = enddate - startdate;
-    let progress:number = Math.floor((distance *100) / duration)
-    let courseTime:object = {
+  courseTime(course){
+    let now = new Date().getTime();
+    let enddate = course.enddate *1000;
+    let startdate = course.startdate *1000;
+    let distance = now - startdate;
+    let duration = enddate - startdate;
+    let progress = Math.floor((distance *100) / duration)
+    let courseTime = {
       duration: duration,
       progress: progress
     }
     return courseTime
 
   }
-  //Calcula o número de dias desde o último acesso
-  getDaysSinceLastAccess(last_access):number{
-    if(last_access == 0){
+  getDaysSinceLastAccess(lastaccess){
+    if(lastaccess == 0){
       return null
     }
-      let lastaccess = new Date(last_access *1000);
+      lastaccess = new Date(lastaccess *1000);
+
       let currentdate = new Date();
       let timeDiff = Math.abs(currentdate.getTime() - lastaccess.getTime());
       let diffDays = Math.floor(timeDiff / (1000 * 3600));
       return diffDays ;
   }
-  //conversor de horas para dias
-  hoursToDays(hours:number):string{
+  hoursToDays(hours){
     if(hours >= 24) {
       let days = Math.floor(hours/24)
       if(days == 1){
@@ -353,8 +357,7 @@ export class ReportComponent implements OnInit {
       return 'menos de 1 dia'
     }
   }
-  //Gera os gráficos
-  chartRender(chart:string):void{
+  chartRender(chart){
     switch(chart){
       case 'access':
       var data1:number = 0;
@@ -368,12 +371,12 @@ export class ReportComponent implements OnInit {
             let courseDuration = Math.floor(this.courseTime(this.course).duration/(1000 * 60 * 60 * 24));
             return Math.floor((percentage*courseDuration)/100);
           }
-          data1 = this.data_source.data.filter(elem => elem.lastaccess/24 == null).length;
-          data2 = this.data_source.data.filter(elem => elem.lastaccess/24 < days(5)).length;
-          data3 = this.data_source.data.filter(elem => elem.lastaccess/24 >= days(5) && elem.lastaccess/24 < days(10) ).length;
-          data4 = this.data_source.data.filter(elem => elem.lastaccess/24 >= days(10) && elem.lastaccess/24 < days(25) ).length;
-          data5 = this.data_source.data.filter(elem => elem.lastaccess/24 >= days(25) && elem.lastaccess/24 < days(50) ).length;
-          data6 = this.data_source.data.filter(elem => elem.lastaccess/24 > days(50)).length;
+          data1 = this.dataSource.data.filter(elem => elem.lastaccess/24 == null).length;
+          data2 = this.dataSource.data.filter(elem => elem.lastaccess/24 < days(5)).length;
+          data3 = this.dataSource.data.filter(elem => elem.lastaccess/24 >= days(5) && elem.lastaccess/24 < days(10) ).length;
+          data4 = this.dataSource.data.filter(elem => elem.lastaccess/24 >= days(10) && elem.lastaccess/24 < days(25) ).length;
+          data5 = this.dataSource.data.filter(elem => elem.lastaccess/24 >= days(25) && elem.lastaccess/24 < days(50) ).length;
+          data6 = this.dataSource.data.filter(elem => elem.lastaccess/24 > days(50)).length;
           var filter_access =  elem =>  elem.lastaccess = this;
           var chtAccessCtx = $("#cht-access")[0].getContext('2d');
           var chtAccess = new Chart(chtAccessCtx, {
@@ -415,12 +418,12 @@ export class ReportComponent implements OnInit {
     break
     case 'progress':
 
-        data1 = this.data_source.data.filter(elem => elem.progress == 0).length;
-        data2 = this.data_source.data.filter(elem => elem.progress >= 1 && elem.progress <= 20).length;
-        data3 = this.data_source.data.filter(elem => elem.progress >= 21 && elem.progress <= 40).length;
-        data4 = this.data_source.data.filter(elem => elem.progress >= 41 && elem.progress <= 60).length;
-        data5 = this.data_source.data.filter(elem => elem.progress >= 61 && elem.progress <= 80).length;
-        data6 = this.data_source.data.filter(elem => elem.progress >= 81 && elem.progress <= 100).length;
+        data1 = this.dataSource.data.filter(elem => elem.progress == 0).length;
+        data2 = this.dataSource.data.filter(elem => elem.progress >= 1 && elem.progress <= 20).length;
+        data3 = this.dataSource.data.filter(elem => elem.progress >= 21 && elem.progress <= 40).length;
+        data4 = this.dataSource.data.filter(elem => elem.progress >= 41 && elem.progress <= 60).length;
+        data5 = this.dataSource.data.filter(elem => elem.progress >= 61 && elem.progress <= 80).length;
+        data6 = this.dataSource.data.filter(elem => elem.progress >= 81 && elem.progress <= 100).length;
         let chtProgressCtx = $("#cht-progress")[0].getContext('2d');
         let chtProgress = new Chart(chtProgressCtx, {
         type: 'bar',
@@ -452,12 +455,12 @@ export class ReportComponent implements OnInit {
         })
         break
         case 'grades':
-        data1 = this.data_source.data.filter(elem => elem.grade == -1).length;
-        data2 = this.data_source.data.filter(elem => elem.grade >= 1 && elem.grade <= 20).length;
-        data3 = this.data_source.data.filter(elem => elem.grade >= 21 && elem.grade <= 40).length;
-        data4 = this.data_source.data.filter(elem => elem.grade >= 41 && elem.grade <= 60).length;
-        data5 = this.data_source.data.filter(elem => elem.grade >= 61 && elem.grade <= 80).length;
-        data6 = this.data_source.data.filter(elem => elem.grade >= 81 && elem.grade <= 100).length;
+        data1 = this.dataSource.data.filter(elem => elem.grade == -1).length;
+        data2 = this.dataSource.data.filter(elem => elem.grade >= 1 && elem.grade <= 20).length;
+        data3 = this.dataSource.data.filter(elem => elem.grade >= 21 && elem.grade <= 40).length;
+        data4 = this.dataSource.data.filter(elem => elem.grade >= 41 && elem.grade <= 60).length;
+        data5 = this.dataSource.data.filter(elem => elem.grade >= 61 && elem.grade <= 80).length;
+        data6 = this.dataSource.data.filter(elem => elem.grade >= 81 && elem.grade <= 100).length;
         let chtGradesCtx = $("#cht-grades")[0].getContext('2d');
         let chtGrades = new Chart(chtGradesCtx, {
         type: 'bar',
@@ -490,34 +493,31 @@ export class ReportComponent implements OnInit {
       break
     }
   }
-  //filtro para as informações da tabela
-  applyFilter(filterValue: string): void {
+  applyFilter(filterValue: string) {
     filterValue = filterValue.trim(); // Remove whitespace
     filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-    this.data_source.filter = filterValue;
+    this.dataSource.filter = filterValue;
   }
-  //Prepara os dados obtidos do moodle para ser usado na tabela
-  prepareDataSource(enrolled_students, user_grades, activitiesCompletion, courseCompletion){
+  prepareDataSource(enrolledStudents, usersGrades, activitiesCompletion, courseCompletion){
 
-      let data_source:any[] = [];
+      let dataSource:any[] = [];
 
-      for (let i in enrolled_students){
-        let uid:string = enrolled_students[i].id;
-        let name:string = enrolled_students[i].fullname;
-        let firstname:string = enrolled_students[i].firstname;
-        let lastname:string = enrolled_students[i].lastname;
-        let email:string = enrolled_students[i].email;
-        let phone:string = enrolled_students[i].phone1;
-        let enrolledcourses = enrolled_students[i].enrolledcourses
+      for (let i in enrolledStudents){
+        let uid = enrolledStudents[i].id;
+        let name = enrolledStudents[i].fullname;
+        let firstname = enrolledStudents[i].firstname;
+        let lastname = enrolledStudents[i].lastname;
+        let email = enrolledStudents[i].email;
+        let phone = enrolledStudents[i].phone1;
 
         //last access
-        let lastaccess = this.getDaysSinceLastAccess(enrolled_students[i].lastaccess);
+        let lastaccess = this.getDaysSinceLastAccess(enrolledStudents[i].lastaccess);
 
         //grade
-        let gradeitems =user_grades.find((element)=>{return element.userid == uid}).gradeitems
+        let gradeitems =usersGrades.find((element)=>{return element.userid == uid}).gradeitems
         let grade = gradeitems[gradeitems.length - 1].graderaw;
         if(!grade) grade = -1;
-        if(!this.is_course_finished){
+        if(!this.isEnded){
           //Progress
 
             let activities = activitiesCompletion[i].statuses.length;
@@ -542,14 +542,13 @@ export class ReportComponent implements OnInit {
               lastname: lastname,
               email: email,
               phone: phone,
-              enrolledcourses: enrolledcourses,
               lastaccess: lastaccess,
               progress: progress,
               grade: grade,
               risk: risk,
               icon:''
             }
-            data_source.push(elem);
+            dataSource.push(elem);
         }
         else{
           //Result
@@ -577,22 +576,20 @@ export class ReportComponent implements OnInit {
             lastname: lastname,
             email: email,
             phone: phone,
-            enrolledcourses: enrolledcourses,
             grade: grade,
             result: result
           }
-          data_source.push(elem);
+          dataSource.push(elem);
         }
       }
-      if(this.is_course_finished) return data_source;
+      if(this.isEnded) return dataSource;
       else {
-        data_source.sort((a,b) => a.risk.localeCompare(b.risk));
-        return data_source.reverse();
+        dataSource.sort((a,b) => a.risk.localeCompare(b.risk));
+        return dataSource.reverse();
       }
 
   }
-  //Muda o título do curso registrado no moodle
-  changeTitle(title:string){
+  changeTitle(title){
     const params ={
       wstoken: this.form_moodle.token,
       courseid: this.course.id,
@@ -600,8 +597,8 @@ export class ReportComponent implements OnInit {
     }
     return this.moodleApiService.core_course_update_courses(this.form_moodle.url, params);
   }
-  //Altera informações de usuário registrado no moodle
-  changeUserInfo(user:any, value:string){
+  changeUserInfo(user, value){
+
     const params ={
       wstoken: this.form_moodle.token,
       userid: user.id,
@@ -653,7 +650,7 @@ export class ReportComponent implements OnInit {
   }
   changeUserInfoHandler(user, event){
     var i;
-    var dataSourceUser = this.data_source.data
+    var dataSourceUser = this.dataSource.data
       .find((element, index) => {
         i = index;
         return element.id == user.id;
@@ -684,9 +681,9 @@ export class ReportComponent implements OnInit {
                 else if(user.type == 'email') $("#email"+user.id).val(dataSourceUser.email);
               }
               else{
-                if(user.type == 'firstname') this.data_source.data[i].firstname = $("#firstname"+user.id).val();
-                else if(user.type == 'lastname') this.data_source.data[i].lastname = $("#lastname"+user.id).val();
-                else if(user.type == 'email') this.data_source.data[i].email = $("#email"+user.id).val();
+                if(user.type == 'firstname') this.dataSource.data[i].firstname = $("#firstname"+user.id).val();
+                else if(user.type == 'lastname') this.dataSource.data[i].lastname = $("#lastname"+user.id).val();
+                else if(user.type == 'email') this.dataSource.data[i].email = $("#email"+user.id).val();
                 swal(
                   '',
                   'Usuário Atualizado!',
@@ -709,15 +706,13 @@ export class ReportComponent implements OnInit {
       })
     }
   }
-  //Armazena informações do usuário selecionado para alterar informações
   setCurrentUserInfo(id, type){
     const userInfo = {
       id: id,
       type: type
     }
-    this.selected_user_info = userInfo;
+    this.selectedUserInfo = userInfo;
   }
-  //Altera a cor da linha da tabela de acordo com uma condição
   getRowColor(condition){
 
     if(condition == '1 - baixo') return 'rgba(54, 162, 235, 0.1)';
@@ -728,94 +723,58 @@ export class ReportComponent implements OnInit {
     else if(condition == 'Sem Critério') return 'rgba(255, 206, 86, 0.1)';
     else if(condition == 'Desconhecido') return 'rgba(255, 206, 86, 0.1)';
   }
-  //Converte o formato da data
   formatDate(date){
     let dateFormat = new Date(date*1000)
     return dateFormat
   }
   print(){
+    // $('#tb-users').printThis();
     window.print();
   }
-  //Busca usuários registrados no moodle que atendam aos critérios de pesquisa
-  getUsers(query, fieldIndex, queryIndex){
+  getUsers(query, fieldIndex){
     var options: string[] = ['id', 'firstname', 'lastname', 'username', 'email'];
-    var params;
-    switch(queryIndex){
-      case 0:
-      params = {
-        wstoken: this.form_moodle.token,
-        criteriakey: options[fieldIndex],
-        criteriavalue: query
-      }
-      break
-      case 1:
-      params = {
-        wstoken: this.form_moodle.token,
-        criteriakey: options[fieldIndex],
-        criteriavalue: '%' + query + '%'
-      }
-      break
-      case 2:
-      params = {
-        wstoken: this.form_moodle.token,
-        criteriakey: options[fieldIndex],
-        criteriavalue: query + '%'
-      }
-      break
-      case 3:
-      params ={
-        wstoken: this.form_moodle.token,
-        criteriakey: options[fieldIndex],
-        criteriavalue: '%' + query
-      }
-      break
-    }
-    this.moodleApiService.core_user_get_users(this.form_moodle.url, params)
+
+
+    this.moodleApiService.core_user_get_users(this.form_moodle.url, {wstoken: this.form_moodle.token,criteriakey:options[fieldIndex],criteriavalue:query})
       .subscribe(
         data => {
-          this.users_list = data.users.sort((a,b) => a.fullname.localeCompare(b.fullname));
+          this.usersList = data.users.sort((a,b) => a.fullname.localeCompare(b.fullname));
         },
         err => console.log(err)
       )
   }
-  //Decide quais gráficos vão renderizar de acordo com a situação do curso
-  tabChange(event):void{
-    //Caso a aba 'Gráficos seja escolhida'
+  tabChange(event){
     if(event.index == 1){
-      if(this.is_course_finished){
-        //Renderiza apenas o gráfico de notas caso o curso tenha finalizado
+      if(this.isEnded){
         this.chartRender('grades')
       }
       else{
-        //Renderiza todos os gráficos caso o curso ainda esteja em andamento
         this.chartRender('access')
         this.chartRender('progress')
         this.chartRender('grades')
       }
     }
   }
-  //adiciona ou remove usuários da lista de usuários para matrícula
   checkUser(event, user){
-    if(event.selected){
-      this.selected_users_for_enrollment.push(user);
+    if(event.checked){
+      this.selectedUsersForEnrol.push(user);
     }
     else{
       var i;
-      this.selected_users_for_enrollment.find(
+      this.selectedUsersForEnrol.find(
         (element, index)=>{
           i = index;
           return element.id == user.id
         })
-      this.selected_users_for_enrollment.splice(i,1);
+      this.selectedUsersForEnrol.splice(i,1);
     }
   }
-
   enrolUsers(){
     let enrolments: string ='';
-    for(let i in this.selected_users_for_enrollment){
+    for(let i in this.selectedUsersForEnrol){
       let enrolment =
       '&enrolments['+i+'][roleid]=5'+
-      '&enrolments['+i+'][userid]='+this.selected_users_for_enrollment[i].id +
+      '&enrolments['+i+'][userid]='+this.selectedUsersForEnrol[i].id +
       '&enrolments['+i+'][courseid]='+this.course.id;
       enrolments += enrolment
     }
@@ -827,13 +786,19 @@ export class ReportComponent implements OnInit {
     this.moodleApiService.enrol_manual_enrol_users(this.form_moodle.url, params).subscribe(
       data => {
         if(data == null){
-
+          this.dataSource = new MatTableDataSource(
+            this.prepareDataSource(
+              this.enrolledStudents,
+              this.usersGrades,
+              this.activitiesStatusArray,
+              this.courseStatusArray
+            )
+          )
           swal(
             '',
             'Usuário matriculado',
             'success'
           )
-          this.report()
         }
       },
       err => console.error(err)
@@ -863,18 +828,19 @@ export class ReportComponent implements OnInit {
           data => {
             if(data == null){
               var i;
-              this.data_source.data.find(
+              this.dataSource.data.find(
                 (element, index)=>{
                   i = index;
                   return element.id == user.id
                 }
               )
+              this.dataSourcePrepared.data.splice(i,1);
+              this.dataSource = this.dataSourcePrepared
               swal(
                 '',
                 'Usuário desmatriculado',
                 'success'
               )
-              this.report();
             }
             else{
               swal(
@@ -890,7 +856,6 @@ export class ReportComponent implements OnInit {
     })
   }
   userReport(user){
-
     var resultG: any[] = [];
     var resultC: any[] = [];
     let params = {
@@ -899,14 +864,14 @@ export class ReportComponent implements OnInit {
     }
 
     this.moodleApiService.gradereport_overview_get_course_grades(this.form_moodle.url, params).subscribe(
-      data => {
-        resultG = data.grades;
-
-        if (user.enrolledcourses !== 0){
+      data => { resultG = data.grades;},
+      err => {console.log(err); return false},
+      () => {
+        if (resultG.length !== 0){
           var courseids = function() {
             let courseidsString = '';
-            for (let i in user.enrolledcourses){
-              courseidsString += '&options[ids][' + [i] + ']=' + user.enrolledcourses[i].id ;
+            for (let i in resultG){
+              courseidsString += '&options[ids][' + [i] + ']=' + resultG[i].courseid ;
             }
             return courseidsString
           }
@@ -915,8 +880,9 @@ export class ReportComponent implements OnInit {
             wstoken: this.form_moodle.token,
             coursesid: courseids()
           }
+
           this.moodleApiService.core_course_get_courses(this.form_moodle.url, params).subscribe(
-            data => { resultC = data;},
+            data => { resultC = data; },
             err => {},
             () => {
               let dialogRef = this.dialog.open(DisplayUsersDialogComponent, {
@@ -946,12 +912,8 @@ export class ReportComponent implements OnInit {
             }
           });
         };
-      },
-      err => {console.log(err); return false},
+      }
     )
-  }
-  log(e){
-    console.log(e)
   }
 }
 export interface Element {

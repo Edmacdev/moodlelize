@@ -15,11 +15,12 @@ export class DisplayUsersDialogComponent  {
     @Inject(MAT_DIALOG_DATA) public data: any) { }
 
 
-  ngOnInit(){}
+  ngOnInit(){console.log(this.data)}
 
-  getCourse(courseid){
-
-    return this.data.courses.find(function(course) {return course.id == courseid})
+  getCourseGrade(courseid){
+    let courseGrade = this.data.grades.find((element) => {return element.courseid == courseid});
+    if(courseGrade) return courseGrade.grade
+    else return 'sem nota'
   }
   onCloseConfirm() {
     this.dialogRef.close('Confirmar');

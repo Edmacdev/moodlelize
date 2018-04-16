@@ -10,7 +10,7 @@
         </mat-form-field>
         <strong>Curso:</strong>
         <mat-form-field class="mat-form">
-          <mat-select [(ngModel)]="form_courseid" name="form_courseid" (change)="report(form_courseid)">
+          <mat-select [(ngModel)]="form_courseid" name="form_courseid" (change)="report()">
             <mat-option  *ngFor="let course of courses let i = index" [value]="i">{{course.fullname}}</mat-option>
           </mat-select>
         </mat-form-field>
@@ -19,22 +19,20 @@
   </div>
 </div>
 
-<div class="container" *ngIf="isReady">
+<div class="container" *ngIf="is_ready">
   <div class="row">
     <flash-messages></flash-messages>
     <div class="col-md-12 title" >
-      <form action="">
         <h2><input  class="editable input-title"value="{{course.fullname}}"></h2>
-      </form>
     </div>
   </div>
   <div class="row">
     <div *ngIf="course"class="countdown-wrapper col-md-6 col-md-offset-3">
       <div class="course-info">
-        <p>Alunos matriculados: {{enrolledStudents.length}}</p>
+        <p>Alunos matriculados: {{enrolled_students.length}}</p>
         <p>Data de início: {{formatDate(course.startdate).getDate()}}-{{formatDate(course.startdate).getMonth()+1}}-{{formatDate(course.startdate).getFullYear()}}</p>
         <p>Data de Término: {{formatDate(course.enddate).getDate()}}-{{formatDate(course.enddate).getMonth()+1}}-{{formatDate(course.enddate).getFullYear()}}</p>
-        <p *ngFor="let teacher of enrolledTeachers">Proferssor: {{teacher.fullname}}</p>
+        <p *ngFor="let teacher of enrolled_teachers">Proferssor: {{teacher.fullname}}</p>
       </div>
       <ul class="countdown">
         <li>
@@ -59,7 +57,7 @@
   </div>
   <div class="icon-print" (click)="print()"><i class="material-icons">print</i></div>
   <div class="row wrapper" >
-    <div class="tabs"*ngIf="!isEnded">
+    <div class="tabs"*ngIf="!is_course_finished">
       <mat-tab-group (selectedTabChange)="tabChange($event)">
         <mat-tab label="Quadro Geral" id="tb-users">
           <div class="container">
@@ -70,7 +68,7 @@
                      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filtro">
                    </mat-form-field>
                  </div>
-                <mat-table #table [dataSource]="dataSource" matSort>
+                <mat-table #table [dataSource]="data_source" matSort>
                   <ng-container matColumnDef="risk">
                     <mat-header-cell *matHeaderCellDef mat-sort-header class="col-risk"> Risco </mat-header-cell>
                     <mat-cell *matCellDef="let element"class="col-risk" > {{element.risk}} </mat-cell>
@@ -83,9 +81,7 @@
                           <input id="firstname{{element.id}}"(click)="setCurrentUserInfo(element.id, 'firstname')"type="text" class="editable user-info" value="{{element.firstname}}">
                           <input id="lastname{{element.id}}"(click)="setCurrentUserInfo(element.id, 'lastname')"type="text" class="editable user-info" value="{{element.lastname}}">
                         </div>
-
                       </div>
-
                     </mat-cell>
                   </ng-container>
                   <ng-container matColumnDef="email" >
@@ -121,8 +117,8 @@
                     </mat-cell>
                   </ng-container>
 
-                  <mat-header-row *matHeaderRowDef="displayColumns"></mat-header-row>
-                  <mat-row *matRowDef="let row; columns: displayColumns"  [style.background-color]="getRowColor(row.risk)"><i class="material-icons">remove_circle</i></mat-row>
+                  <mat-header-row *matHeaderRowDef="display_columns"></mat-header-row>
+                  <mat-row *matRowDef="let row; columns: display_columns"  [style.background-color]="getRowColor(row.risk)"><i class="material-icons">remove_circle</i></mat-row>
             </mat-table>
                 <mat-paginator #paginator
                  [pageSize]="25"
@@ -159,7 +155,11 @@
                 <mat-option *ngFor="let option of options let i = index" [value]="i"><h3>{{option}}</h3></mat-option>
               </mat-select>
             </mat-form-field>
-          igual a:
+            <mat-form-field class="mat-form">
+              <mat-select [(ngModel)]="form_opt_query" name="form_opt_query" [formControl]="form_ctrl">
+                <mat-option *ngFor="let option of options_query let i = index" [value]="i"><h3>{{option}}</h3></mat-option>
+              </mat-select>
+            </mat-form-field>
             <mat-form-field class="mat-form" >
               <input formControlName="qry" [(ngModel)]="form_query" matInput type="text" class="addText" placeholder="" value="">
             </mat-form-field>
@@ -167,7 +167,7 @@
           </form>
           <div class="usersList">
             <mat-list role="list">
-              <mat-list-item *ngFor="let moodleUser of usersList" role="listitem">
+              <mat-list-item *ngFor="let moodleUser of users_list" role="listitem">
                 <mat-checkbox (change)="checkUser($event, moodleUser)"></mat-checkbox>
                 <img [src]=moodleUser.profileimageurlsmall alt="">
                 <h3>{{moodleUser.fullname}} </h3> <p>{{moodleUser.email}}</p>
@@ -179,7 +179,7 @@
         </mat-tab>
       </mat-tab-group>
     </div>
-    <div class="tabs" *ngIf="isEnded">
+    <div class="tabs" *ngIf="is_course_finished">
       <mat-tab-group (selectedTabChange)="tabChange($event)">
         <mat-tab label="Quadro Geral" id="tb-users">
           <div class="container">
@@ -191,7 +191,7 @@
                      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filtro">
                    </mat-form-field>
                  </div>
-                <mat-table #table [dataSource]="dataSource" matSort>
+                <mat-table #table [dataSource]="data_source" matSort>
                   <ng-container matColumnDef="name" >
                     <mat-header-cell *matHeaderCellDef mat-sort-header class="col-name">  Nome </mat-header-cell>
                     <mat-cell *matCellDef="let element" class="col-name" >
@@ -233,8 +233,8 @@
                       <i class="material-icons icon icon-remove-circle" (click)="unenrolUser(element)">remove_circle</i>
                     </mat-cell>
                   </ng-container>
-                  <mat-header-row *matHeaderRowDef="displayColumnsResult"></mat-header-row>
-                  <mat-row *matRowDef="let row; columns: displayColumnsResult"  [style.background-color]="getRowColor(row.result)"></mat-row>
+                  <mat-header-row *matHeaderRowDef="display_columns_result"></mat-header-row>
+                  <mat-row *matRowDef="let row; columns: display_columns_result"  [style.background-color]="getRowColor(row.result)"></mat-row>
                 </mat-table>
                 <mat-paginator #paginator
                  [pageSize]="25"
@@ -263,28 +263,33 @@
                 <mat-option *ngFor="let option of options let i = index" [value]="i"><h3>{{option}}</h3></mat-option>
               </mat-select>
             </mat-form-field>
-          igual a:
+            <mat-form-field class="mat-form">
+              <mat-select [(ngModel)]="form_opt_query" name="form_opt_query" [formControl]="form_ctrl">
+                <mat-option *ngFor="let option of options_query let i = index" [value]="i"><h3>{{option}}</h3></mat-option>
+              </mat-select>
+            </mat-form-field>
             <mat-form-field class="mat-form" >
               <input formControlName="qry" [(ngModel)]="form_query" matInput type="text" class="addText" placeholder="" value="">
             </mat-form-field>
-            <div class="btn btn-primary" (click)="getUsers(form_query,form_opt)">Buscar</div>
+            <div class="btn btn-primary" (click)="getUsers(form_query,form_opt, form_opt_query)">Buscar</div>
           </form>
           <div class="usersList">
-            <mat-list role="list">
-              <mat-list-item *ngFor="let moodleUser of usersList" role="listitem">
-                <mat-checkbox (change)="checkUser($event, moodleUser)"></mat-checkbox>
-                <img [src]=moodleUser.profileimageurlsmall alt="">
-                <h3>{{moodleUser.fullname}} </h3> <p>{{moodleUser.email}}</p>
-                <mat-divider></mat-divider>
-              </mat-list-item>
-            </mat-list>
-            <button class="btn btn-primary" (click)="enrolUsers()"[disabled]="selectedUsersForEnrol.length == 0">Matricular</button>
+            <mat-selection-list #selectedUser >
+              <mat-list-option *ngFor="let element of users_list"(selectionChange)='checkUser($event, element)'>
+                <div class="user-element">
+                  <h4>{{element.fullname}}</h4>
+                  <p>{{element.email}}</p>
+                </div>
+              </mat-list-option>
+            </mat-selection-list>
+            <button class="btn btn-primary" (click)="enrolUsers()"[disabled]="selected_users_for_enrollment.length == 0">Matricular</button>
+
           </div>
         </mat-tab>
       </mat-tab-group>
     </div>
   </div>
 </div>
-<div class="container" *ngIf="isLoading">
+<div class="container" *ngIf="is_loading">
   <div class="row" class="col-md-6 col-md-offset-3" style="margin-top:50px; text-align:center"><h1>CARREGANDO...</h1></div>
 </div>

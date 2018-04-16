@@ -111,6 +111,7 @@ ul.countdown li p {
 }
 .input-title{
   text-align: center;
+  width: 100%;
 }
 .user-info{
   background-color: rgba(0,0,0,0)
@@ -172,4 +173,15 @@ ul.countdown li p {
 }
 .icon{
   cursor: pointer;
+}
+.user-element{
+  display: flex;
+}
+.user-element h4, .user-element p{
+  // float: left;
+  flex: 2;
+  margin: 10px 25px 10px 0px;
+}
+.user-element h4{
+
 }
